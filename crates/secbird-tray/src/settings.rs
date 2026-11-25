@@ -55,13 +55,13 @@ pub struct TraySettings {
     /// or left as they are when unset.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub away_lights: Option<String>,
-    /// Editor language: "en", "zh-CN", or automatic browser-language detection.
+    /// Editor language: "en", "zh-CN", "fr", or automatic browser-language detection.
     /// Kept here because the local editor uses a different origin after each restart.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub editor_language: Option<String>,
 }
 
-pub const EDITOR_LANGUAGES: [&str; 3] = ["auto", "en", "zh-CN"];
+pub const EDITOR_LANGUAGES: [&str; 4] = ["auto", "en", "zh-CN", "fr"];
 
 /// Choices for [`TraySettings::away_lights`], with the percent of the saved brightness.
 pub const AWAY_LIGHTS: [(&str, u8); 2] = [("dim", 25), ("off", 0)];
@@ -167,7 +167,7 @@ mod tests {
     fn editor_language_survives_serialization_and_accepts_old_settings() {
         let old: TraySettings = serde_json::from_str(r#"{"updates_off":true}"#).unwrap();
         assert_eq!(old.editor_language(), "auto");
-        for language in ["auto", "en", "zh-CN"] {
+        for language in ["auto", "en", "zh-CN", "fr"] {
             let settings = TraySettings { editor_language: Some(language.into()), ..Default::default() };
             let saved = serde_json::to_string(&settings).unwrap();
             let restored: TraySettings = serde_json::from_str(&saved).unwrap();

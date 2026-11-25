@@ -9,7 +9,9 @@ test('automatic language follows the first browser preference, with English fall
   assert.equal(i18n.resolveLanguage('auto', ['zh-CN', 'en']), 'zh-CN');
   assert.equal(i18n.resolveLanguage('auto', ['zh-TW']), 'zh-CN');
   assert.equal(i18n.resolveLanguage('auto', ['en', 'zh-CN']), 'en');
-  assert.equal(i18n.resolveLanguage('auto', ['fr']), 'en');
+  assert.equal(i18n.resolveLanguage('auto', ['fr-CA', 'en']), 'fr');
+  assert.equal(i18n.resolveLanguage('auto', ['de']), 'en');
+  assert.equal(i18n.resolveLanguage('fr', ['en']), 'fr');
   assert.equal(i18n.resolveLanguage('auto', []), 'en');
   assert.equal(i18n.resolveLanguage('en', ['zh-CN']), 'en');
   assert.equal(i18n.resolveLanguage('zh-CN', ['en']), 'zh-CN');
@@ -71,4 +73,20 @@ test('localization does not change CSS class tokens or keyboard event identifier
   assert.doesNotMatch(html, /(?:\.key|\.code)\s*[!=]==?\s*uiText\(/);
   assert.match(html, /className: 'tile' \+ \(changed \? ' changed' : ''\)/);
   assert.match(html, /className: 'cell' \+ \(changed \? ' changed' : ''\)/);
+});
+
+test('French covers every editor message and keeps placeholders', () => {
+  const fr = i18n.create({ preference: 'fr' });
+  assert.equal(fr.text('Underglow'), 'Dessous');
+  assert.equal(fr.text`Sniper · ${400} DPI`, 'Sniper · 400 DPI');
+  assert.equal(fr.plural(1, 'button'), '1 bouton');
+  assert.equal(fr.plural(3, 'DPI stage'), '3 paliers DPI');
+  for (const [source, translated] of Object.entries(i18n.frMessages)) {
+    const available = new Set(source.match(/\{\d+\}/g) || []);
+    for (const placeholder of translated.match(/\{\d+\}/g) || []) assert.ok(available.has(placeholder), `${source}: invented ${placeholder}`);
+  }
+  const html = fs.readFileSync(path.join(__dirname, '../src/editor.html'), 'utf8');
+  const keys = [...html.matchAll(/uiText\(\s*'((?:[^'\\]|\\.)*)'\s*\)/g)].map(m => m[1].replace(/\\'/g, "'"));
+  const missing = keys.filter(k => !(k in i18n.frMessages));
+  assert.deepEqual(missing, [], 'untranslated: ' + missing.join(' | '));
 });

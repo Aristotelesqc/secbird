@@ -547,6 +547,104 @@
   #toast.act { pointer-events: auto; display: flex; align-items: center; gap: 12px; padding-right: 8px; }
   #toast button { background: none; border: 1px solid var(--accent); color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; font-weight: 600; }
 
+  /* Mouse editor: profiles on the left, the mouse in the middle, the chosen setting on the right. */
+  .pe { --pe-hs: var(--warn-text); flex: 1; min-height: 0; display: grid; grid-template-columns: 224px minmax(0, 1fr) 360px; }
+  .pe-profiles { background: var(--bar); border-right: 1px solid var(--line); overflow-y: auto; padding: 14px 10px; display: flex; flex-direction: column; gap: 3px; }
+  .pe-cap { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin: 2px 8px 8px; font-weight: 600; }
+  .pe-prof { display: grid; gap: 2px; text-align: left; background: none; border: 1px solid transparent; border-radius: 9px; padding: 8px 10px; cursor: pointer; color: var(--muted); }
+  .pe-prof b { color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .pe-prof b span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pe-prof small { font-size: 12px; }
+  .pe-prof:hover { background: var(--raise); }
+  .pe-prof[aria-current=true] { background: var(--panel); border-color: var(--accent); }
+  .pe-live { flex: none; font-size: 10.5px; font-weight: 650; color: var(--accent-text); border: 1px solid var(--accent); border-radius: 999px; padding: 0 6px; }
+  .pe-pacts { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 4px 0; }
+  .pe-pacts .newform { margin: 0; flex-wrap: wrap; } .pe-pacts .newform input { width: 100%; }
+  .pe-note { color: var(--faint); font-size: 12px; margin: 12px 8px 0; }
+  .pe-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .pe-tabs { display: flex; gap: 2px; padding: 8px 18px 0; border-bottom: 1px solid var(--line); flex: none; overflow-x: auto; }
+  .pe-tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 14px 10px; color: var(--muted); font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .pe-tab:hover { color: var(--text); }
+  .pe-tab[aria-selected=true] { color: var(--text); border-bottom-color: var(--accent); }
+  .pe-bar { display: flex; align-items: center; gap: 10px; padding: 12px 18px; flex: none; flex-wrap: wrap; }
+  .pe-bar .hint { color: var(--faint); font-size: 12.5px; margin: 0; }
+  .pe-bar .grow { flex: 1; }
+  .pe-bar .seg button[data-l=hypershift][aria-pressed=true] { color: var(--pe-hs); }
+  .pe-stage { flex: 1; min-height: 0; overflow: auto; padding: 0 18px 18px; }
+  svg.pe-mouse { width: 100%; height: 100%; min-height: 420px; max-height: 640px; display: block; }
+  .pe-body { fill: var(--body-fill); stroke: var(--body-stroke); stroke-width: 3; }
+  .pe-seam { fill: none; stroke: var(--body-stroke); stroke-width: 3; }
+  .pe-hot { fill: var(--button-fill); stroke: var(--line-strong); stroke-width: 2; cursor: pointer; transition: fill .12s; }
+  .pe-hot:hover, .pe-hot.on { fill: var(--lit); stroke: var(--lit-edge); }
+  .pe-hot.chg { stroke: var(--value); }
+  .pe-lead { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
+  .pe-lead.on { stroke: var(--lit-edge); stroke-width: 1.8; }
+  .pe-pin { fill: var(--line-strong); }
+  .pe-pin.chg { fill: var(--value); }
+  .pe-pin.on { fill: var(--lit-edge); }
+  .pe-call { cursor: pointer; }
+  .pe-call rect { fill: var(--panel); stroke: var(--line); }
+  .pe-call:hover rect { stroke: var(--line-strong); }
+  .pe-call.on rect { stroke: var(--lit-edge); fill: var(--raise); stroke-width: 1.5; }
+  .pe-call:focus-visible { outline: none; } .pe-call:focus-visible rect { stroke: var(--accent); stroke-width: 2; }
+  .pe-call .n { fill: var(--muted); font-size: 11.5px; }
+  .pe-call .a { fill: var(--text); font-size: 13.5px; font-weight: 600; }
+  .pe-call .a.chg { fill: var(--value); }
+  .pe-under { fill: var(--faint); font-size: 11px; text-anchor: middle; }
+  .pe.hs .pe-hot:hover, .pe.hs .pe-hot.on { stroke: var(--pe-hs); }
+  .pe.hs .pe-call.on rect, .pe.hs .pe-lead.on { stroke: var(--pe-hs); }
+  .pe.hs .pe-pin.on { fill: var(--pe-hs); }
+  .pe.hs .pe-body { stroke-dasharray: 8 5; }
+  .pe-list { width: 100%; border-collapse: collapse; }
+  .pe-list th { text-align: left; color: var(--faint); font-weight: 600; font-size: 12px; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+  .pe-list td { padding: 9px 10px; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .pe-list tr:hover td { background: var(--panel); }
+  .pe-list tr[aria-selected=true] td { background: var(--raise); }
+  .pe-list .chg { color: var(--value); font-weight: 600; }
+  .pe-list td:first-child { color: var(--muted); }
+  .pe-more { margin-top: 10px; }
+  .pe-insp { background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding: 16px 18px 24px; min-width: 0; }
+  .pe-insp h3.pe-title { margin: 0 0 2px; font-size: 17px; font-weight: 650; }
+  .pe-where { color: var(--muted); font-size: 12.5px; margin: 0 0 12px; }
+  .pe-where .hsl { color: var(--pe-hs); font-weight: 600; }
+  .pe-now { background: var(--raise); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; display: grid; gap: 2px; }
+  .pe-now small { color: var(--faint); font-size: 11.5px; }
+  .pe-now b { font-size: 15px; font-weight: 650; }
+  .pe-cats { display: flex; flex-direction: column; gap: 2px; }
+  .pe-cat { text-align: left; background: none; border: 1px solid transparent; border-radius: 8px; padding: 7px 10px; display: flex; justify-content: space-between; gap: 8px; cursor: pointer; }
+  .pe-cat:hover { background: var(--raise); }
+  .pe-cat[aria-expanded=true] { background: var(--raise); border-color: var(--line-strong); }
+  .pe-cat span { color: var(--faint); }
+  .pe-cat.cur b { color: var(--accent-text); }
+  .pe-cat b { font-weight: 500; }
+  .pe-opts { padding: 6px 2px 12px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .pe-opt { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+  .pe-opt:hover { border-color: var(--line-strong); }
+  .pe-opt[aria-pressed=true] { border-color: var(--lit-edge); background: var(--lit); }
+  .pe-opts .combo { width: 100%; text-align: center; border-style: dashed; }
+  .pe-opts .combo:focus { border-style: solid; border-color: var(--accent); outline: none; }
+  .pe-opts .row { width: 100%; }
+  .pe-opts .num { width: 96px; }
+  .pe-help { color: var(--faint); font-size: 12.5px; margin: 12px 0 0; }
+  .pe-restore { margin-top: 14px; }
+  .pe-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; }
+  .pe-card > h3 { margin: 0 0 10px; font-size: 14px; font-weight: 650; }
+  .pe-card .edbox { gap: 14px; }
+  .pe-stages { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pe-st { width: 138px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px 10px; background: var(--bg); cursor: pointer; display: grid; gap: 4px; }
+  .pe-st:hover { border-color: var(--line-strong); }
+  .pe-st.on { border-color: var(--lit-edge); background: var(--lit); }
+  .pe-st small { color: var(--muted); display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+  .pe-st input { width: 100%; font-weight: 650; font-size: 15px; padding: 4px 8px; }
+  .pe-st .x { background: none; border: 0; color: var(--faint); cursor: pointer; padding: 0 2px; }
+  .pe-st .x:hover { color: var(--text); }
+  .pe-st.add { place-items: center; color: var(--muted); border-style: dashed; min-height: 68px; }
+  .pe-zone { cursor: pointer; transition: opacity .15s; }
+  .pe-zone.on { stroke: var(--text); stroke-width: 3; }
+  .pe-zones { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 4px 0 14px; }
+  @media (max-width: 1180px) { .pe { grid-template-columns: 196px minmax(0, 1fr) 320px; } }
+  @media (max-width: 980px) { .pe { grid-template-columns: 180px minmax(0, 1fr); } .pe-insp { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); } }
+
   /* Medium windows: a narrower panel. */
   @media (max-width: 1180px) { .work { grid-template-columns: 172px minmax(0, 1fr) 330px; } .work.wide { grid-template-columns: 172px minmax(0, 1fr); } }
   /* Small windows and phones: sections become tabs, the panel slides up from the bottom. */
@@ -708,6 +806,7 @@
     </div>
     <div class="scrollrow" id="profilesRow"><nav class="profiles" id="profiles" aria-label="Profiles"></nav></div>
     <div class="devright">
+      <button class="ghost" id="classicBtn" hidden title="Switch between the mouse editor and the classic tiles">Classic view</button>
       <button class="ghost" id="compareBtn" aria-pressed="false" title="Every profile side by side">Compare</button>
     </div>
   </div>
@@ -717,6 +816,7 @@
     <section class="tiles" id="tiles" aria-live="polite"></section>
     <aside class="panel" id="panel" aria-label="Edit"></aside>
   </div>
+  <div class="pe" id="pe" hidden></div>
 
   <section class="settings" id="settings" hidden aria-label="Settings"></section>
   <section class="spage" id="studioPage" hidden aria-label="RGB Studio"></section>
@@ -1015,8 +1115,10 @@ function render() {
   $('studioPage').hidden = !showStudio || showSettings;
   $('gear').ariaPressed = showSettings;
   const onDevice = has && !showAll && !showSettings && !showStudio;
+  if (dev && view !== 'compare') view = usePE() ? 'mouse' : 'work';
   $('devbar').hidden = !onDevice;
-  $('work').hidden = !onDevice || view === 'compare';
+  $('work').hidden = !onDevice || view !== 'work';
+  $('pe').hidden = !onDevice || view !== 'mouse';
   $('compare').hidden = !onDevice || view !== 'compare';
   $('synBanner').hidden = !synapse.length;
   $('sync').hidden = !devices.some(d => d.lighting_control && d.leds.length);
@@ -1056,6 +1158,10 @@ function renderDevbar() {
     !dev.known && uiText('not in the device database')].filter(Boolean).join(' · ');
   paintPreview();
   renderProfiles();
+  // The mouse editor lists the profiles itself; the classic view keeps them in this bar.
+  $('profilesRow').hidden = view === 'mouse';
+  $('classicBtn').hidden = dev.kind !== 'mouse';
+  $('classicBtn').textContent = usePE() ? uiText('Classic view') : uiText('Mouse editor');
   $('compareBtn').ariaPressed = view === 'compare';
   $('compareBtn').hidden = dev.profiles.length < 2 && view !== 'compare';
 }
@@ -1219,6 +1325,7 @@ const autoOpen = s => (s && !s.loading && s.rows.length === 1 ? s.rows[0].key : 
 
 // The workbench: rail, tiles of the section, edit panel. `keepPanel` leaves an open editor alone.
 function renderWork(keepPanel) {
+  if (view === 'mouse') return renderPE(keepPanel);
   const secs = sections();
   let entering = false;
   if (!secs.some(s => s.id === section)) {
@@ -1488,6 +1595,7 @@ async function toggleEditor(row, name) {
   if (name !== dev.active) {
     const ok = await activate(name, true); if (!ok) return;
   }
+  if (usePE()) { view = 'mouse'; peOpen(row); return; }
   view = 'work';
   section = sectionOf(row) || section;
   sel = null;
@@ -1506,6 +1614,7 @@ function renderSheet() {
 // One value changed: update its tile, the rail line, and its Compare cell.
 function refreshCell(row) {
   if (view === 'compare') return renderCompare();
+  if (view === 'mouse') return renderPE(true);
   const t = document.querySelector(`.tile[data-row="${CSS.escape(row)}"]`);
   if (t) {
     const [html, changed] = cellView(row, dev.active);
@@ -1555,6 +1664,7 @@ function renderCompare() {
   requestAnimationFrame(placeBand);
 }
 $('compareBtn').onclick = () => { view = view === 'compare' ? 'work' : 'compare'; sel = null; render(); };
+$('classicBtn').onclick = () => { remember('classic', usePE() ? '1' : ''); if (view === 'compare') view = 'work'; sel = null; render(); };
 
 // Comparable value of a cell, to mark where another profile differs from the active one.
 function cellValue(key, name) {
@@ -3655,6 +3765,467 @@ function paintAt(target) {
 }
 window.addEventListener('pointerup', () => painting = false);
 
+// ---------- Mouse editor ----------
+// One page per mouse: the profiles on the left (a click makes one live and opens it), tabs for
+// buttons, performance, lighting and macros in the middle, and the thing picked on the right.
+// Writes go through the same calls as the classic view (assign, /api/stages, zoneEditor…), so
+// every change is saved to the live profile right away, with Undo where the classic view has it.
+const usePE = () => !!dev && dev.kind === 'mouse' && remembered('classic') !== '1';
+let peTab = 'buttons', peSel = null, peList = false, peZone = null, peCat = null, peAside = null, peAdding = false, peInspSig = '';
+
+// Where each button sits on the drawing (a plain top view, the left flank showing), its
+// leader line's side, and a name by where it is. Buttons missing here go in a list below.
+const PE_SPOTS = {
+  left: { side: 'L', pin: [205, 120], shape: 'M246 46C200 50 170 88 164 160c26 9 54 13 82 14z', name: uiText('Left button') },
+  'tilt-left': { side: 'L', pin: [230, 112], shape: 'M236 102l-8 10 8 10z', name: uiText('Wheel, tilt left') },
+  sniper: { side: 'L', pin: [148, 206], shape: 'M156 188c-10 2-14 10-14 18s4 16 14 18z', name: uiText('Side trigger') },
+  hypershift: { side: 'L', pin: [148, 206], shape: 'M156 188c-10 2-14 10-14 18s4 16 14 18z', name: uiText('Side trigger (HyperShift)') },
+  'side-extra': { side: 'L', pin: [148, 232], rect: [143, 226, 12, 14, 5], name: uiText('Side, extra button') },
+  'side-forward': { side: 'L', pin: [150, 252], rect: [144, 236, 14, 34, 6], name: uiText('Side, front (Mouse 5)') },
+  'side-back': { side: 'L', pin: [152, 293], rect: [146, 276, 14, 36, 6], name: uiText('Side, rear (Mouse 4)') },
+  'dpi-down': { side: 'L', pin: [240, 207], rect: [240, 200, 20, 14, 5], name: uiText('DPI down button') },
+  right: { side: 'R', pin: [295, 120], shape: 'M254 46c46 4 76 42 82 114-26 9-54 13-82 14z', name: uiText('Right button') },
+  'scroll-up': { side: 'R', pin: [260, 84], rect: [240, 72, 20, 24, 8], name: uiText('Wheel, roll up') },
+  wheel: { side: 'R', pin: [260, 112], rect: [240, 100, 20, 24, 4], name: uiText('Wheel, press') },
+  'scroll-down': { side: 'R', pin: [260, 140], rect: [240, 128, 20, 24, 8], name: uiText('Wheel, roll down') },
+  'tilt-right': { side: 'R', pin: [270, 112], shape: 'M264 102l8 10-8 10z', name: uiText('Wheel, tilt right') },
+  'wheel-mode': { side: 'R', pin: [260, 179], rect: [240, 172, 20, 14, 5], name: uiText('Below the wheel (wheel mode)') },
+  'dpi-up': { side: 'R', pin: [260, 179], rect: [240, 172, 20, 14, 5], name: uiText('DPI up button') },
+  dpi: { side: 'R', pin: [260, 207], rect: [240, 200, 20, 14, 5], name: uiText('DPI button') },
+  profile: { side: 'R', pin: [268, 398], rect: [232, 390, 36, 16, 6], under: true, name: uiText('Underside (profile button)') },
+};
+const PE_BODY = 'M250 40C186 40 158 92 155 170c-3 86 4 160 26 226 18 46 120 46 138 0 22-66 30-140 27-226C343 92 314 40 250 40z';
+const peName = b => (buttonPlace(b.name) || [PE_SPOTS[b.name] && PE_SPOTS[b.name].name])[0] || uiText(b.label);
+// Shortcuts Windows users reach for, so they're a click away rather than typed.
+const PE_WIN = [['key:ctrl+c', uiText('Copy')], ['key:ctrl+v', uiText('Paste')], ['key:ctrl+x', uiText('Cut')], ['key:ctrl+z', uiText('Undo')],
+  ['key:ctrl+y', uiText('Redo')], ['key:alt+left', uiText('Page back')], ['key:alt+right', uiText('Page forward')], ['key:ctrl+tab', uiText('Next tab')],
+  ['key:ctrl+shift+tab', uiText('Previous tab')], ['key:ctrl+w', uiText('Close tab')], ['key:ctrl+shift+t', uiText('Reopen closed tab')],
+  ['key:alt+tab', uiText('Switch window')], ['key:win+tab', uiText('Task view')], ['key:win+d', uiText('Show desktop')], ['key:win+e', uiText('File Explorer')],
+  ['key:win+v', uiText('Clipboard history')], ['key:shift+win+s', uiText('Screenshot')], ['key:win+l', uiText('Lock')], ['key:ctrl+shift+esc', uiText('Task Manager')],
+  ['key:alt+f4', uiText('Close window')]];
+const PE_WIN_LABEL = Object.fromEntries(PE_WIN);
+const peLabel = a => a == null ? uiText('Not set') : (actionLabel(a) + (PE_WIN_LABEL[a] ? ' · ' + PE_WIN_LABEL[a] : ''));
+const peCats = () => [
+  ['mouse', uiText('Mouse'), BTN_CHOICES[0][1]],
+  ['key', uiText('Key or shortcut')],
+  ['win', uiText('Windows shortcuts'), PE_WIN],
+  ['sens', uiText('Sensitivity'), [['dpi-up', uiText('DPI up')], ['dpi-down', uiText('DPI down')], ['dpi-cycle-up', uiText('DPI cycle')], ['dpi-cycle-down', uiText('DPI cycle down')], ['dpi-clutch', uiText('Sniper (DPI while held)…')]]],
+  ['media', uiText('Media'), BTN_CHOICES[4][1]],
+  dev.macros && ['macro', uiText('Macro')],
+  ['turbo', uiText('Turbo')],
+  ['hs', 'HyperShift', [['hypershift', uiText('HyperShift (hold)')]]],
+  ['wheel', uiText('Scroll wheel'), [['scroll-mode:1', uiText('Switch wheel free-spin')]]],
+  ['onboard', uiText('On-board profiles'), [['profile-cycle-up', uiText('Next on-board profile')]]],
+  ['off', uiText('Disabled'), [['disabled', uiText('Disabled')]]],
+].filter(Boolean);
+function peCatOf(a) {
+  if (!a) return null;
+  const [choice] = splitAction(a);
+  if (choice === 'key') return PE_WIN_LABEL[a] ? 'win' : 'key';
+  if (/^turbo/.test(choice)) return 'turbo';
+  if (/^dpi/.test(choice)) return 'sens';
+  if (/^media:/.test(a)) return 'media';
+  if (choice === 'macro') return 'macro';
+  if (a === 'hypershift') return 'hs';
+  if (/^scroll-mode/.test(a)) return 'wheel';
+  if (/^profile/.test(a)) return 'onboard';
+  if (a === 'disabled') return 'off';
+  return BTN_CHOICES[0][1].some(([v]) => v === a) ? 'mouse' : null;
+}
+const peButtons = () => (btnData[dev.id] || []).filter(b => b[btnLayer] != null);
+const peHolder = () => (btnData[dev.id] || []).find(b => b.normal === 'hypershift');
+const svgEl = (tag, attrs = {}, text) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+
+// Open a setting from elsewhere (the preview at the top, a Compare cell).
+function peOpen(row) {
+  peAside = null;
+  if (row.startsWith('zone:')) { peTab = 'light'; peZone = row.slice(5); }
+  else if (row.startsWith('btn:')) { peTab = 'buttons'; peSel = row.slice(4); }
+  else if (['dpi', 'stages', 'polling', 'scroll', 'sleep'].includes(row)) peTab = 'perf';
+  else if (row === 'macros') peTab = 'macros';
+  else if (row === 'apps') peAside = 'apps';
+  else if (row === 'onboard') { peTab = 'buttons'; peAside = 'onboard'; }
+  render();
+}
+
+function renderPE(keepInsp) {
+  const root = $('pe');
+  if (!root.firstChild) root.append(el('aside', { className: 'pe-profiles', id: 'peProfiles', ariaLabel: uiText('Profiles') }),
+    el('div', { className: 'pe-main' }, el('nav', { className: 'pe-tabs', id: 'peTabs', role: 'tablist' }),
+      el('div', { className: 'pe-bar', id: 'peBar' }), el('div', { className: 'pe-stage', id: 'peStage' })),
+    el('aside', { className: 'pe-insp', id: 'peInsp', ariaLabel: uiText('Edit') }));
+  const tabs = [['buttons', uiText('Buttons')], ['perf', uiText('Performance')], dev.lighting_control != null && dev.leds.length && ['light', uiText('Lighting')],
+    dev.macros && ['macros', uiText('Macros')]].filter(Boolean);
+  if (!tabs.some(t => t[0] === peTab)) peTab = 'buttons';
+  if (peTab === 'buttons') loadButtons(dev);
+  if (dev.macros && macroData[dev.id] === undefined && (peTab === 'buttons' || peTab === 'macros')) loadMacros(dev);
+  root.classList.toggle('hs', peTab === 'buttons' && btnLayer === 'hypershift');
+  peProfiles();
+  $('peTabs').innerHTML = '';
+  tabs.forEach(([id, text]) => $('peTabs').append(el('button', { className: 'pe-tab', role: 'tab', textContent: text, ariaSelected: id === peTab,
+    onclick: () => { if (peTab !== id) { peTab = id; peAside = null; peCat = null; render(); } } })));
+  peBar();
+  const stage = $('peStage'), scroll = stage.scrollTop;
+  stage.innerHTML = '';
+  ({ buttons: peButtonsStage, perf: pePerfStage, light: peLightStage, macros: peMacrosStage })[peTab](stage);
+  stage.scrollTop = scroll;
+  // Keep an open control (a slider being dragged, a field being typed in) unless what it
+  // edits changed: another button, layer, profile or tab.
+  const sig = JSON.stringify([peTab, peAside, peSel, btnLayer, dev.active, peZone, peCat, !!btnData[dev.id], dev.lighting_control,
+    peTab === 'buttons' && peAside == null && peSelected() ? peSelected()[btnLayer] : null, peTab === 'macros' || peAside ? 0 : macroData[dev.id] === null]);
+  if (keepInsp && sig === peInspSig && $('peInsp').childElementCount) return;
+  peInspSig = sig;
+  const typing = document.activeElement && document.activeElement.id === 'peCapture';
+  const insp = $('peInsp'), top = insp.scrollTop;
+  insp.innerHTML = '';
+  peInspector(insp);
+  insp.scrollTop = top;
+  if (typing && $('peCapture')) $('peCapture').focus({ preventScroll: true });
+}
+
+function peProfiles() {
+  const box = $('peProfiles');
+  box.innerHTML = '';
+  box.append(el('h2', { className: 'pe-cap', textContent: uiText('Profiles') }));
+  dev.profiles.forEach(n => {
+    const p = prof(n), keys = Object.keys(p.buttons || {});
+    const st = n === dev.active && dev.stages ? dev.stages.list.length : p.dpi_stages ? p.dpi_stages.stages.length : 0;
+    const normal = keys.filter(k => !k.includes('/')).length, hyper = keys.length - normal, apps = (p.apps || []).length;
+    const bits = [st && plural(st, 'DPI stage'), normal && plural(normal, 'button'), hyper && hyper + ' HyperShift', apps && (apps === 1 ? uiText('1 game') : apps + uiText(' games'))].filter(Boolean);
+    box.append(el('button', { className: 'pe-prof', ariaCurrent: n === dev.active,
+      title: n === dev.active ? n + uiText(' is live') : uiText('Make ') + n + uiText(' live'),
+      onclick: () => { if (n !== dev.active) activate(n); } },
+      el('b', {}, el('span', { textContent: n }), n === dev.active ? el('i', { className: 'pe-live', textContent: uiText('live') }) : null),
+      el('small', { textContent: bits.join(' · ') || uiText('As the mouse has it') })));
+  });
+  const acts = el('div', { className: 'pe-pacts' });
+  if (peAdding) {
+    const input = el('input', { type: 'text', placeholder: uiText('Name, e.g. Valorant'), maxLength: 32, ariaLabel: uiText('New profile name') });
+    input.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); peAdding = false; peProfiles(); } };
+    acts.append(el('form', { className: 'newform', onsubmit: e => { e.preventDefault(); const v = input.value.trim(); if (v) { peAdding = false; createProfile(v); } } },
+      input, el('button', { className: 'ghost', type: 'submit', textContent: uiText('Create') }),
+      el('button', { className: 'ghost', type: 'button', textContent: uiText('Cancel'), onclick: () => { peAdding = false; peProfiles(); } })));
+    requestAnimationFrame(() => input.focus());
+  } else {
+    acts.append(el('button', { className: 'ghost', innerHTML: icon('plus') + uiText('New'), title: uiText('New profile, a copy of ') + dev.active, onclick: () => { peAdding = true; peProfiles(); } }),
+      el('button', { className: 'ghost', textContent: uiText('Games…'), title: uiText('Games and apps that bring up ') + dev.active, ariaPressed: peAside === 'apps',
+        onclick: () => { peAside = peAside === 'apps' ? null : 'apps'; renderPE(); } }),
+      dev.profiles.length > 1 ? el('button', { className: 'ghost', innerHTML: icon('trash'), title: uiText('Delete ') + dev.active, ariaLabel: uiText('Delete ') + dev.active, onclick: () => deleteProfile(dev.active) }) : '');
+  }
+  box.append(acts, el('p', { className: 'pe-note', textContent: uiText('A click on a profile makes it live on the mouse and opens it here. Every change is saved to it right away.') }));
+}
+
+function peBar() {
+  const bar = $('peBar');
+  bar.innerHTML = '';
+  if (peTab === 'buttons') {
+    const layer = el('span', { className: 'seg', role: 'group', ariaLabel: uiText('Button layer') });
+    [['normal', uiText('Standard')], ['hypershift', 'HyperShift']].forEach(([v, text]) => layer.append(el('button', { textContent: text, ariaPressed: btnLayer === v, dataset: { l: v },
+      onclick: () => { if (btnLayer !== v) { btnLayer = v; peCat = null; renderPE(); } } })));
+    const hsBtn = peHolder();
+    const how = el('span', { className: 'seg', role: 'group', ariaLabel: uiText('Show as') });
+    [[false, uiText('Drawing')], [true, uiText('List')]].forEach(([v, text]) => how.append(el('button', { textContent: text, ariaPressed: peList === v, onclick: () => { peList = v; renderPE(true); } })));
+    bar.append(layer, el('p', { className: 'hint', textContent: btnLayer === 'normal' ? uiText('Pick a button to choose what it does.')
+        : hsBtn ? uiText`What each button does while ${peName(hsBtn)} is held.` : uiText('No button holds HyperShift in this profile: set one to HyperShift in Standard first.') }),
+      el('span', { className: 'grow' }), how,
+      el('button', { className: 'ghost', textContent: uiText('Saved on the mouse…'), ariaPressed: peAside === 'onboard', title: uiText('Save the remaps into the mouse so they work without Secretarybird'),
+        onclick: () => { peAside = peAside === 'onboard' ? null : 'onboard'; renderPE(); } }),
+      Object.keys(dev.profile.buttons || {}).length ? el('button', { className: 'ghost', textContent: uiText('Restore all'), title: uiText`Every changed ${uiText('button')} back to what the ${holder()} stores`, onclick: restoreAllButtons }) : '');
+  } else if (peTab === 'perf') bar.append(el('p', { className: 'hint', textContent: uiText('DPI stages, polling rate and scroll wheel of ') + dev.active + '.' }));
+  else if (peTab === 'light') bar.append(el('p', { className: 'hint', textContent: dev.lighting_control ? uiText('Pick a zone on the mouse to set its color.') : uiText('Secretarybird leaves this mouse’s lighting alone.') }));
+  else bar.append(el('p', { className: 'hint', textContent: uiText('Macros live on the mouse and can be played by any button, in every profile.') }));
+}
+
+function peSelected() {
+  const list = peButtons();
+  if (!list.length) return null;
+  return list.find(b => b.name === peSel) || list[0];
+}
+function pePick(name) { peSel = name; peAside = null; peCat = null; renderPE(); }
+
+function peButtonsStage(stage) {
+  const list = btnData[dev.id];
+  if (!list) return stage.append(el('p', { className: 'hint', textContent: uiText('Reading the buttons from the mouse…') }));
+  const shown = peButtons();
+  if (!shown.length) return stage.append(el('p', { className: 'hint', textContent: btnFailed[dev.id] ? uiText('Couldn’t read the buttons. Unplug and replug the mouse, then open this again.')
+    : list.length ? uiText('This mouse has no HyperShift layer to change.') : uiText('Button remapping isn’t supported on this mouse. It doesn’t answer Razer’s button commands.') }));
+  const cur = peSelected();
+  if (peList) {
+    const t = el('table', { className: 'pe-list' });
+    t.append(el('tr', {}, el('th', { textContent: uiText('Button') }), el('th', { textContent: uiText('Standard') }), el('th', { textContent: 'HyperShift' })));
+    [...list].sort((a, b) => Object.keys(PE_SPOTS).indexOf(a.name) - Object.keys(PE_SPOTS).indexOf(b.name)).forEach(b => {
+      const cell = layer => el('span', { className: b.remapped[layer] ? 'chg' : '', textContent: b[layer] == null ? '—' : peLabel(b[layer]) });
+      const tr = el('tr', { ariaSelected: cur && cur.name === b.name, tabIndex: 0, onclick: () => pePick(b.name), onkeydown: e => { if (e.key === 'Enter') pePick(b.name); } },
+        el('td', { textContent: peName(b) }), el('td', {}, cell('normal')), el('td', {}, cell('hypershift')));
+      t.append(tr);
+    });
+    return stage.append(t, el('p', { className: 'pe-help', textContent: uiText('Both layers side by side. Changed actions are highlighted.') }));
+  }
+  const svg = svgEl('svg', { class: 'pe-mouse', viewBox: '0 0 900 470', role: 'group', 'aria-label': uiText('Mouse: pick a button to change what it does') });
+  const g = svgEl('g', { transform: 'translate(200,0)' });
+  g.append(svgEl('path', { d: PE_BODY, class: 'pe-body' }), svgEl('path', { d: 'M250 44v116M158 162c56 18 128 18 184 0', class: 'pe-seam' }));
+  const placed = shown.filter(b => PE_SPOTS[b.name]), rest = shown.filter(b => !PE_SPOTS[b.name]);
+  const order = Object.keys(PE_SPOTS);
+  for (const side of ['L', 'R']) {
+    const col = placed.filter(b => PE_SPOTS[b.name].side === side).sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+    const gap = Math.min(58, 440 / Math.max(col.length, 1));
+    col.forEach((b, i) => {
+      const spot = PE_SPOTS[b.name], on = cur && cur.name === b.name, chg = b.remapped[btnLayer];
+      const x = side === 'L' ? 0 : 690, y = 14 + i * gap, [px, py] = [spot.pin[0] + 200, spot.pin[1]];
+      const shape = spot.rect ? svgEl('rect', { x: spot.rect[0], y: spot.rect[1], width: spot.rect[2], height: spot.rect[3], rx: spot.rect[4] }) : svgEl('path', { d: spot.shape });
+      shape.setAttribute('class', 'pe-hot' + (on ? ' on' : '') + (chg ? ' chg' : ''));
+      if (spot.under) shape.setAttribute('stroke-dasharray', '3 3');
+      shape.append(svgEl('title', {}, peName(b)));
+      shape.onclick = () => pePick(b.name);
+      g.append(shape);
+      const cx = side === 'L' ? 220 : 690, cy = y + 24;
+      svg.append(svgEl('path', { d: `M${cx} ${cy}C${(cx + px) / 2} ${cy} ${(cx + px) / 2} ${py} ${px} ${py}`, class: 'pe-lead' + (on ? ' on' : '') }));
+      svg.append(svgEl('circle', { cx: px, cy: py, r: 3.5, class: 'pe-pin' + (chg ? ' chg' : '') + (on ? ' on' : '') }));
+      const what = peLabel(b[btnLayer]), short = what.length > 30 ? what.slice(0, 29) + '…' : what;
+      const c = svgEl('g', { class: 'pe-call' + (on ? ' on' : ''), transform: `translate(${x},${y})`, tabindex: 0, role: 'button',
+        'aria-pressed': String(!!on), 'aria-label': peName(b) + ': ' + what + (chg ? uiText(' (changed)') : '') });
+      c.append(svgEl('rect', { width: 210, height: 48, rx: 9 }), svgEl('title', {}, peName(b) + ': ' + what),
+        svgEl('text', { x: 12, y: 19, class: 'n' }, peName(b)), svgEl('text', { x: 12, y: 37, class: 'a' + (chg ? ' chg' : '') }, short));
+      c.onclick = () => pePick(b.name);
+      c.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pePick(b.name); } };
+      svg.append(c);
+    });
+  }
+  if (placed.some(b => PE_SPOTS[b.name].under)) g.append(svgEl('text', { x: 250, y: 428, class: 'pe-under' }, uiText('underside')));
+  svg.append(g);
+  stage.append(svg);
+  if (rest.length) {
+    const grid = el('div', { className: 'tgrid pe-more' });
+    rest.forEach(b => grid.append(el('button', { className: 'tile' + (b.remapped[btnLayer] ? ' changed' : ''), ariaPressed: cur && cur.name === b.name, onclick: () => pePick(b.name) },
+      el('span', { className: 'tl', textContent: peName(b) }), el('span', { className: 'tv', textContent: peLabel(b[btnLayer]) }))));
+    stage.append(el('p', { className: 'subhead', textContent: uiText('Other buttons') }), grid);
+  }
+}
+
+function peInspector(box) {
+  if (peAside === 'apps') return peAsideBox(box, uiText('Games and apps'), appsEditor);
+  if (peAside === 'onboard') return peAsideBox(box, uiText('Saved on the mouse'), onboardEditor);
+  if (peTab === 'buttons') return peButtonInsp(box);
+  if (peTab === 'light') return peLightInsp(box);
+  if (peTab === 'perf') {
+    box.append(el('h2', { className: 'pe-cap', textContent: uiText('Right now') }));
+    if (dev.dpi) box.append(el('div', { className: 'pe-now' }, el('small', { textContent: uiText('DPI the mouse is using') }), el('b', { className: 'num', textContent: dev.dpi.x.toLocaleString(uiI18n.language) + ' DPI' })));
+    box.append(el('p', { className: 'pe-help', textContent: uiText('Click a stage to use it. The DPI button on the mouse goes through the stages in this order, and this follows it.') }));
+    return;
+  }
+  box.append(el('h2', { className: 'pe-cap', textContent: uiText('Macros') }),
+    el('p', { className: 'pe-help', textContent: uiText('Record or type the steps, save the macro to the mouse, then pick it for a button: Buttons, then Macro.') }));
+}
+function peAsideBox(box, title, fill) {
+  box.append(el('div', { className: 'row' }, el('h3', { className: 'pe-title', textContent: title, style: 'flex:1' }),
+    el('button', { className: 'xbtn', innerHTML: icon('x'), title: uiText('Close'), ariaLabel: uiText('Close'), onclick: () => { peAside = null; renderPE(); } })),
+    el('p', { className: 'pe-where', textContent: uiText('Profile ') + dev.active }));
+  const ed = el('div', { className: 'edbox' });
+  box.append(ed);
+  fill(ed);
+}
+
+async function peAssign(name, action) {
+  await assign(name, action);
+  renderPE();
+}
+
+function peButtonInsp(box) {
+  const list = btnData[dev.id];
+  if (!list) return box.append(el('p', { className: 'pe-help', textContent: uiText('Reading the buttons from the mouse…') }));
+  const b = peSelected();
+  if (!b) return;
+  const a = b[btnLayer], name = peName(b), cat = peCatOf(a), hsBtn = peHolder();
+  box.append(el('h2', { className: 'pe-cap', textContent: uiText('Button') }), el('h3', { className: 'pe-title', textContent: name }),
+    el('p', { className: 'pe-where' }, btnLayer === 'hypershift' ? el('span', { className: 'hsl', textContent: uiText('HyperShift layer') }) : uiText('Standard layer'), ' · ' + uiText('profile ') + dev.active));
+  const place = buttonPlace(b.name);
+  if (place) box.append(el('p', { className: 'pe-help', style: 'margin:0 0 12px', textContent: place[1] }));
+  const saved = b.saved && b.saved[btnLayer];
+  box.append(el('div', { className: 'pe-now' }, el('small', { textContent: uiText('What it does now') }), el('b', { textContent: peLabel(a) }),
+    b.remapped[btnLayer] ? el('small', { textContent: uiText`Stored on the ${holder()}: ` + (actionLabel(saved) || uiText('Unknown')) }) : null));
+  if (btnLayer === "hypershift" && hsBtn && hsBtn.name === b.name)
+    box.append(el('p', { className: 'pe-help', style: 'margin:0 0 12px', textContent: uiText('This button holds HyperShift: while it is held, the other buttons do what this layer says.') }));
+  const cats = el('div', { className: 'pe-cats' });
+  const open = peCat ?? cat;
+  peCats().forEach(([id, text, opts]) => {
+    const isOpen = open === id;
+    cats.append(el('button', { className: 'pe-cat' + (cat === id ? ' cur' : ''), ariaExpanded: isOpen,
+      onclick: () => { peCat = isOpen ? '' : id; renderPE(); } }, el('b', { textContent: text }), el('span', { textContent: isOpen ? '▾' : '▸' })));
+    if (!isOpen) return;
+    const o = el('div', { className: 'pe-opts' });
+    if (id === 'key') peKeyCapture(o, b.name, /^key:/.test(a || '') ? a.slice(4) : '', keys => 'key:' + keys);
+    else if (id === 'macro') peMacroOpts(o, b.name, a);
+    else if (id === 'turbo') peTurboOpts(o, b.name, a);
+    else opts.forEach(([v, t]) => {
+      const pressed = v === 'dpi-clutch' ? /^dpi-clutch:/.test(a || '') : a === v;
+      o.append(el('button', { className: 'pe-opt', ariaPressed: pressed, textContent: t,
+        onclick: () => peAssign(b.name, v === 'dpi-clutch' ? 'dpi-clutch:' + (splitAction(a || '')[0] === 'dpi-clutch' ? splitAction(a)[2] : 400) : v) }));
+      if (v === 'dpi-clutch' && pressed) {
+        const d = dev.dpi || { min: 100, max: 30000, step: 50 };
+        const num = el('input', { type: 'number', className: 'num', min: Math.max(100, d.min), max: d.max, step: d.step || 50, value: splitAction(a)[2], ariaLabel: uiText('DPI while held'),
+          onchange: () => { const v2 = Math.round(+num.value); if (v2 >= 100) peAssign(b.name, 'dpi-clutch:' + v2); } });
+        o.append(el('div', { className: 'row' }, num, el('span', { className: 'tl', textContent: uiText('DPI while held') })));
+      }
+    });
+    cats.append(o);
+  });
+  box.append(cats);
+  if (b.remapped[btnLayer]) box.append(el('button', { className: 'ghost pe-restore', textContent: uiText('Restore'), title: uiText`Put back what the ${holder()} stores`, onclick: () => peAssign(b.name, '') }));
+}
+
+// A box that takes a key or shortcut as it is pressed, with modifier and Tab buttons for the
+// shortcuts Windows keeps for itself (Win+D, Alt+Tab), as in the classic view (#25, #51).
+function peKeyCapture(o, button, keys, make) {
+  const input = el('input', { type: 'text', className: 'combo', id: 'peCapture', readOnly: true, value: keys ? combo(keys) : '', placeholder: uiText('Press keys…'), ariaLabel: uiText('Key for ') + button });
+  input.dataset.keys = keys;
+  const send = k => { input.dataset.keys = k; input.value = combo(k); if (k) peAssign(button, make(k)); };
+  let lone = null;
+  input.onkeydown = e => {
+    if (e.key === 'Tab') return;
+    e.preventDefault();
+    if (MOD_CODES[e.code]) { lone = MOD_CODES[e.code]; return; }
+    const k = keyName(e.code); if (!k) return;
+    lone = null;
+    send([e.ctrlKey && 'ctrl', e.shiftKey && 'shift', e.altKey && 'alt', e.metaKey && 'win', k].filter(Boolean).join('+'));
+  };
+  input.onkeyup = e => { if (lone && MOD_CODES[e.code] === lone) { const m = lone; lone = null; send(m); } };
+  const mods = el('div', { className: 'row' });
+  const parts = () => (input.dataset.keys ? input.dataset.keys.split('+') : []);
+  ['ctrl', 'shift', 'alt', 'win'].forEach(m => mods.append(el('button', { className: 'pe-opt', textContent: keyLabel(m), ariaPressed: parts().includes(m),
+    title: uiText('Add or remove ') + keyLabel(m) + uiText('. For shortcuts Windows keeps for itself, like Win+D: press the key, then click this.'),
+    onclick: () => {
+      const p = parts(), on = new Set(p.filter(x => MODIFIER_ORDER.includes(x)));
+      on.has(m) ? on.delete(m) : on.add(m);
+      const key = p.find(x => !MODIFIER_ORDER.includes(x));
+      send([...MODIFIER_ORDER.filter(x => on.has(x)), key].filter(Boolean).join('+'));
+    } })));
+  mods.append(el('button', { className: 'pe-opt', textContent: 'Tab', title: uiText('Use Tab as the key. For Alt+Tab, click this, then Alt.'),
+    onclick: () => send([...parts().filter(x => MODIFIER_ORDER.includes(x)), 'tab'].join('+')) }));
+  o.append(input, mods);
+}
+function peMacroOpts(o, button, a) {
+  const data = macroData[dev.id];
+  if (!data) return o.append(el('p', { className: 'pe-help', textContent: uiText('Reading the macros from the device…') }));
+  if (!data.macros.length) return o.append(el('button', { className: 'pe-opt', textContent: uiText('Make a macro first, then pick it here'), onclick: () => { peTab = 'macros'; renderPE(); } }));
+  const [choice, id0, n0] = splitAction(a || '');
+  const pick = el('select', { ariaLabel: uiText('Macro for ') + button });
+  pick.append(new Option(uiText('Pick a macro…'), '', true, choice !== 'macro'));
+  data.macros.forEach(m => pick.append(new Option(m.name, m.id, false, choice === 'macro' && String(m.id) === id0)));
+  const play = el('select', { ariaLabel: uiText('How the macro plays') });
+  [['1', uiText('Once')], ['times', uiText('Several times')], ['hold', uiText('While held')], ['toggle', uiText('Toggle on / off')]].forEach(([v, t]) =>
+    play.append(new Option(t, v, false, choice === 'macro' && (v === n0 || (v === 'times' && /^\d+$/.test(n0) && n0 !== '1')))));
+  const times = el('input', { type: 'number', className: 'num', min: 2, max: 255, value: /^\d+$/.test(n0) && +n0 > 1 ? n0 : 2, ariaLabel: uiText('Times to play') });
+  const send = () => { times.hidden = play.value !== 'times'; if (!pick.value) return;
+    const how = play.value === 'times' ? String(Math.max(2, Math.min(255, +times.value || 2))) : play.value;
+    peAssign(button, joinAction('macro', pick.value, how)); };
+  pick.onchange = play.onchange = times.onchange = send;
+  times.hidden = play.value !== 'times';
+  o.append(el('div', { className: 'row' }, pick, play, times));
+}
+function peTurboOpts(o, button, a) {
+  const [choice, keys, n] = splitAction(a || '');
+  const rate = el('input', { type: 'number', className: 'num', min: 1, max: 50, value: /^turbo/.test(choice) ? n : 7, ariaLabel: uiText('Presses per second') });
+  const r = () => Math.max(1, Math.min(50, Math.round(+rate.value) || 7));
+  [['turbo-left', uiText('Turbo left click')], ['turbo-right', uiText('Turbo right click')]].forEach(([v, t]) =>
+    o.append(el('button', { className: 'pe-opt', ariaPressed: choice === v, textContent: t, onclick: () => peAssign(button, joinAction(v, '', r())) })));
+  rate.onchange = () => { if (/^turbo/.test(choice)) peAssign(button, joinAction(choice, keys, r())); };
+  o.append(el('div', { className: 'row' }, rate, el('span', { className: 'tl', textContent: uiText('presses / second') })),
+    el('p', { className: 'pe-help', style: 'margin:4px 0 0', textContent: uiText('Turbo key: press it below.') }));
+  peKeyCapture(o, button, choice === 'turbo-key' ? keys : '', k => joinAction('turbo-key', k, r()));
+}
+
+// Performance: DPI stages as cards (click one to use it), then polling, wheel and sleep.
+function pePerfStage(stage) {
+  if (dev.stages) {
+    const card = el('section', { className: 'pe-card' }, el('h3', { textContent: uiText('DPI stages') }));
+    const d = dev.dpi || { min: 100, max: 30000, step: 50 };
+    const st = stagesOf(dev.active), list = st.list.map(v => v.slice());
+    let active = st.active;
+    const save = async msg => {
+      try {
+        const r = await api('/api/stages', { active, stages: list });
+        dev.stages.list = r.stages.list; dev.stages.active = r.stages.active;
+        dev.profile.dpi_stages = { active: r.stages.active, stages: r.stages.list };
+        if (dev.dpi) { dev.dpi.x = r.dpi[0]; dev.dpi.y = r.dpi[1]; dev.profile.dpi = r.dpi; }
+        toast(msg || uiText('DPI stages · saved to ') + dev.active);
+      } catch (e) { toast(e.message, true); }
+      renderPE();
+    };
+    const row = el('div', { className: 'pe-stages' });
+    list.forEach((v, i) => {
+      const num = el('input', { type: 'number', className: 'num', min: d.min, max: d.max, step: d.step, value: v[0], ariaLabel: uiText('Stage ') + (i + 1) + ' DPI',
+        onclick: e => e.stopPropagation(), onkeydown: e => { if (e.key === 'Enter') num.blur(); },
+        onchange: () => { const n = Math.min(d.max, Math.max(d.min, Math.round(+num.value / (d.step || 50)) * (d.step || 50))); if (n) { list[i] = [n, n]; save(); } } });
+      row.append(el('div', { className: 'pe-st' + (i + 1 === active ? ' on' : ''), role: 'button', tabIndex: 0, ariaPressed: i + 1 === active,
+        title: uiText('Use this stage'), onclick: () => { if (active !== i + 1) { active = i + 1; save(uiText`Stage ${i + 1} in use · saved to ${dev.active}`); } },
+        onkeydown: e => { if (e.key === 'Enter' && e.target === e.currentTarget) e.currentTarget.click(); } },
+        el('small', {}, el('span', { textContent: uiText('Stage ') + (i + 1) + (i + 1 === active ? uiText(' · in use') : '') }),
+          list.length > 1 ? el('button', { className: 'x', innerHTML: icon('x'), title: uiText('Remove stage ') + (i + 1), ariaLabel: uiText('Remove stage ') + (i + 1),
+            onclick: e => { e.stopPropagation(); list.splice(i, 1); if (active > i + 1 || active > list.length) active = Math.max(1, active - 1); save(); } }) : null),
+        num));
+    });
+    if (list.length < dev.stages.max) row.append(el('button', { className: 'pe-st add', innerHTML: icon('plus') + ' ' + uiText('Add stage'),
+      onclick: () => { const next = Math.min(d.max, list[list.length - 1][0] * 2); list.push([next, next]); save(); } }));
+    card.append(row, el('p', { className: 'pe-help', textContent: uiText('Up to ') + dev.stages.max + uiText(' stages, stored on the mouse. The stage in use sets the DPI right away.') }));
+    stage.append(card);
+  } else if (dev.dpi) stage.append(peCard('DPI', dpiEditor));
+  if (dev.polling) stage.append(peCard(uiText('Polling rate'), pollingEditor));
+  if (dev.scroll) stage.append(peCard(uiText('Scroll wheel'), scrollEditor));
+  if (dev.sleep) stage.append(peCard(uiText('Sleep when idle'), sleepEditor));
+}
+function peCard(title, fill) {
+  const box = el('div', { className: 'edbox' });
+  fill(box);
+  return el('section', { className: 'pe-card' }, el('h3', { textContent: title }), box);
+}
+
+// Lighting: the zones on the drawing; the one picked is edited on the right.
+function peLightStage(stage) {
+  if (!dev.lighting_control) return stage.append(peCard(uiText('Control lighting'), lightingControlEditor));
+  const names = dev.leds.map(l => l.name);
+  if (!names.includes(peZone)) peZone = names[0];
+  const svg = svgEl('svg', { class: 'pe-mouse', viewBox: '0 0 900 470', role: 'group', 'aria-label': uiText('Mouse: pick a zone') });
+  const g = svgEl('g', { transform: 'translate(200,0)' });
+  const paint = (shape, n) => {
+    const z = zoneOf(dev.profile, n), c = zonePaint(z);
+    const color = c && !c.startsWith('conic') ? c : c ? '#ffffff' : 'var(--zone-off)';
+    shape.setAttribute(shape.getAttribute('fill') === 'none' ? 'stroke' : 'fill', color);
+    shape.style.opacity = c ? 0.35 + 0.65 * ((z.brightness ?? 100) / 100) : 1;
+    shape.setAttribute('class', 'pe-zone' + (n === peZone ? ' on' : ''));
+    shape.append(svgEl('title', {}, label(n)));
+    shape.onclick = () => { peZone = n; renderPE(); };
+  };
+  if (names.includes('underglow')) { const u = svgEl('path', { d: 'M250 30C178 30 146 88 143 170c-3 88 4 164 28 232 20 52 138 52 158 0 24-68 31-144 28-232C354 88 322 30 250 30z', fill: 'none', 'stroke-width': 10 }); paint(u, 'underglow'); g.append(u); }
+  g.append(svgEl('path', { d: PE_BODY, class: 'pe-body' }), svgEl('path', { d: 'M250 44v116M158 162c56 18 128 18 184 0', class: 'pe-seam' }));
+  if (names.includes('scroll')) { const s = svgEl('rect', { x: 238, y: 70, width: 24, height: 84, rx: 12 }); paint(s, 'scroll'); g.append(s); }
+  if (names.includes('logo')) { const l = svgEl('circle', { cx: 250, cy: 300, r: 28 }); paint(l, 'logo'); g.append(l); }
+  svg.append(g);
+  const chips = el('div', { className: 'pe-zones' });
+  names.forEach(n => chips.append(el('button', { className: 'pe-opt', ariaPressed: n === peZone, textContent: label(n), onclick: () => { peZone = n; renderPE(); } })));
+  stage.append(chips, svg);
+  if (dev.leds.length > 1) stage.append(el('div', { className: 'pe-zones' }, el('button', { className: 'ghost', textContent: uiText('Same on all zones'),
+    title: uiText('The colour or effect of the zone you changed last, on every zone'), onclick: () => { const src = zoneLighting(peZone) ? peZone : sourceZone(); if (src) copyToZones(src); else toast(uiText('Pick a color or effect for one zone first'), true); } })));
+  stage.append(peCard(uiText('Control lighting'), lightingControlEditor));
+}
+function peLightInsp(box) {
+  if (!dev.lighting_control) return box.append(el('p', { className: 'pe-help', textContent: uiText('Turn on lighting control to set colors here.') }));
+  const names = dev.leds.map(l => l.name);
+  if (!names.includes(peZone)) peZone = names[0];
+  box.append(el('h2', { className: 'pe-cap', textContent: uiText('Zone') }), el('h3', { className: 'pe-title', textContent: label(peZone) }),
+    el('p', { className: 'pe-where', textContent: uiText('Profile ') + dev.active }));
+  const ed = el('div', { className: 'edbox' });
+  box.append(ed);
+  zoneEditor(ed, peZone);
+}
+
+function peMacrosStage(stage) {
+  const card = el('section', { className: 'pe-card' }, el('h3', { textContent: uiText('Macros on the device') }));
+  const box = el('div', { className: 'edbox' });
+  macrosEditor(box);
+  card.append(box);
+  stage.append(card);
+}
+
 // ---------- Profiles ----------
 
 async function activate(name, quiet) {
@@ -3744,7 +4315,7 @@ function renderSettings() {
       toast(error.message, true); select.value = languagePreference; select.disabled = false;
     }
   } });
-  [['auto', uiText('System language')], ['en', 'English'], ['zh-CN', '简体中文']].forEach(([value, text]) =>
+  [['auto', uiText('System language')], ['en', 'English'], ['fr', 'Français'], ['zh-CN', '简体中文']].forEach(([value, text]) =>
     languageSelect.append(el('option', { value, textContent: text, selected: value === languagePreference })));
   const editor = group(uiText('Editor'),
     row(uiText('Language'), uiText('Choose the editor language. Changing it reloads this page.'), languageSelect),
