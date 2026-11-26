@@ -41,6 +41,11 @@
   are untested.
 - Turbo on the middle button, back, forward and the four scroll directions shows its rate and
   can be changed in the editor; only left and right click turbo were recognised.
+- **"Restore all" asks first and can be undone.** One click on it used to put every remapped
+  button of the profile back at once, so a stray click wiped a profile's remaps. It now asks in
+  place ("Put 8 remapped buttons of PC back to what the mouse stores?"), and the message after
+  it has an Undo button for 10 seconds that sends every remap again. Tested in the editor with
+  the simulated mouse (`SECBIRD_SIM=all`).
 
 ## [0.6.1] - 2026-11-21
 

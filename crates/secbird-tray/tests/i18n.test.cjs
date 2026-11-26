@@ -84,6 +84,8 @@ test('French covers every editor message and keeps placeholders', () => {
   const fr = i18n.create({ preference: 'fr' });
   assert.equal(fr.text('Underglow'), 'Dessous');
   assert.equal(fr.text`Sniper · ${400} DPI`, 'Sniper · 400 DPI');
+  assert.equal(fr.text`Put ${fr.plural(8, 'remapped button')} of ${'PC'} back to what the ${'la souris'} stores?`,
+    'Remettre 8 boutons réassignés de « PC » à ce que garde la souris ?');
   assert.equal(fr.plural(1, 'button'), '1 bouton');
   assert.equal(fr.plural(3, 'DPI stage'), '3 paliers DPI');
   for (const [source, translated] of Object.entries(i18n.frMessages)) {

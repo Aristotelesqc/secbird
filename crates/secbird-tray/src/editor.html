@@ -574,6 +574,10 @@
   .pe-confirm p { margin: 0; font-size: 12.5px; color: var(--text); overflow-wrap: anywhere; }
   .pe-confirm .row { display: flex; gap: 6px; }
   .pe-confirm .ghost { flex: 1 1 0; justify-content: center; padding: 5px 8px; min-width: 0; }
+  .restore-ask { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 4px 4px 4px 10px; border: 1px solid var(--err); border-radius: 9px;
+    background: var(--panel); font-size: 12.5px; color: var(--text); max-width: 100%; min-width: 0; }
+  .restore-ask > span { overflow-wrap: anywhere; min-width: 0; }
+  .restore-ask .ghost { padding: 4px 10px; }
   .pe-pacts { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 4px 0; }
   .pe-pacts > .ghost { flex: 1 1 auto; justify-content: center; padding: 6px 10px; }
   .pe-pacts .newform { margin: 0; flex: 1 1 100%; min-width: 0; flex-wrap: wrap; }
@@ -1379,8 +1383,7 @@ function renderTiles(cur) {
   const head = el('div', { className: 'sechead' }, el('h2', { textContent: cur.name }));
   const tools = el('div', { className: 'tools' });
   if (cur.tools === 'layer') {
-    if (Object.keys(dev.profile.buttons || {}).length) tools.append(el('button', { className: 'ghost', textContent: uiText('Restore all'),
-      title: uiText`Every changed ${isBoard() ? uiText('key') : uiText('button')} back to what the ${holder()} stores`, onclick: restoreAllButtons }));
+    tools.append(restoreAllControl(() => renderTiles(cur)));
     if (isBoard() && remapLayout()) {
       const pick = el('select', { ariaLabel: uiText('Keyboard layout'), onchange: () => { remember('kblayout-' + dev.id, pick.value); renderWork(true); } });
       KB_LAYOUTS.forEach(([v, txt]) => pick.append(new Option(txt, v, false, v === kbLayout())));
@@ -3675,13 +3678,58 @@ async function macroCall(body, done) {
   } catch (e) { toast(e.message, true); }
 }
 
+// "Restore all" asks first, in place: one stray click used to wipe every remap of the profile.
+let restoreAsking = null;
+function restoreAllControl(rerender) {
+  const n = Object.keys(dev.profile.buttons || {}).length;
+  if (!n) return '';
+  const word = isBoard() ? uiText('key') : uiText('button');
+  if (!restoreAsking || restoreAsking.id !== dev.id || restoreAsking.profile !== dev.active) {
+    return el('button', { className: 'ghost', textContent: uiText('Restore all'), title: uiText`Every changed ${word} back to what the ${holder()} stores`,
+      onclick: () => {
+        restoreAsking = { id: dev.id, profile: dev.active }; rerender();
+        const cancel = document.querySelector('.restore-ask .cancel'); if (cancel) cancel.focus();
+      } });
+  }
+  const done = () => {
+    restoreAsking = null; rerender();
+    const b = [...document.querySelectorAll('button')].find(x => x.textContent === uiText('Restore all')); if (b) b.focus();
+  };
+  const id = 'restoreAskMsg';
+  const box = el('span', { className: 'restore-ask', role: 'group', onkeydown: e => { if (e.key === 'Escape') { e.stopPropagation(); done(); } } },
+    el('span', { id, textContent: uiText`Put ${plural(n, isBoard() ? 'key' : 'remapped button')} of ${dev.active} back to what the ${holder()} stores?` }),
+    el('button', { className: 'ghost danger', type: 'button', textContent: uiText('Restore'), onclick: () => { restoreAsking = null; restoreAllButtons(); } }),
+    el('button', { className: 'ghost cancel', type: 'button', textContent: uiText('Cancel'), onclick: done }));
+  box.setAttribute('aria-labelledby', id);
+  return box;
+}
+
 async function restoreAllButtons() {
+  const before = { ...(dev.profile.buttons || {}) }, id = dev.id, profile = dev.active;
   try {
     const r = await api('/api/buttons-restore', {});
     btnData[dev.id] = r.buttons; onboardData[dev.id] = r.onboard; dev.profile.buttons = {};
     sel = null; renderWork();
-    toast(uiText`Every ${isBoard() ? uiText('key') : uiText('button')} is back to what the ${holder()} stores`);
-  } catch (err) { toast(err.message, true); }
+    toast(uiText`Every ${isBoard() ? uiText('key') : uiText('button')} is back to what the ${holder()} stores`, false, () => putBackButtons(id, profile, before));
+  } catch (err) { toast(err.message, true); renderWork(); }
+}
+
+// Undo for "Restore all": send each remap again, standard layer first so a HyperShift
+// button is in place before the HyperShift layer's remaps.
+async function putBackButtons(id, profile, remaps) {
+  if (!dev || dev.id !== id || dev.active !== profile) { toast(uiText('The profile changed, so nothing was put back'), true); return; }
+  const order = Object.entries(remaps).sort(([a], [b]) => a.includes('/') - b.includes('/'));
+  const done = {};
+  let r, failed;
+  for (const [key, action] of order) {
+    const [button, layer] = key.split('/');
+    try { r = await api('/api/button', { button, layer: layer || 'normal', assign: action }); done[key] = action; }
+    catch (err) { failed = failed || err; }
+  }
+  if (r) { btnData[dev.id] = r.buttons; onboardData[dev.id] = r.onboard; }
+  dev.profile.buttons = { ...(dev.profile.buttons || {}), ...done };
+  renderWork();
+  if (failed) toast(failed.message, true); else toast(uiText('Undone'));
 }
 
 async function assign(button, action, isUndo) {
@@ -3984,7 +4032,7 @@ function peBar() {
       el('span', { className: 'grow' }), how,
       el('button', { className: 'ghost', textContent: uiText('Saved on the mouse…'), ariaPressed: peAside === 'onboard', title: uiText('Save the remaps into the mouse so they work without Secretarybird'),
         onclick: () => { peAside = peAside === 'onboard' ? null : 'onboard'; renderPE(); } }),
-      Object.keys(dev.profile.buttons || {}).length ? el('button', { className: 'ghost', textContent: uiText('Restore all'), title: uiText`Every changed ${uiText('button')} back to what the ${holder()} stores`, onclick: restoreAllButtons }) : '');
+      restoreAllControl(() => peBar()));
   } else if (peTab === 'perf') bar.append(el('p', { className: 'hint', textContent: uiText('DPI stages, polling rate and scroll wheel of ') + dev.active + '.' }));
   else if (peTab === 'light') bar.append(el('p', { className: 'hint', textContent: dev.lighting_control ? uiText('Pick a zone on the mouse to set its color.') : uiText('Secretarybird leaves this mouse’s lighting alone.') }));
   else bar.append(el('p', { className: 'hint', textContent: uiText('Macros live on the mouse and can be played by any button, in every profile.') }));
