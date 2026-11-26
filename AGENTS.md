@@ -1,8 +1,9 @@
 # Rules for agents working on this fork
 
-This is Aristotelesqc's fork of Secretarybird (upstream: infinityInfinite/secbird). Read
-`CONTRIBUTING.md` too. Its rules apply here as a strong preference: if one blocks a clearly
-better result, break it and say which rule and why.
+This is Aristotelesqc's fork of Secretarybird (upstream: infinityInfinite/secbird). It stands
+on its own: whether upstream would accept a change doesn't matter, and the fork may be renamed
+(#31). Upstream's `CONTRIBUTING.md` is a guide worth reading, not a set of rules. Follow it
+when it costs little, and when you depart from it, say so in the commit.
 
 ## Goal
 Make the editor as pleasant to use as Synapse's customise screen, without any of Synapse's
@@ -54,6 +55,15 @@ Toolchain on Windows (PowerShell): `$env:Path = "$env:USERPROFILE\.cargo\bin;$en
   saying what the user sees and what it was tested on.
 - **Branches and commits:** work on a feature branch, never on `main`, and make small commits.
   Commit and push only when the owner asks. Never rewrite pushed history.
+
+## Merging upstream
+The fork's update check follows this repository (`repository` in `Cargo.toml`), never
+upstream's releases. To take upstream's changes:
+1. `git fetch upstream`.
+2. On a new branch, `git merge upstream/main`.
+3. Resolve conflicts, run all the checks above, and rebuild.
+
+Then record the upstream version merged (see #32).
 
 ## Backlog
 The backlog lives in this fork's GitHub issues, with labels `area: …` and `priority: next` /
