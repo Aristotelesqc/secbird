@@ -629,7 +629,6 @@
   });
 
   // French (fr, fr-CA). Same keys as above; quotes and apostrophes typographic.
-  // French (fr, fr-CA). Same keys as above; quotes and apostrophes typographic.
   const FR_MESSAGES = {
     "Red": "Rouge",
     "Orange": "Orange",
