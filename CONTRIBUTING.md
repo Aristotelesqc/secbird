@@ -207,6 +207,12 @@ $env:SECBIRD_SIM = "all"                 # or a list: "mouse,keyboard,headset"
 It prints a local URL; open it in a browser. `secbird list` and `secbird report` see the
 same simulated devices. The presets are listed in `sim.rs` (`PRESETS`).
 
+To try the tray itself (icon, menu, popups) while your own tray runs with your real devices,
+add `$env:SECBIRD_SIM_ONLY = "1"` and start it without `--serve`. It then leaves real hardware
+alone, sees only the simulated devices, and uses its own single-instance lock, so it runs
+beside the real tray. Don't tick "Start with Windows" in that one: it would point autostart at
+your build.
+
 If you edit `editor.html`, check its script still parses, because a single duplicate name
 blanks the whole page:
 

@@ -867,6 +867,13 @@ impl Transport for Sim {
     }
 }
 
+/// `SECBIRD_SIM_ONLY=1` (development): discovery leaves real hardware alone, so only the
+/// `SECBIRD_SIM` devices are seen. Lets a test tray run beside the real one, with real
+/// devices plugged in, without sending them anything.
+pub fn only() -> bool {
+    std::env::var_os("SECBIRD_SIM_ONLY").is_some_and(|v| v == "1")
+}
+
 /// Simulated devices listed in `SECBIRD_SIM`: `all`, or comma-separated [`PRESETS`] names.
 pub fn from_env() -> Vec<Device> {
     let Ok(list) = std::env::var("SECBIRD_SIM") else { return Vec::new() };

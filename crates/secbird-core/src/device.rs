@@ -315,6 +315,9 @@ pub struct Candidate {
 }
 
 pub fn candidates(api: &HidApi) -> Vec<Candidate> {
+    if crate::sim::only() {
+        return Vec::new();
+    }
     let mut out: Vec<Candidate> = api
         .device_list()
         .filter(|d| d.vendor_id() == RAZER_VID)

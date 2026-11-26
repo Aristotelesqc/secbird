@@ -43,6 +43,12 @@ const WM_START_UPDATE: u32 = WM_APP + 8;
 /// Sent by the editor's server after it rescanned by itself: who is asleep may have changed.
 const WM_RESCANNED: u32 = WM_APP + 9;
 const CLASS_NAME: &str = "SecretarybirdTray";
+const MUTEX_NAME: &str = "Local\\Secretarybird.Tray";
+/// Development, with `SECBIRD_SIM_ONLY=1` (see [`secbird_core::sim::only`]): a tray that only
+/// sees simulated devices gets its own lock and window class, so it runs beside the real
+/// one and neither hands the other its editor.
+const SIM_ONLY_CLASS_NAME: &str = "SecretarybirdTraySimOnly";
+const SIM_ONLY_MUTEX_NAME: &str = "Local\\Secretarybird.Tray.SimOnly";
 const TIMER_RESCAN: usize = 1;
 /// Extra rescans after start and wake: devices often answer late at boot.
 const TIMER_RETRY: usize = 2;
@@ -274,10 +280,12 @@ fn copy_wide(dst: &mut [u16], s: &str) {
 
 pub fn run() {
     unsafe {
-        let _mutex = CreateMutexW(null(), 0, wide("Local\\Secretarybird.Tray").as_ptr());
+        let sim_only = secbird_core::sim::only();
+        let (class_name, mutex_name) = if sim_only { (SIM_ONLY_CLASS_NAME, SIM_ONLY_MUTEX_NAME) } else { (CLASS_NAME, MUTEX_NAME) };
+        let _mutex = CreateMutexW(null(), 0, wide(mutex_name).as_ptr());
         if GetLastError() == ERROR_ALREADY_EXISTS {
-            let running = FindWindowW(wide(CLASS_NAME).as_ptr(), null());
-            if std::env::var_os("SECBIRD_SIM").is_some() {
+            let running = FindWindowW(wide(class_name).as_ptr(), null());
+            if std::env::var_os("SECBIRD_SIM").is_some() && !sim_only {
                 let text = wide(
                     "Secretarybird is already running, so SECBIRD_SIM has no effect.
 
@@ -303,7 +311,7 @@ pub fn run() {
         };
 
         let hinstance = GetModuleHandleW(null());
-        let class = wide(CLASS_NAME);
+        let class = wide(class_name);
         let wc = WNDCLASSW {
             lpfnWndProc: Some(wndproc),
             hInstance: hinstance,
