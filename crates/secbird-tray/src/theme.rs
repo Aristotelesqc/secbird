@@ -1,5 +1,6 @@
 //! How the tray looks: its icon follows the taskbar's light or dark theme and the screen's
-//! scale, and its menu turns dark when Windows apps are dark.
+//! scale, its menu turns dark when Windows apps are dark, and the popup above the clock
+//! takes Windows' app theme and accent colour.
 //!
 //! The process is PerMonitorV2 (see `app.manifest`), so sizes here are real pixels.
 
@@ -9,7 +10,9 @@ use std::sync::OnceLock;
 use windows_sys::core::PCSTR;
 use windows_sys::Win32::Foundation::*;
 use windows_sys::Win32::System::LibraryLoader::{GetModuleHandleW, GetProcAddress, LoadLibraryExW, LOAD_LIBRARY_SEARCH_SYSTEM32};
-use windows_sys::Win32::System::Registry::{RegGetValueW, HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, RRF_RT_REG_DWORD, RRF_RT_REG_SZ};
+use windows_sys::Win32::System::Registry::{
+    RegGetValueW, HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, RRF_RT_REG_BINARY, RRF_RT_REG_DWORD, RRF_RT_REG_SZ,
+};
 use windows_sys::Win32::UI::HiDpi::{GetDpiForWindow, GetSystemMetricsForDpi};
 use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
@@ -32,6 +35,50 @@ fn personalize(name: &str) -> Option<u32> {
         RegGetValueW(HKEY_CURRENT_USER, path.as_ptr(), wide(name).as_ptr(), RRF_RT_REG_DWORD, null_mut(), &mut data as *mut u32 as *mut c_void, &mut size)
     };
     (ok == ERROR_SUCCESS).then_some(data)
+}
+
+/// Windows apps are light (Settings > Personalization > Colors). Light when Windows doesn't
+/// say: before 1809 apps had no dark mode.
+pub fn apps_light() -> bool {
+    personalize("AppsUseLightTheme") != Some(0)
+}
+
+/// Windows' accent colour as a COLORREF, in the shade Windows 11 puts on a dark surface
+/// (`on_dark`: a lighter one) or a light one (a darker one). `None` when Windows doesn't say.
+pub fn accent(on_dark: bool) -> Option<COLORREF> {
+    // Eight RGBA colours, lightest first: Light3, Light2, Light1, the accent, Dark1...
+    let mut palette = [0u8; 32];
+    let mut size = palette.len() as u32;
+    let path = wide(r"Software\Microsoft\Windows\CurrentVersion\Explorer\Accent");
+    let ok = unsafe {
+        RegGetValueW(
+            HKEY_CURRENT_USER,
+            path.as_ptr(),
+            wide("AccentPalette").as_ptr(),
+            RRF_RT_REG_BINARY,
+            null_mut(),
+            palette.as_mut_ptr() as *mut c_void,
+            &mut size,
+        )
+    };
+    if ok == ERROR_SUCCESS && size as usize >= palette.len() {
+        let i = if on_dark { 1 } else { 4 } * 4;
+        let [r, g, b] = [palette[i], palette[i + 1], palette[i + 2]].map(u32::from);
+        return Some(r | g << 8 | b << 16);
+    }
+    // Before the palette: the accent alone, 0xAABBGGRR.
+    let mut data: u32 = 0;
+    let mut size = 4u32;
+    let path = wide(r"Software\Microsoft\Windows\DWM");
+    let ok = unsafe {
+        RegGetValueW(HKEY_CURRENT_USER, path.as_ptr(), wide("AccentColor").as_ptr(), RRF_RT_REG_DWORD, null_mut(), &mut data as *mut u32 as *mut c_void, &mut size)
+    };
+    (ok == ERROR_SUCCESS).then_some(data & 0x00FF_FFFF)
+}
+
+/// Windows 11 or later (rounded corners, window border colours).
+pub fn windows_11() -> bool {
+    windows_build() >= 22000
 }
 
 /// The taskbar, hence the notification area, is light. Windows' own setting for it is apart

@@ -235,7 +235,12 @@ impl Server {
             ("GET", "/api/settings") => Ok(settings_json(&engine)),
             ("GET", "/api/export") => Store::load(&config_dir().join("profiles.json"))
                 .and_then(|s| serde_json::to_value(&s).map_err(|e| Error::Db(e.to_string()))),
-            ("POST", path) => post(&mut engine, path, &req.body),
+            ("POST", path) => {
+                let result = post(&mut engine, path, &req.body);
+                // A change made here: the device's answer to it gets no DPI popup.
+                engine.hush_dpi();
+                result
+            }
             _ => return Response::text("404 Not Found", "Not found"),
         };
         match result {

@@ -19,6 +19,17 @@
   (`SECBIRD_SIM=all`). The drawing is original, with no Razer artwork.
 - **French editor.** Settings → Editor → Language: Français, or "system language" on a French
   Windows. Covers every message the editor has.
+- **Clearer DPI and profile popups.** The small popup above the clock is now a card in
+  Windows' light or dark theme: a DPI change shows the DPI in large type, a bar in Windows'
+  accent colour filled up to the mouse's highest DPI, the stage ("Stage 2 of 5") and the
+  mouse's name; a profile change shows the profile, the device and why ("Auto · game.exe",
+  "Auto · back from game.exe"); an on-board profile change shows its number and the DPI that
+  came with it. It now also shows when you pick a profile in the tray menu, but not for changes
+  made in the editor, on plug-in or wake, nor while a full-screen game or presentation is in
+  front. It fades in and out (at once when Windows' animation effects are off), and a second
+  press updates it in place. Tested on Windows 11 (build 26300) at 150 % with the simulated
+  mouse, in dark and light; not yet with a real mouse's buttons, on several screens or over a
+  full-screen game.
 
 ### Fixed
 - **Sharp, dark tray menu and a tray icon that follows the theme.** The right-click menu was

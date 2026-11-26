@@ -4467,7 +4467,7 @@ function renderSettings() {
     checkBtn.disabled = false;
   } });
   const notes = group(uiText('Notifications and checks'),
-    row(uiText('DPI and profile popups'), uiText('A small popup above the clock when DPI, the on-board profile or a game profile changes.'), ...traySwitch('popups', uiText('DPI and profile popups'))),
+    row(uiText('DPI and profile popups'), uiText('A small popup above the clock when the DPI or the profile changes, except for changes made here.'), ...traySwitch('popups', uiText('DPI and profile popups'))),
     row(uiText('Low battery warning'), uiText('A notification when a wireless device drops to ') + a.battery_warning_at + '%.',
       batteryLevel(),
       ...traySwitch('battery_warning', uiText('Low battery warning'))),

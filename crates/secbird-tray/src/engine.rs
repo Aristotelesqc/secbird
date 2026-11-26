@@ -2,7 +2,7 @@
 
 use secbird_core::{config_dir, discover, hidapi::HidApi, Db, Device, Dimming, Result, Store};
 use crate::studio::Studio;
-use std::cell::{RefCell, RefMut};
+use std::cell::{Cell, RefCell, RefMut};
 use std::collections::{HashMap, HashSet};
 use std::time::{Duration, Instant, SystemTime};
 
@@ -33,6 +33,21 @@ pub struct Engine {
     studio: RefCell<Studio>,
     /// Grows each time a rescan finds other devices than the one before it.
     list_seq: u64,
+    /// Settings were just sent from here (a profile, the editor): a DPI report the device
+    /// sends back until then is that, not its button, and gets no popup.
+    dpi_quiet_until: Cell<Option<Instant>>,
+}
+
+/// How long after settings were sent a DPI report from the device is taken as its answer.
+const DPI_ECHO: Duration = Duration::from_millis(1500);
+
+/// What the DPI popup says about the device ([`Engine::dpi_popup`]).
+pub struct DpiPopup {
+    pub device: String,
+    /// The device's highest DPI, when known.
+    pub max: Option<u16>,
+    /// The stage this DPI is, of how many, when it is one of the device's stages.
+    pub stage: Option<(usize, usize)>,
 }
 
 const FINDER_PAUSE: Duration = Duration::from_secs(10 * 60);
@@ -103,6 +118,7 @@ impl Engine {
             dim: HashMap::new(),
             studio: RefCell::new(Studio::default()),
             list_seq: 0,
+            dpi_quiet_until: Cell::new(None),
         })
     }
 
@@ -151,6 +167,42 @@ impl Engine {
                 profile.dpi = Some((x, y));
                 let _ = store.save();
             }
+        }
+    }
+
+    /// Settings were just sent to devices from here: see [`Engine::dpi_quiet`].
+    pub fn hush_dpi(&self) {
+        self.dpi_quiet_until.set(Some(Instant::now() + DPI_ECHO));
+    }
+
+    /// Settings were sent from here a moment ago (a profile applied, a change in the editor):
+    /// a DPI report now is the device answering them, not its DPI button, so no popup.
+    pub fn dpi_quiet(&self) -> bool {
+        self.dpi_quiet_until.get().is_some_and(|t| Instant::now() < t)
+    }
+
+    /// For the DPI popup: the device's name, its highest DPI, and which of its stages `(x, y)`
+    /// is (one short read of the stages, on devices with a DPI range).
+    pub fn dpi_popup(&self, key: &str, x: u16, y: u16) -> DpiPopup {
+        let Some(dev) = self.devices.iter().find(|d| d.key() == key) else {
+            return DpiPopup { device: "Mouse".into(), max: None, stage: None };
+        };
+        let max = dev.spec.as_ref().and_then(|s| s.dpi.as_ref()).map(|r| r.max);
+        let stage = max.and_then(|_| dev.dpi_stages().ok()).and_then(|s| {
+            // The active stage when it is this DPI, else the first stage that is.
+            let active = (s.active as usize).checked_sub(1).filter(|&i| s.stages.get(i) == Some(&(x, y)));
+            let at = active.or_else(|| s.stages.iter().position(|&st| st == (x, y)))?;
+            Some((at + 1, s.stages.len()))
+        });
+        DpiPopup { device: self.label(dev), max, stage }
+    }
+
+    /// For the on-board profile popup: the device's name and how many on-board profiles it
+    /// has (0 when unknown).
+    pub fn onboard_popup(&self, key: &str) -> (String, u8) {
+        match self.devices.iter().find(|d| d.key() == key) {
+            Some(dev) => (self.label(dev), dev.spec.as_ref().map_or(0, |s| s.onboard_profiles)),
+            None => ("Mouse".into(), 0),
         }
     }
 
@@ -472,6 +524,9 @@ impl Engine {
     /// to the program in front, else the active one.
     pub fn apply(&self, keys: &[String]) -> Vec<ApplyReport> {
         self.studio.borrow_mut().restart(keys);
+        if !keys.is_empty() {
+            self.hush_dpi();
+        }
         let mut store = Self::store();
         self.devices
             .iter()

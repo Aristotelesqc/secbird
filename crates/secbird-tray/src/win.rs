@@ -42,6 +42,13 @@ const WM_UPDATE_INSTALL: u32 = WM_APP + 7;
 const WM_START_UPDATE: u32 = WM_APP + 8;
 /// Sent by the editor's server after it rescanned by itself: who is asleep may have changed.
 const WM_RESCANNED: u32 = WM_APP + 9;
+/// Development: sent by `secbird-tray --sim-event` to a tray with `SECBIRD_SIM_ONLY=1`, to
+/// make a simulated device do what a real one does by itself ([`send_sim_events`]).
+const WM_SIM_EVENT: u32 = WM_APP + 10;
+const SIM_DPI_BUTTON: usize = 1;
+const SIM_DPI: usize = 2;
+const SIM_ONBOARD: usize = 3;
+const SIM_MENU: usize = 4;
 const CLASS_NAME: &str = "SecretarybirdTray";
 const MUTEX_NAME: &str = "Local\\Secretarybird.Tray";
 /// Development, with `SECBIRD_SIM_ONLY=1` (see [`secbird_core::sim::only`]): a tray that only
@@ -187,7 +194,13 @@ struct App {
     input_woke: bool,
     /// How many more times input may start one (see [`INPUT_WAKES`]).
     input_wakes_left: u8,
+    /// The last on-board profile popup: (device key, slot, when). The DPI report that
+    /// follows it goes into it instead of replacing it.
+    onboard_shown: Option<(String, u8, std::time::Instant)>,
 }
+
+/// How long after an on-board profile switch a DPI report is taken as part of it.
+const ONBOARD_DPI_FOR: Duration = Duration::from_millis(600);
 
 /// A device in [`App::asleep`].
 struct Sleeper {
@@ -251,7 +264,7 @@ fn now_secs() -> u64 {
 /// Something a device did by itself, reported on its event collection.
 enum DeviceEvent {
     Dpi { key: String, x: u16, y: u16 },
-    OnboardProfile(u8),
+    OnboardProfile { key: String, slot: u8 },
 }
 
 /// Listener threads only block on a read, so a small stack is plenty.
@@ -394,6 +407,7 @@ pub fn run() {
                 asleep: Vec::new(),
                 input_woke: false,
                 input_wakes_left: INPUT_WAKES,
+                onboard_shown: None,
             })
         });
         log::append("tray started");
@@ -458,6 +472,10 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             if let Some(r) = REQUESTED_UPDATE.lock().unwrap_or_else(|p| p.into_inner()).take() {
                 with_app(|app| app.start_update(r));
             }
+            0
+        }
+        WM_SIM_EVENT if secbird_core::sim::only() => {
+            with_app(|app| app.sim_event(wparam, lparam as usize));
             0
         }
         WM_RESCANNED => {
@@ -855,7 +873,7 @@ impl App {
                             x: u16::from_be_bytes([buf[2], buf[3]]),
                             y: u16::from_be_bytes([buf[4], buf[5]]),
                         },
-                        (3.., 0x05, 0x01) => DeviceEvent::OnboardProfile(buf[2]),
+                        (3.., 0x05, 0x01) => DeviceEvent::OnboardProfile { key: key.clone(), slot: buf[2] },
                         _ => continue,
                     };
                     if tx.send(event).is_err() {
@@ -871,22 +889,80 @@ impl App {
         }
     }
 
+    /// What devices did by themselves (their DPI or profile button): recorded, and shown in
+    /// the popup above the clock unless popups are off.
     fn device_events(&mut self) {
+        let popups = !TraySettings::load().popups_off;
         while let Ok(event) = self.events.try_recv() {
             match event {
                 DeviceEvent::Dpi { key, x, y } => {
-                    self.engine().dpi_changed(&key, x, y);
-                    if !TraySettings::load().popups_off {
-                        osd::show(&if x == y { format!("{x} DPI") } else { format!("{x} × {y} DPI") });
+                    let quiet = {
+                        let mut engine = self.engine();
+                        engine.dpi_changed(&key, x, y);
+                        engine.dpi_quiet()
+                    };
+                    // `quiet`: the device answering settings sent from here (a profile, the editor).
+                    if !popups || quiet {
+                        continue;
                     }
+                    // The on-board profile just changed, and this is its DPI: one popup.
+                    let onboard = self.onboard_shown.as_ref().filter(|(k, _, at)| *k == key && at.elapsed() < ONBOARD_DPI_FOR);
+                    if let Some(&(_, slot, _)) = onboard {
+                        let (device, count) = self.engine().onboard_popup(&key);
+                        osd::show(osd::Popup::onboard(slot, count, &device, Some((x, y))));
+                        continue;
+                    }
+                    let info = self.engine().dpi_popup(&key, x, y);
+                    osd::show(osd::Popup::dpi(x, y, info.max, info.stage, &info.device));
                 }
-                DeviceEvent::OnboardProfile(n) => {
-                    if !TraySettings::load().popups_off {
-                        osd::show(&format!("On-board profile {n}"));
+                DeviceEvent::OnboardProfile { key, slot } => {
+                    if popups {
+                        let (device, count) = self.engine().onboard_popup(&key);
+                        osd::show(osd::Popup::onboard(slot, count, &device, None));
+                        self.onboard_shown = Some((key, slot, std::time::Instant::now()));
                     }
                 }
             }
         }
+    }
+
+    /// Development, in a tray with `SECBIRD_SIM_ONLY=1` only: the simulated mouse does what a
+    /// real one does by itself, and it goes the way a real device's report goes.
+    fn sim_event(&mut self, what: usize, value: usize) {
+        let mouse = {
+            let engine = self.engine();
+            let mouse = engine.devices().iter().find(|d| d.spec.as_ref().is_some_and(|s| s.kind == Kind::Mouse));
+            mouse.map(|d| d.key())
+        };
+        let Some(key) = mouse else { return log::append("sim event: no simulated mouse") };
+        let event = match what {
+            // The DPI button: the next stage, which the mouse moves to by itself.
+            SIM_DPI_BUTTON => {
+                let engine = self.engine();
+                let Some(dev) = engine.devices().iter().find(|d| d.key() == key) else { return };
+                let Ok(mut stages) = dev.dpi_stages() else { return };
+                stages.active = stages.active % stages.stages.len().max(1) as u8 + 1;
+                let Ok(sent) = dev.set_dpi_stages(&stages) else { return };
+                let (x, y) = sent.stages[sent.active as usize - 1];
+                DeviceEvent::Dpi { key, x, y }
+            }
+            // A DPI that is no stage (the sniper button).
+            SIM_DPI => {
+                let engine = self.engine();
+                let Some(dev) = engine.devices().iter().find(|d| d.key() == key) else { return };
+                let Ok((x, y)) = dev.set_dpi(value as u16, (value >> 16) as u16) else { return };
+                DeviceEvent::Dpi { key, x, y }
+            }
+            SIM_ONBOARD => DeviceEvent::OnboardProfile { key, slot: value as u8 },
+            // The tray menu's profile item at this place, as if clicked.
+            SIM_MENU => {
+                unsafe { DestroyMenu(self.build_menu()) };
+                return self.handle_command(ID_PROFILE_BASE + value as u32);
+            }
+            _ => return,
+        };
+        let _ = self.events_tx.send(event);
+        self.device_events();
     }
 
     /// Switch devices to the profile tied to the program now in front, or back.
@@ -896,16 +972,27 @@ impl App {
             return;
         }
         let exe = apps::foreground();
-        let reports = self.engine().set_foreground(exe.clone());
+        let (before, reports, now) = {
+            let mut engine = self.engine();
+            let before = engine.foreground().map(str::to_string);
+            let reports = engine.set_foreground(exe.clone());
+            (before, reports, engine.foreground().map(str::to_string))
+        };
         if reports.is_empty() {
             return;
         }
         let what: Vec<String> = reports.iter().map(|r| format!("{} -> {}", r.device, r.profile)).collect();
         log::append(&format!("{} in front: {}", exe.as_deref().unwrap_or("?"), what.join(", ")));
-        let mut names: Vec<&str> = reports.iter().map(|r| r.profile.as_str()).collect();
-        names.dedup();
         if !settings.popups_off {
-            osd::show(&format!("{} profile", names.join(", ")));
+            // Why: the program tied to the profile came to the front, or the one before left.
+            let why = match (&now, &before) {
+                (Some(exe), _) => osd::Why::Auto(exe),
+                (None, Some(exe)) => osd::Why::Back(exe),
+                (None, None) => osd::Why::Menu,
+            };
+            let names: Vec<String> = reports.iter().map(|r| r.profile.clone()).collect();
+            let devices: Vec<String> = reports.iter().map(|r| r.device.clone()).collect();
+            osd::show(osd::Popup::profile(&names, &devices, why));
         }
         self.notify_failures(&reports);
         self.update_tooltip();
@@ -1350,7 +1437,18 @@ impl App {
                 if let Some((key, name)) = self.profile_items.get(idx).cloned() {
                     let result = self.engine().switch_profile(&key, &name);
                     match result {
-                        Ok(reports) => self.notify_failures(&reports),
+                        Ok(reports) => {
+                            // What was applied: a program in front with its own profile keeps it.
+                            if !TraySettings::load().popups_off {
+                                let mut names: Vec<String> = reports.iter().map(|r| r.profile.clone()).collect();
+                                if names.is_empty() {
+                                    names.push(name);
+                                }
+                                let devices: Vec<String> = reports.iter().map(|r| r.device.clone()).collect();
+                                osd::show(osd::Popup::profile(&names, &devices, osd::Why::Menu));
+                            }
+                            self.notify_failures(&reports);
+                        }
                         Err(e) => self.balloon("Could not switch profile", &e.to_string()),
                     }
                     self.update_tooltip();
@@ -1359,6 +1457,35 @@ impl App {
             _ => {}
         }
     }
+}
+
+/// Development: `secbird-tray --sim-event <event>...` makes the simulated mouse of a tray
+/// started with `SECBIRD_SIM_ONLY=1` do what a real mouse does by itself, to see the popups
+/// without one. Events, sent in turn: `dpi-button` (the next DPI stage), `dpi <x> [<y>]`
+/// (a DPI that is no stage), `onboard <slot>`, `menu <n>` (the tray menu's profile item n,
+/// from 0). A tray that sees real devices has another window class and never gets them.
+pub fn send_sim_events(args: &[String]) -> Result<(), String> {
+    let tray = unsafe { FindWindowW(wide(SIM_ONLY_CLASS_NAME).as_ptr(), null()) };
+    if tray.is_null() {
+        return Err("no tray with SECBIRD_SIM_ONLY=1 is running".into());
+    }
+    let number = |s: Option<&String>| s.and_then(|s| s.parse::<u16>().ok()).ok_or("a number is missing");
+    let mut args = args.iter().peekable();
+    while let Some(what) = args.next() {
+        let (kind, value) = match what.as_str() {
+            "dpi-button" => (SIM_DPI_BUTTON, 0),
+            "dpi" => {
+                let x = number(args.next())?;
+                let y = args.next_if(|s| s.parse::<u16>().is_ok()).map_or(Ok(x), |s| number(Some(s)))?;
+                (SIM_DPI, x as usize | (y as usize) << 16)
+            }
+            "onboard" => (SIM_ONBOARD, number(args.next())? as usize),
+            "menu" => (SIM_MENU, number(args.next())? as usize),
+            other => return Err(format!("unknown event {other}: dpi-button, dpi <x> [<y>], onboard <slot> or menu <n>")),
+        };
+        unsafe { PostMessageW(tray, WM_SIM_EVENT, kind, value as LPARAM) };
+    }
+    Ok(())
 }
 
 /// Open a web page in the default browser.

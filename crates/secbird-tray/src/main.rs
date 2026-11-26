@@ -32,6 +32,16 @@ fn main() {
     if std::env::args().any(|a| a == "--serve") {
         return serve();
     }
+    // Development: the simulated mouse of a `SECBIRD_SIM_ONLY=1` tray presses its DPI
+    // button and the like, to see the popups (see `win::send_sim_events`).
+    let args: Vec<String> = std::env::args().collect();
+    if let Some(at) = args.iter().position(|a| a == "--sim-event") {
+        if let Err(e) = win::send_sim_events(&args[at + 1..]) {
+            eprintln!("{e}");
+            std::process::exit(1);
+        }
+        return;
+    }
     win::run();
 }
 

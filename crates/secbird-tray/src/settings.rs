@@ -39,7 +39,8 @@ pub struct TraySettings {
     /// The version that ran last, to say "Updated to ..." once after an update.
     #[serde(default)]
     pub last_version: String,
-    /// No small popups above the clock for DPI, on-board profile and game profile changes.
+    /// No small popups above the clock for DPI and profile changes (the DPI button, the
+    /// on-board profile, the tray menu, a program tied to a profile).
     #[serde(default)]
     pub popups_off: bool,
     /// No notification when a wireless device runs low.
