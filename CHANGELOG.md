@@ -1,5 +1,29 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **Mouse editor.** Mice open on a new screen in the editor:
+  - the profile list on the left;
+  - a drawing of the mouse whose buttons you click;
+  - the actions for the picked button on the right, by category (mouse, keyboard shortcut,
+    Windows shortcut, sensitivity, media, macro, turbo, HyperShift);
+  - a Standard / HyperShift switch, and a List view that shows both layers side by side;
+  - tabs for Performance (DPI stages, polling, scroll, sleep), Lighting (click a zone on the
+    drawing) and Macros.
+
+  A button marks it as changed with a dot, not only with a colour. Profiles are deleted from
+  their own card, after a confirmation in the page. The classic tiles are one click away
+  ("Classic view"). Every change goes through the same calls as before and is saved to the live
+  profile at once. Tested on a Basilisk V3 (0099) with three profiles, and on the simulator
+  (`SECBIRD_SIM=all`). The drawing is original, with no Razer artwork.
+- **French editor.** Settings → Editor → Language: Français, or "system language" on a French
+  Windows. Covers every message the editor has.
+
+### Fixed
+- Turbo on the middle button, back, forward and the four scroll directions shows its rate and
+  can be changed in the editor; only left and right click turbo were recognised.
+
 ## [0.6.1] - 2026-11-21
 
 ### Added
