@@ -56,6 +56,12 @@ Toolchain on Windows (PowerShell): `$env:Path = "$env:USERPROFILE\.cargo\bin;$en
 - **Branches and commits:** work on a feature branch, never on `main`, and make small commits.
   Commit and push only when the owner asks. Never rewrite pushed history.
 
+## Delegating to Gemini (agy)
+To hand work to Gemini through the Antigravity CLI, follow `.agents/skills/agy/SKILL.md`.
+It covers the headless limits (no commands, so supply snapshots), the report in the response,
+scoped authorization with no permission bypass, and verifying every result. Runs go in the
+git-ignored `.agy-runs/`.
+
 ## Merging upstream
 The fork's update check follows this repository (`repository` in `Cargo.toml`), never
 upstream's releases. To take upstream's changes:
