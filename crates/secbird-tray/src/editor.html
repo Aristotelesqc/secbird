@@ -9,14 +9,14 @@
   /* Themes. Each sets every token; the accent means live, selected, changed or focused, and
      the value colour carries numbers. Auto follows Windows: Bridge when dark, Light when light. */
   :root { --fill: var(--accent); }
-  :root, :root[data-theme="bridge"] { --bg: #050505; --bar: #0d0d0e; --panel: #131314; --raise: #1b1b1d; --line: #242426; --line-strong: #4a4440; --text: #f4efe9; --muted: #b8aea3; --faint: #9c9287; --value: #ffb85d; --accent: #ff5412; --accent-text: #ff7a45; --on-accent: #000; --lit: #ff541224; --lit-edge: #ff5412; --toast: #1b1b1d; --zone-off: #242426; --body-fill: #131314; --body-stroke: #3a3632; --button-fill: #1b1b1d; --key-fill: #1b1b1d; --key-stroke: #34312e; --key-text: #f4efe999; --warn-line: #ffb85d55; --warn-bg: #ffb85d14; --warn-text: #ffb85d; --err: #ff4a5a; --err-text: #ffb4bb; --shadow: 0 12px 32px -14px #000000e6; color-scheme: dark; }
-  :root[data-theme="roast"] { --bg: #150d05; --bar: #1e1007; --panel: #201002; --raise: #2b1909; --line: #3a2916; --line-strong: #64492b; --text: #f5e0d3; --muted: #b58754; --faint: #ad8150; --value: #e2aa6b; --accent: #e6c08f; --accent-text: #efcf9f; --on-accent: #1e1007; --lit: #e6c08f26; --lit-edge: #e6c08f; --toast: #2b1909; --zone-off: #3a2916; --body-fill: #201002; --body-stroke: #4a2b09; --button-fill: #2b1909; --key-fill: #2b1909; --key-stroke: #4a2b09; --key-text: #f5e0d399; --warn-line: #f8ac6055; --warn-bg: #f8ac6014; --warn-text: #f8ac60; --err: #ff5a4e; --err-text: #ffb4a8; --shadow: 0 12px 32px -14px #000000d9; color-scheme: dark; }
-  @media (prefers-color-scheme: light) { :root:not([data-theme]) { --bg: #f4f4f7; --bar: #ffffff; --panel: #ffffff; --raise: #f0f0f4; --line: #e1e1e8; --line-strong: #c3c3cc; --text: #18181d; --muted: #5f5f6b; --faint: #6c6c78; --value: #18181d; --accent: #4f86ec; --accent-text: #1d4ed8; --on-accent: #0f2a66; --fill: #cfe0ff; --lit: #4f86ec1a; --lit-edge: #4f86ec; --toast: #ffffff; --zone-off: #d9d9df; --body-fill: #f1f1f4; --body-stroke: #c4c4cc; --button-fill: #e4e4ea; --key-fill: #ececf0; --key-stroke: #cfcfd7; --key-text: #00000099; --warn-line: #c9a20055; --warn-bg: #fff7d6; --warn-text: #6b5200; --err: #d70015; --err-text: #b3261e; --shadow: 0 10px 30px -14px #1b1b3040; color-scheme: light; } }
-  :root[data-theme="classic"] { --bg: #0d0d10; --bar: #111115; --panel: #15151a; --raise: #1b1b21; --line: #25252d; --line-strong: #3a3a44; --text: #ececf1; --muted: #9a9aa6; --faint: #858591; --value: #ececf1; --accent: #5b9cff; --accent-text: #8bb8ff; --on-accent: #000; --lit: #5b9cff1f; --lit-edge: #5b9cff; --toast: #222229; --zone-off: #2a2a31; --body-fill: #141418; --body-stroke: #2b2b33; --button-fill: #1d1d23; --key-fill: #1b1b21; --key-stroke: #2e2e37; --key-text: #ffffff99; --warn-line: #ffd60a55; --warn-bg: #ffd60a12; --warn-text: #ffe58a; --err: #ff453a; --err-text: #ffb4ae; --shadow: 0 10px 30px -12px #000000cc; color-scheme: dark; }
-  :root[data-theme="light"] { --bg: #f4f4f7; --bar: #ffffff; --panel: #ffffff; --raise: #f0f0f4; --line: #e1e1e8; --line-strong: #c3c3cc; --text: #18181d; --muted: #5f5f6b; --faint: #6c6c78; --value: #18181d; --accent: #4f86ec; --accent-text: #1d4ed8; --on-accent: #0f2a66; --fill: #cfe0ff; --lit: #4f86ec1a; --lit-edge: #4f86ec; --toast: #ffffff; --zone-off: #d9d9df; --body-fill: #f1f1f4; --body-stroke: #c4c4cc; --button-fill: #e4e4ea; --key-fill: #ececf0; --key-stroke: #cfcfd7; --key-text: #00000099; --warn-line: #c9a20055; --warn-bg: #fff7d6; --warn-text: #6b5200; --err: #d70015; --err-text: #b3261e; --shadow: 0 10px 30px -14px #1b1b3040; color-scheme: light; }
-  :root[data-theme="workshop"] { --bg: #ede7dc; --bar: #e0d7c7; --panel: #f7f3ec; --raise: #e8e0d2; --line: #d6ccb9; --line-strong: #b3a68d; --text: #3d362a; --muted: #5c5141; --faint: #62564a; --value: #8a3f1b; --accent: #3f6e45; --accent-text: #2f5a35; --on-accent: #fff; --lit: #3f6e4533; --lit-edge: #3f6e45; --toast: #f7f3ec; --zone-off: #d6ccb9; --body-fill: #e8e0d2; --body-stroke: #b3a68d; --button-fill: #e0d7c7; --key-fill: #e8e0d2; --key-stroke: #cbbfa8; --key-text: #3d362a99; --warn-line: #a6672255; --warn-bg: #e7a2652a; --warn-text: #5a3412; --err: #c2181a; --err-text: #a3171a; --shadow: 0 12px 32px -16px #3d362a40; color-scheme: light; }
-  :root[data-theme="neon"] { --bg: #160520; --bar: #1e0829; --panel: #250a33; --raise: #2f0d40; --line: #45185a; --line-strong: #6b2a85; --text: #f1e3d0; --muted: #c99ec6; --faint: #ad80ab; --value: #fbb550; --accent: #dd3290; --accent-text: #f26cb4; --on-accent: #000; --lit: #dd32902e; --lit-edge: #dd3290; --toast: #2f0d40; --zone-off: #45185a; --body-fill: #250a33; --body-stroke: #5a1f73; --button-fill: #2f0d40; --key-fill: #2f0d40; --key-stroke: #5a1f73; --key-text: #f1e3d099; --warn-line: #fbb55055; --warn-bg: #fbb55014; --warn-text: #fbb550; --err: #ff5a6e; --err-text: #ffb4c0; --shadow: 0 12px 32px -14px #000000d9; color-scheme: dark; }
-  :root[data-theme="acid"] { --bg: #050605; --bar: #0b0d0b; --panel: #111411; --raise: #181c18; --line: #222822; --line-strong: #3a4838; --text: #eaf2e8; --muted: #a6b4a3; --faint: #8e9c8b; --value: #b9f0a8; --accent: #44d62c; --accent-text: #5fe048; --on-accent: #000; --lit: #44d62c24; --lit-edge: #44d62c; --toast: #181c18; --zone-off: #222822; --body-fill: #111411; --body-stroke: #2f3a2e; --button-fill: #181c18; --key-fill: #181c18; --key-stroke: #2c352b; --key-text: #eaf2e899; --warn-line: #ffd25e55; --warn-bg: #ffd25e14; --warn-text: #ffd25e; --err: #ff4d5e; --err-text: #ffb4bb; --shadow: 0 12px 32px -14px #000000e6; color-scheme: dark; }
+  :root, :root[data-theme="bridge"] { --bg: #050505; --bar: #0d0d0e; --panel: #131314; --raise: #1b1b1d; --line: #242426; --line-strong: #4a4440; --text: #f4efe9; --muted: #b8aea3; --faint: #9c9287; --value: #ffb85d; --accent: #ff5412; --accent-text: #ff7a45; --on-accent: #000; --lit: #ff541224; --lit-edge: #ff5412; --toast: #1b1b1d; --zone-off: #242426; --body-fill: #131314; --body-stroke: #3a3632; --button-fill: #1b1b1d; --key-fill: #1b1b1d; --key-stroke: #34312e; --key-text: #f4efe999; --warn-line: #ffb85d55; --warn-bg: #ffb85d14; --warn-text: #ffb85d; --err: #ff4a5a; --err-text: #ffb4bb; --shadow: 0 12px 32px -14px #000000e6; --pe-chg: #5cd0ff; --pe-hs: #e09bff; --pe-hs-fill: #e09bff; --pe-hs-on: #000; color-scheme: dark; }
+  :root[data-theme="roast"] { --bg: #150d05; --bar: #1e1007; --panel: #201002; --raise: #2b1909; --line: #3a2916; --line-strong: #64492b; --text: #f5e0d3; --muted: #b58754; --faint: #ad8150; --value: #e2aa6b; --accent: #e6c08f; --accent-text: #efcf9f; --on-accent: #1e1007; --lit: #e6c08f26; --lit-edge: #e6c08f; --toast: #2b1909; --zone-off: #3a2916; --body-fill: #201002; --body-stroke: #4a2b09; --button-fill: #2b1909; --key-fill: #2b1909; --key-stroke: #4a2b09; --key-text: #f5e0d399; --warn-line: #f8ac6055; --warn-bg: #f8ac6014; --warn-text: #f8ac60; --err: #ff5a4e; --err-text: #ffb4a8; --shadow: 0 12px 32px -14px #000000d9; --pe-chg: #8fd3ff; --pe-hs: #c4adff; --pe-hs-fill: #c4adff; --pe-hs-on: #000; color-scheme: dark; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme]) { --bg: #f4f4f7; --bar: #ffffff; --panel: #ffffff; --raise: #f0f0f4; --line: #e1e1e8; --line-strong: #c3c3cc; --text: #18181d; --muted: #5f5f6b; --faint: #6c6c78; --value: #18181d; --accent: #4f86ec; --accent-text: #1d4ed8; --on-accent: #0f2a66; --fill: #cfe0ff; --lit: #4f86ec1a; --lit-edge: #4f86ec; --toast: #ffffff; --zone-off: #d9d9df; --body-fill: #f1f1f4; --body-stroke: #c4c4cc; --button-fill: #e4e4ea; --key-fill: #ececf0; --key-stroke: #cfcfd7; --key-text: #00000099; --warn-line: #c9a20055; --warn-bg: #fff7d6; --warn-text: #6b5200; --err: #d70015; --err-text: #b3261e; --shadow: 0 10px 30px -14px #1b1b3040; --pe-chg: #a14a08; --pe-hs: #6741d9; --pe-hs-fill: #e9e3ff; --pe-hs-on: #3b2391; color-scheme: light; } }
+  :root[data-theme="classic"] { --bg: #0d0d10; --bar: #111115; --panel: #15151a; --raise: #1b1b21; --line: #25252d; --line-strong: #3a3a44; --text: #ececf1; --muted: #9a9aa6; --faint: #858591; --value: #ececf1; --accent: #5b9cff; --accent-text: #8bb8ff; --on-accent: #000; --lit: #5b9cff1f; --lit-edge: #5b9cff; --toast: #222229; --zone-off: #2a2a31; --body-fill: #141418; --body-stroke: #2b2b33; --button-fill: #1d1d23; --key-fill: #1b1b21; --key-stroke: #2e2e37; --key-text: #ffffff99; --warn-line: #ffd60a55; --warn-bg: #ffd60a12; --warn-text: #ffe58a; --err: #ff453a; --err-text: #ffb4ae; --shadow: 0 10px 30px -12px #000000cc; --pe-chg: #ffb35c; --pe-hs: #d0b8ff; --pe-hs-fill: #d0b8ff; --pe-hs-on: #000; color-scheme: dark; }
+  :root[data-theme="light"] { --bg: #f4f4f7; --bar: #ffffff; --panel: #ffffff; --raise: #f0f0f4; --line: #e1e1e8; --line-strong: #c3c3cc; --text: #18181d; --muted: #5f5f6b; --faint: #6c6c78; --value: #18181d; --accent: #4f86ec; --accent-text: #1d4ed8; --on-accent: #0f2a66; --fill: #cfe0ff; --lit: #4f86ec1a; --lit-edge: #4f86ec; --toast: #ffffff; --zone-off: #d9d9df; --body-fill: #f1f1f4; --body-stroke: #c4c4cc; --button-fill: #e4e4ea; --key-fill: #ececf0; --key-stroke: #cfcfd7; --key-text: #00000099; --warn-line: #c9a20055; --warn-bg: #fff7d6; --warn-text: #6b5200; --err: #d70015; --err-text: #b3261e; --shadow: 0 10px 30px -14px #1b1b3040; --pe-chg: #a14a08; --pe-hs: #6741d9; --pe-hs-fill: #e9e3ff; --pe-hs-on: #3b2391; color-scheme: light; }
+  :root[data-theme="workshop"] { --bg: #ede7dc; --bar: #e0d7c7; --panel: #f7f3ec; --raise: #e8e0d2; --line: #d6ccb9; --line-strong: #b3a68d; --text: #3d362a; --muted: #5c5141; --faint: #62564a; --value: #8a3f1b; --accent: #3f6e45; --accent-text: #2f5a35; --on-accent: #fff; --lit: #3f6e4533; --lit-edge: #3f6e45; --toast: #f7f3ec; --zone-off: #d6ccb9; --body-fill: #e8e0d2; --body-stroke: #b3a68d; --button-fill: #e0d7c7; --key-fill: #e8e0d2; --key-stroke: #cbbfa8; --key-text: #3d362a99; --warn-line: #a6672255; --warn-bg: #e7a2652a; --warn-text: #5a3412; --err: #c2181a; --err-text: #a3171a; --shadow: 0 12px 32px -16px #3d362a40; --pe-chg: #8a3f1b; --pe-hs: #5b3fb0; --pe-hs-fill: #e4dcf7; --pe-hs-on: #3a2675; color-scheme: light; }
+  :root[data-theme="neon"] { --bg: #160520; --bar: #1e0829; --panel: #250a33; --raise: #2f0d40; --line: #45185a; --line-strong: #6b2a85; --text: #f1e3d0; --muted: #c99ec6; --faint: #ad80ab; --value: #fbb550; --accent: #dd3290; --accent-text: #f26cb4; --on-accent: #000; --lit: #dd32902e; --lit-edge: #dd3290; --toast: #2f0d40; --zone-off: #45185a; --body-fill: #250a33; --body-stroke: #5a1f73; --button-fill: #2f0d40; --key-fill: #2f0d40; --key-stroke: #5a1f73; --key-text: #f1e3d099; --warn-line: #fbb55055; --warn-bg: #fbb55014; --warn-text: #fbb550; --err: #ff5a6e; --err-text: #ffb4c0; --shadow: 0 12px 32px -14px #000000d9; --pe-chg: #fbb550; --pe-hs: #7fd8ff; --pe-hs-fill: #7fd8ff; --pe-hs-on: #000; color-scheme: dark; }
+  :root[data-theme="acid"] { --bg: #050605; --bar: #0b0d0b; --panel: #111411; --raise: #181c18; --line: #222822; --line-strong: #3a4838; --text: #eaf2e8; --muted: #a6b4a3; --faint: #8e9c8b; --value: #b9f0a8; --accent: #44d62c; --accent-text: #5fe048; --on-accent: #000; --lit: #44d62c24; --lit-edge: #44d62c; --toast: #181c18; --zone-off: #222822; --body-fill: #111411; --body-stroke: #2f3a2e; --button-fill: #181c18; --key-fill: #181c18; --key-stroke: #2c352b; --key-text: #eaf2e899; --warn-line: #ffd25e55; --warn-bg: #ffd25e14; --warn-text: #ffd25e; --err: #ff4d5e; --err-text: #ffb4bb; --shadow: 0 12px 32px -14px #000000e6; --pe-chg: #ffd25e; --pe-hs: #c9b2ff; --pe-hs-fill: #c9b2ff; --pe-hs-on: #000; color-scheme: dark; }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
   body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -548,7 +548,11 @@
   #toast button { background: none; border: 1px solid var(--accent); color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; font-weight: 600; }
 
   /* Mouse editor: profiles on the left, the mouse in the middle, the chosen setting on the right. */
-  .pe { --pe-hs: var(--warn-text); flex: 1; min-height: 0; display: grid; grid-template-columns: 224px minmax(0, 1fr) 360px; }
+  /* Mouse editor. Three marks never to be mistaken for one another: the selection (the accent),
+     a changed button (--pe-chg, always with a dot as well) and the HyperShift layer (--pe-hs; its
+     pressed button is --pe-hs-fill with --pe-hs-on text, 4.5:1 or more). Each theme sets hues away
+     from its own accent. */
+  .pe { flex: 1; min-height: 0; display: grid; grid-template-columns: 224px minmax(0, 1fr) 360px; }
   .pe-profiles { background: var(--bar); border-right: 1px solid var(--line); overflow-y: auto; padding: 14px 10px; display: flex; flex-direction: column; gap: 3px; }
   .pe-cap { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin: 2px 8px 8px; font-weight: 600; }
   .pe-prof { display: grid; gap: 2px; text-align: left; background: none; border: 1px solid transparent; border-radius: 9px; padding: 8px 10px; cursor: pointer; color: var(--muted); }
@@ -558,8 +562,23 @@
   .pe-prof:hover { background: var(--raise); }
   .pe-prof[aria-current=true] { background: var(--panel); border-color: var(--accent); }
   .pe-live { flex: none; font-size: 10.5px; font-weight: 650; color: var(--accent-text); border: 1px solid var(--accent); border-radius: 999px; padding: 0 6px; }
+  .pe-pitem { position: relative; display: grid; }
+  .pe-pitem .pe-prof { padding-right: 40px; }
+  .pe-pdel { position: absolute; top: 5px; right: 5px; width: 30px; height: 30px; padding: 0; display: grid; place-items: center; background: none;
+    border: 1px solid transparent; border-radius: 8px; color: var(--faint); cursor: pointer; opacity: 0; }
+  .pe-pdel .ico { width: 14px; height: 14px; }
+  .pe-pitem:hover .pe-pdel, .pe-pitem:focus-within .pe-pdel, .pe-pitem.cur .pe-pdel { opacity: 1; }
+  @media (hover: none) { .pe-pdel { opacity: 1; } }
+  .pe-pdel:hover { color: var(--err-text); border-color: var(--line-strong); }
+  .pe-confirm { margin: 4px 0 6px; padding: 10px; border: 1px solid var(--err); border-radius: 9px; background: var(--panel); display: grid; gap: 8px; }
+  .pe-confirm p { margin: 0; font-size: 12.5px; color: var(--text); overflow-wrap: anywhere; }
+  .pe-confirm .row { display: flex; gap: 6px; }
+  .pe-confirm .ghost { flex: 1 1 0; justify-content: center; padding: 5px 8px; min-width: 0; }
   .pe-pacts { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 4px 0; }
-  .pe-pacts .newform { margin: 0; flex-wrap: wrap; } .pe-pacts .newform input { width: 100%; }
+  .pe-pacts > .ghost { flex: 1 1 auto; justify-content: center; padding: 6px 10px; }
+  .pe-pacts .newform { margin: 0; flex: 1 1 100%; min-width: 0; flex-wrap: wrap; }
+  .pe-pacts .newform input { flex: 1 1 100%; width: 100%; min-width: 0; }
+  .pe-pacts .newform .ghost { flex: 1 1 0; justify-content: center; padding: 6px 8px; min-width: 0; }
   .pe-note { color: var(--faint); font-size: 12px; margin: 12px 8px 0; }
   .pe-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
   .pe-tabs { display: flex; gap: 2px; padding: 8px 18px 0; border-bottom: 1px solid var(--line); flex: none; overflow-x: auto; }
@@ -569,18 +588,18 @@
   .pe-bar { display: flex; align-items: center; gap: 10px; padding: 12px 18px; flex: none; flex-wrap: wrap; }
   .pe-bar .hint { color: var(--faint); font-size: 12.5px; margin: 0; }
   .pe-bar .grow { flex: 1; }
-  .pe-bar .seg button[data-l=hypershift][aria-pressed=true] { color: var(--pe-hs); }
+  .pe-bar .seg button[data-l=hypershift][aria-pressed=true] { background: var(--pe-hs-fill); color: var(--pe-hs-on); font-weight: 600; }
   .pe-stage { flex: 1; min-height: 0; overflow: auto; padding: 0 18px 18px; }
   svg.pe-mouse { width: 100%; height: 100%; min-height: 420px; max-height: 640px; display: block; }
   .pe-body { fill: var(--body-fill); stroke: var(--body-stroke); stroke-width: 3; }
   .pe-seam { fill: none; stroke: var(--body-stroke); stroke-width: 3; }
   .pe-hot { fill: var(--button-fill); stroke: var(--line-strong); stroke-width: 2; cursor: pointer; transition: fill .12s; }
+  .pe-hot.chg { stroke: var(--pe-chg); }
   .pe-hot:hover, .pe-hot.on { fill: var(--lit); stroke: var(--lit-edge); }
-  .pe-hot.chg { stroke: var(--value); }
   .pe-lead { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
   .pe-lead.on { stroke: var(--lit-edge); stroke-width: 1.8; }
   .pe-pin { fill: var(--line-strong); }
-  .pe-pin.chg { fill: var(--value); }
+  .pe-pin.chg { fill: var(--pe-chg); }
   .pe-pin.on { fill: var(--lit-edge); }
   .pe-call { cursor: pointer; }
   .pe-call rect { fill: var(--panel); stroke: var(--line); }
@@ -589,9 +608,12 @@
   .pe-call:focus-visible { outline: none; } .pe-call:focus-visible rect { stroke: var(--accent); stroke-width: 2; }
   .pe-call .n { fill: var(--muted); font-size: 11.5px; }
   .pe-call .a { fill: var(--text); font-size: 13.5px; font-weight: 600; }
-  .pe-call .a.chg { fill: var(--value); }
+  .pe-call .a.chg { fill: var(--pe-chg); }
+  /* The changed dot: a shape, so a changed button never depends on its colour alone. */
+  .pe-call .dot, .pe-dot { fill: var(--pe-chg); }
+  .pe-dot-key { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--pe-chg); margin-right: 6px; vertical-align: 1px; }
   .pe-under { fill: var(--faint); font-size: 11px; text-anchor: middle; }
-  .pe.hs .pe-hot:hover, .pe.hs .pe-hot.on { stroke: var(--pe-hs); }
+  .pe.hs .pe-hot:hover, .pe.hs .pe-hot.on { stroke: var(--pe-hs); fill: color-mix(in srgb, var(--pe-hs) 18%, transparent); }
   .pe.hs .pe-call.on rect, .pe.hs .pe-lead.on { stroke: var(--pe-hs); }
   .pe.hs .pe-pin.on { fill: var(--pe-hs); }
   .pe.hs .pe-body { stroke-dasharray: 8 5; }
@@ -600,7 +622,7 @@
   .pe-list td { padding: 9px 10px; border-bottom: 1px solid var(--line); cursor: pointer; }
   .pe-list tr:hover td { background: var(--panel); }
   .pe-list tr[aria-selected=true] td { background: var(--raise); }
-  .pe-list .chg { color: var(--value); font-weight: 600; }
+  .pe-list .chg { color: var(--pe-chg); font-weight: 600; }
   .pe-list td:first-child { color: var(--muted); }
   .pe-more { margin-top: 10px; }
   .pe-insp { background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding: 16px 18px 24px; min-width: 0; }
@@ -640,7 +662,12 @@
   .pe-st .x:hover { color: var(--text); }
   .pe-st.add { place-items: center; color: var(--muted); border-style: dashed; min-height: 68px; }
   .pe-zone { cursor: pointer; transition: opacity .15s; }
-  .pe-zone.on { stroke: var(--text); stroke-width: 3; }
+  /* The picked zone gets a ring drawn behind it (a gap, then a line), so the zone keeps its own
+     colour, whether that colour is a fill or, for the underglow, a stroke. */
+  .pe-zone-ring, .pe-zone-gap { pointer-events: none; fill: none; }
+  .pe-zone-ring { stroke: var(--text); }
+  .pe-zone-gap { stroke: var(--bg); }
+  .pe-zone-gap.solid { fill: var(--bg); }
   .pe-zones { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 4px 0 14px; }
   @media (max-width: 1180px) { .pe { grid-template-columns: 196px minmax(0, 1fr) 320px; } }
   @media (max-width: 980px) { .pe { grid-template-columns: 180px minmax(0, 1fr); } .pe-insp { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); } }
@@ -2022,7 +2049,8 @@ function audioEditor(host, part) {
 let audioEditSlot = null; // the EQ slot open in the panel; null: the one playing
 
 // The live profile's games and apps: while one is in front, this profile comes up.
-function appsEditor(box) {
+// `noDelete`: the mouse editor deletes from the profile's own card, so it leaves this out.
+function appsEditor(box, noDelete) {
   const n = dev.active, apps = dev.profile.apps || [];
   const games = el('div', { className: 'games' });
   apps.forEach(a => games.append(el('span', { className: 'game' }, a,
@@ -2039,7 +2067,7 @@ function appsEditor(box) {
     el('div', { className: 'edgroup' }, el('h3', { textContent: uiText('Add one') }),
       el('div', { className: 'row' }, input, list, el('button', { className: 'ghost', innerHTML: icon('plus') + uiText('Add'), onclick: add }))),
     el('p', { className: 'note', textContent: uiText('Running programs are suggested as you type. While one is in front, the tray switches to this profile, then back when you leave it.') }));
-  if (dev.profiles.length > 1) box.append(el('div', { className: 'edgroup' }, el('h3', { textContent: uiText('This profile') }),
+  if (dev.profiles.length > 1 && !noDelete) box.append(el('div', { className: 'edgroup' }, el('h3', { textContent: uiText('This profile') }),
     el('div', { className: 'row' }, el('button', { className: 'ghost danger', textContent: uiText('Delete ') + n, onclick: () => deleteProfile(n) }))));
 }
 
@@ -3404,7 +3432,9 @@ const BTN_CHOICES = [
     ['forward', uiText('Forward')], ['double-click', uiText('Double click')], ['scroll-up', uiText('Scroll up')], ['scroll-down', uiText('Scroll down')],
     ['scroll-left', uiText('Scroll left')], ['scroll-right', uiText('Scroll right')]]],
   [uiText('Keyboard'), [['key', uiText('Key or shortcut…')], ['turbo-key', uiText('Turbo key…')]]],
-  [uiText('Turbo'), [['turbo-left', uiText('Turbo left click')], ['turbo-right', uiText('Turbo right click')]]],
+  [uiText('Turbo'), [['turbo-left', uiText('Turbo left click')], ['turbo-right', uiText('Turbo right click')], ['turbo-middle', uiText('Turbo middle click')],
+    ['turbo-back', uiText('Turbo back')], ['turbo-forward', uiText('Turbo forward')], ['turbo-scroll-up', uiText('Turbo scroll up')],
+    ['turbo-scroll-down', uiText('Turbo scroll down')], ['turbo-scroll-left', uiText('Turbo scroll left')], ['turbo-scroll-right', uiText('Turbo scroll right')]]],
   [uiText('Sensitivity'), [['dpi-up', uiText('DPI up')], ['dpi-down', uiText('DPI down')], ['dpi-cycle-up', uiText('DPI cycle')],
     ['dpi-cycle-down', uiText('DPI cycle down')], ['dpi-clutch', uiText('Sniper (DPI while held)…')]]],
   [uiText('Media'), [['media:volume-up', uiText('Volume up')], ['media:volume-down', uiText('Volume down')], ['media:mute', uiText('Mute')],
@@ -3437,7 +3467,8 @@ const MODIFIER_ORDER = ['ctrl', 'shift', 'alt', 'win', 'rctrl', 'rshift', 'ralt'
 function splitAction(a) {
   let m;
   if ((m = /^turbo:key:(.+)@(\d+)$/.exec(a))) return ['turbo-key', m[1], m[2]];
-  if ((m = /^turbo:(left|right)@(\d+)$/.exec(a))) return ['turbo-' + m[1], '', m[2]];
+  // Every mouse button turbo takes (the core's MOUSE_NAMES): clicks, back/forward and scrolls.
+  if ((m = /^turbo:(left|right|middle|back|forward|scroll-(?:up|down|left|right))@(\d+)$/.exec(a))) return ['turbo-' + m[1], '', m[2]];
   if ((m = /^key:(.+)$/.exec(a))) return ['key', m[1], ''];
   if ((m = /^dpi-clutch:(\d+)/.exec(a))) return ['dpi-clutch', '', m[1]];
   if ((m = /^macro:(\d+)(?:@(\w+))?$/.exec(a))) return ['macro', m[1], m[2] || '1'];
@@ -3446,7 +3477,7 @@ function splitAction(a) {
 function joinAction(choice, keys, n) {
   if (choice === 'key') return keys ? 'key:' + keys : null;
   if (choice === 'turbo-key') return keys ? `turbo:key:${keys}@${n || 7}` : null;
-  if (choice === 'turbo-left' || choice === 'turbo-right') return `turbo:${choice.slice(6)}@${n || 7}`;
+  if (/^turbo-/.test(choice)) return `turbo:${choice.slice(6)}@${n || 7}`;
   if (choice === 'dpi-clutch') return 'dpi-clutch:' + (n || 400);
   if (choice === 'macro') return keys ? 'macro:' + keys + (n && n !== '1' ? '@' + n : '') : null;
   return choice;
@@ -3551,7 +3582,7 @@ function buttonEditor(box, name) {
   };
   keyIn.onkeyup = e => { if (lone && MOD_CODES[e.code] === lone) { setKeys(lone); lone = null; send(); } };
   const extras = () => {
-    const v = sel.value, clutch = v === 'dpi-clutch', turbo = v === 'turbo-left' || v === 'turbo-right' || v === 'turbo-key';
+    const v = sel.value, clutch = v === 'dpi-clutch', turbo = /^turbo-/.test(v);
     const mac = v === 'macro', times = mac && playSel.value === 'times';
     keyIn.hidden = modBox.hidden = !(v === 'key' || v === 'turbo-key');
     macroSel.hidden = playSel.hidden = !mac;
@@ -3771,7 +3802,7 @@ window.addEventListener('pointerup', () => painting = false);
 // Writes go through the same calls as the classic view (assign, /api/stages, zoneEditor…), so
 // every change is saved to the live profile right away, with Undo where the classic view has it.
 const usePE = () => !!dev && dev.kind === 'mouse' && remembered('classic') !== '1';
-let peTab = 'buttons', peSel = null, peList = false, peZone = null, peCat = null, peAside = null, peAdding = false, peInspSig = '';
+let peTab = 'buttons', peSel = null, peList = false, peZone = null, peCat = null, peAside = null, peAdding = false, peDeleting = null, peInspSig = '';
 
 // Where each button sits on the drawing (a plain top view, the left flank showing), its
 // leader line's side, and a name by where it is. Buttons missing here go in a list below.
@@ -3887,16 +3918,27 @@ function peProfiles() {
   const box = $('peProfiles');
   box.innerHTML = '';
   box.append(el('h2', { className: 'pe-cap', textContent: uiText('Profiles') }));
+  // The profile whose deletion is being asked about, on this device only.
+  if (peDeleting && (peDeleting.id !== dev.id || !dev.profiles.includes(peDeleting.name) || dev.profiles.length < 2)) peDeleting = null;
+  const asking = n => !!peDeleting && peDeleting.name === n;
   dev.profiles.forEach(n => {
     const p = prof(n), keys = Object.keys(p.buttons || {});
     const st = n === dev.active && dev.stages ? dev.stages.list.length : p.dpi_stages ? p.dpi_stages.stages.length : 0;
     const normal = keys.filter(k => !k.includes('/')).length, hyper = keys.length - normal, apps = (p.apps || []).length;
     const bits = [st && plural(st, 'DPI stage'), normal && plural(normal, 'button'), hyper && hyper + ' HyperShift', apps && (apps === 1 ? uiText('1 game') : apps + uiText(' games'))].filter(Boolean);
-    box.append(el('button', { className: 'pe-prof', ariaCurrent: n === dev.active,
-      title: n === dev.active ? n + uiText(' is live') : uiText('Make ') + n + uiText(' live'),
-      onclick: () => { if (n !== dev.active) activate(n); } },
-      el('b', {}, el('span', { textContent: n }), n === dev.active ? el('i', { className: 'pe-live', textContent: uiText('live') }) : null),
-      el('small', { textContent: bits.join(' · ') || uiText('As the mouse has it') })));
+    const item = el('div', { className: 'pe-pitem' + (n === dev.active ? ' cur' : '') },
+      el('button', { className: 'pe-prof', ariaCurrent: n === dev.active,
+        title: n === dev.active ? n + uiText(' is live') : uiText('Make ') + n + uiText(' live'),
+        onclick: () => { if (n !== dev.active) activate(n); } },
+        el('b', {}, el('span', { textContent: n }), n === dev.active ? el('i', { className: 'pe-live', textContent: uiText('live') }) : null),
+        el('small', { textContent: bits.join(' · ') || uiText('As the mouse has it') })),
+      dev.profiles.length > 1 ? el('button', { className: 'pe-pdel', innerHTML: icon('trash'), title: uiText('Delete ') + n, ariaLabel: uiText('Delete ') + n,
+        ariaExpanded: asking(n), dataset: { p: n }, onclick: () => {
+          peDeleting = asking(n) ? null : { id: dev.id, name: n }; peProfiles();
+          const cancel = $('peProfiles').querySelector('.pe-confirm .cancel'); if (cancel) cancel.focus();
+        } }) : null);
+    box.append(item);
+    if (asking(n)) box.append(peDeleteConfirm(n));
   });
   const acts = el('div', { className: 'pe-pacts' });
   if (peAdding) {
@@ -3909,10 +3951,22 @@ function peProfiles() {
   } else {
     acts.append(el('button', { className: 'ghost', innerHTML: icon('plus') + uiText('New'), title: uiText('New profile, a copy of ') + dev.active, onclick: () => { peAdding = true; peProfiles(); } }),
       el('button', { className: 'ghost', textContent: uiText('Games…'), title: uiText('Games and apps that bring up ') + dev.active, ariaPressed: peAside === 'apps',
-        onclick: () => { peAside = peAside === 'apps' ? null : 'apps'; renderPE(); } }),
-      dev.profiles.length > 1 ? el('button', { className: 'ghost', innerHTML: icon('trash'), title: uiText('Delete ') + dev.active, ariaLabel: uiText('Delete ') + dev.active, onclick: () => deleteProfile(dev.active) }) : '');
+        onclick: () => { peAside = peAside === 'apps' ? null : 'apps'; renderPE(); } }));
   }
   box.append(acts, el('p', { className: 'pe-note', textContent: uiText('A click on a profile makes it live on the mouse and opens it here. Every change is saved to it right away.') }));
+}
+// Asked in place, under the profile's card, instead of the browser's confirm() box. Deleting
+// can't be undone (the server has no way to bring a profile back), so this asks first.
+function peDeleteConfirm(name) {
+  const done = () => { peDeleting = null; peProfiles(); const b = [...$('peProfiles').querySelectorAll('.pe-pdel')].find(x => x.dataset.p === name); if (b) b.focus(); };
+  const id = 'peDelMsg';
+  const cancel = el('button', { className: 'ghost cancel', type: 'button', textContent: uiText('Cancel'), onclick: done });
+  const box = el('div', { className: 'pe-confirm', role: 'group', onkeydown: e => { if (e.key === 'Escape') { e.stopPropagation(); done(); } } },
+    el('p', { id, textContent: profileDeleteQuestion(name) + uiText(' This can’t be undone.') }),
+    el('div', { className: 'row' }, el('button', { className: 'ghost danger', type: 'button', innerHTML: icon('trash') + uiText('Delete'),
+      onclick: () => { peDeleting = null; removeProfile(name); } }), cancel));
+  box.setAttribute('aria-labelledby', id);
+  return box;
 }
 
 function peBar() {
@@ -3954,12 +4008,14 @@ function peButtonsStage(stage) {
     const t = el('table', { className: 'pe-list' });
     t.append(el('tr', {}, el('th', { textContent: uiText('Button') }), el('th', { textContent: uiText('Standard') }), el('th', { textContent: 'HyperShift' })));
     [...list].sort((a, b) => Object.keys(PE_SPOTS).indexOf(a.name) - Object.keys(PE_SPOTS).indexOf(b.name)).forEach(b => {
-      const cell = layer => el('span', { className: b.remapped[layer] ? 'chg' : '', textContent: b[layer] == null ? '—' : peLabel(b[layer]) });
+      const cell = layer => b.remapped[layer]
+        ? el('span', { className: 'chg' }, el('i', { className: 'pe-dot-key', ariaHidden: 'true' }), peLabel(b[layer]), el('span', { className: 'sr', textContent: uiText(' (changed)') }))
+        : el('span', { textContent: b[layer] == null ? '—' : peLabel(b[layer]) });
       const tr = el('tr', { ariaSelected: cur && cur.name === b.name, tabIndex: 0, onclick: () => pePick(b.name), onkeydown: e => { if (e.key === 'Enter') pePick(b.name); } },
         el('td', { textContent: peName(b) }), el('td', {}, cell('normal')), el('td', {}, cell('hypershift')));
       t.append(tr);
     });
-    return stage.append(t, el('p', { className: 'pe-help', textContent: uiText('Both layers side by side. Changed actions are highlighted.') }));
+    return stage.append(t, el('p', { className: 'pe-help', textContent: uiText('Both layers side by side. A dot marks the buttons this profile changes.') }));
   }
   const svg = svgEl('svg', { class: 'pe-mouse', viewBox: '0 0 900 470', role: 'group', 'aria-label': uiText('Mouse: pick a button to change what it does') });
   const g = svgEl('g', { transform: 'translate(200,0)' });
@@ -3986,12 +4042,19 @@ function peButtonsStage(stage) {
         'aria-pressed': String(!!on), 'aria-label': peName(b) + ': ' + what + (chg ? uiText(' (changed)') : '') });
       c.append(svgEl('rect', { width: 210, height: 48, rx: 9 }), svgEl('title', {}, peName(b) + ': ' + what),
         svgEl('text', { x: 12, y: 19, class: 'n' }, peName(b)), svgEl('text', { x: 12, y: 37, class: 'a' + (chg ? ' chg' : '') }, short));
+      if (chg) c.append(svgEl('circle', { cx: 197, cy: 14, r: 4.5, class: 'dot' }));
       c.onclick = () => pePick(b.name);
       c.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pePick(b.name); } };
       svg.append(c);
     });
   }
   if (placed.some(b => PE_SPOTS[b.name].under)) g.append(svgEl('text', { x: 250, y: 428, class: 'pe-under' }, uiText('underside')));
+  // What the dot means, under the mouse, so it stays in view with the drawing.
+  if (shown.some(b => b.remapped[btnLayer])) {
+    const legend = svgEl('text', { x: 450, y: 462, class: 'pe-under' });
+    legend.append(svgEl('tspan', { class: 'pe-dot' }, '● '), uiText('Changed in this profile'));
+    svg.append(legend);
+  }
   svg.append(g);
   stage.append(svg);
   if (rest.length) {
@@ -4003,7 +4066,7 @@ function peButtonsStage(stage) {
 }
 
 function peInspector(box) {
-  if (peAside === 'apps') return peAsideBox(box, uiText('Games and apps'), appsEditor);
+  if (peAside === 'apps') return peAsideBox(box, uiText('Games and apps'), ed => appsEditor(ed, true));
   if (peAside === 'onboard') return peAsideBox(box, uiText('Saved on the mouse'), onboardEditor);
   if (peTab === 'buttons') return peButtonInsp(box);
   if (peTab === 'light') return peLightInsp(box);
@@ -4126,7 +4189,7 @@ function peTurboOpts(o, button, a) {
   const [choice, keys, n] = splitAction(a || '');
   const rate = el('input', { type: 'number', className: 'num', min: 1, max: 50, value: /^turbo/.test(choice) ? n : 7, ariaLabel: uiText('Presses per second') });
   const r = () => Math.max(1, Math.min(50, Math.round(+rate.value) || 7));
-  [['turbo-left', uiText('Turbo left click')], ['turbo-right', uiText('Turbo right click')]].forEach(([v, t]) =>
+  BTN_CHOICES[2][1].forEach(([v, t]) =>
     o.append(el('button', { className: 'pe-opt', ariaPressed: choice === v, textContent: t, onclick: () => peAssign(button, joinAction(v, '', r())) })));
   rate.onchange = () => { if (/^turbo/.test(choice)) peAssign(button, joinAction(choice, keys, r())); };
   o.append(el('div', { className: 'row' }, rate, el('span', { className: 'tl', textContent: uiText('presses / second') })),
@@ -4186,19 +4249,29 @@ function peLightStage(stage) {
   if (!names.includes(peZone)) peZone = names[0];
   const svg = svgEl('svg', { class: 'pe-mouse', viewBox: '0 0 900 470', role: 'group', 'aria-label': uiText('Mouse: pick a zone') });
   const g = svgEl('g', { transform: 'translate(200,0)' });
+  // The zone in its own colour, and when picked a ring behind it (same shape, wider stroke).
   const paint = (shape, n) => {
-    const z = zoneOf(dev.profile, n), c = zonePaint(z);
+    const z = zoneOf(dev.profile, n), c = zonePaint(z), stroked = shape.getAttribute('fill') === 'none';
     const color = c && !c.startsWith('conic') ? c : c ? '#ffffff' : 'var(--zone-off)';
-    shape.setAttribute(shape.getAttribute('fill') === 'none' ? 'stroke' : 'fill', color);
+    const ring = [];
+    if (n === peZone) {
+      const w = stroked ? +shape.getAttribute('stroke-width') : 0;
+      ring.push(shape.cloneNode(false), shape.cloneNode(false));
+      ring[0].setAttribute('class', 'pe-zone-ring'); ring[0].setAttribute('stroke-width', w + 12);
+      ring[1].setAttribute('class', 'pe-zone-gap' + (stroked ? '' : ' solid')); ring[1].setAttribute('stroke-width', w + 5);
+      ring.forEach(r => { r.removeAttribute('fill'); r.setAttribute('aria-hidden', 'true'); });
+    }
+    shape.setAttribute(stroked ? 'stroke' : 'fill', color);
     shape.style.opacity = c ? 0.35 + 0.65 * ((z.brightness ?? 100) / 100) : 1;
-    shape.setAttribute('class', 'pe-zone' + (n === peZone ? ' on' : ''));
+    shape.setAttribute('class', 'pe-zone');
     shape.append(svgEl('title', {}, label(n)));
     shape.onclick = () => { peZone = n; renderPE(); };
+    return [...ring, shape];
   };
-  if (names.includes('underglow')) { const u = svgEl('path', { d: 'M250 30C178 30 146 88 143 170c-3 88 4 164 28 232 20 52 138 52 158 0 24-68 31-144 28-232C354 88 322 30 250 30z', fill: 'none', 'stroke-width': 10 }); paint(u, 'underglow'); g.append(u); }
+  if (names.includes('underglow')) g.append(...paint(svgEl('path', { d: 'M250 30C178 30 146 88 143 170c-3 88 4 164 28 232 20 52 138 52 158 0 24-68 31-144 28-232C354 88 322 30 250 30z', fill: 'none', 'stroke-width': 10 }), 'underglow'));
   g.append(svgEl('path', { d: PE_BODY, class: 'pe-body' }), svgEl('path', { d: 'M250 44v116M158 162c56 18 128 18 184 0', class: 'pe-seam' }));
-  if (names.includes('scroll')) { const s = svgEl('rect', { x: 238, y: 70, width: 24, height: 84, rx: 12 }); paint(s, 'scroll'); g.append(s); }
-  if (names.includes('logo')) { const l = svgEl('circle', { cx: 250, cy: 300, r: 28 }); paint(l, 'logo'); g.append(l); }
+  if (names.includes('scroll')) g.append(...paint(svgEl('rect', { x: 238, y: 70, width: 24, height: 84, rx: 12 }), 'scroll'));
+  if (names.includes('logo')) g.append(...paint(svgEl('circle', { cx: 250, cy: 300, r: 28 }), 'logo'));
   svg.append(g);
   const chips = el('div', { className: 'pe-zones' });
   names.forEach(n => chips.append(el('button', { className: 'pe-opt', ariaPressed: n === peZone, textContent: label(n), onclick: () => { peZone = n; renderPE(); } })));
@@ -4246,9 +4319,15 @@ async function createProfile(name) {
     toast(uiText('Created ') + name + uiText(' (a copy of the previous profile)'));
   } catch (err) { toast(err.message, true); }
 }
-async function deleteProfile(name) {
+function profileDeleteQuestion(name) {
   const other = name === dev.active ? dev.profiles.find(p => p !== name) : null;
-  if (!confirm(uiText`Delete the profile "${name}"?` + (other ? uiText` "${other}" becomes active.` : uiText(' Games tied to it go back to the active profile.')))) return;
+  return uiText`Delete the profile "${name}"?` + (other ? uiText` "${other}" becomes active.` : uiText(' Games tied to it go back to the active profile.'));
+}
+async function deleteProfile(name) {
+  if (confirm(profileDeleteQuestion(name))) await removeProfile(name);
+}
+async function removeProfile(name) {
+  const other = name === dev.active ? dev.profiles.find(p => p !== name) : null;
   try {
     if (other) await api('/api/profile', { action: 'use', name: other });
     const r = await api('/api/profile', { action: 'delete', name }); adopt(r.device);

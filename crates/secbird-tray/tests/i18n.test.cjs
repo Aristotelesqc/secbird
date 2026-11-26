@@ -62,9 +62,14 @@ test('localization preserves button action encoding and round trips', () => {
   const helpers = html.slice(html.indexOf('function splitAction('), html.indexOf('// Plain words for any action text.'));
   const { splitAction, joinAction } = vm.runInNewContext(helpers + '\n({splitAction, joinAction})');
   for (const action of ['key:ctrl+shift+f13', 'turbo:key:alt+tab@9', 'turbo:left@15',
-    'dpi-clutch:400', 'macro:7@hold', 'macro:9@toggle', 'hypershift', 'scroll-mode:1']) {
+    'dpi-clutch:400', 'macro:7@hold', 'macro:9@toggle', 'hypershift', 'scroll-mode:1',
+    'turbo:right@7', 'turbo:middle@20', 'turbo:back@5', 'turbo:forward@5', 'turbo:scroll-up@12',
+    'turbo:scroll-down@1', 'turbo:scroll-left@50', 'turbo:scroll-right@30']) {
     assert.equal(joinAction(...splitAction(action)), action);
   }
+  // Turbo scrolls are recognised (a choice and a rate), not passed through as raw text.
+  assert.deepEqual([...splitAction('turbo:scroll-left@50')], ['turbo-scroll-left', '', '50']);
+  assert.equal(joinAction('turbo-scroll-left', '', '12'), 'turbo:scroll-left@12');
 });
 
 test('localization does not change CSS class tokens or keyboard event identifiers', () => {
