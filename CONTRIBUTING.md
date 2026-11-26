@@ -168,6 +168,7 @@ crates/
 | `editor.html` | The whole editor: markup, CSS and script in one file |
 | `apps.rs` | Which program is in front, for per-game profiles |
 | `osd.rs` | The small DPI and profile popups |
+| `theme.rs`, `app.manifest` | Tray icon for the taskbar's theme and scale, dark menu, per-screen DPI (icons: `tools/make-tray-icons.ps1`) |
 | `studio.rs`, `sensors.rs`, `input.rs` | RGB Studio's frame timer, audio/screen sensors, key presses |
 | `settings.rs` | The tray's own settings |
 

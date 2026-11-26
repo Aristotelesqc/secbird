@@ -21,6 +21,13 @@
   Windows. Covers every message the editor has.
 
 ### Fixed
+- **Sharp, dark tray menu and a tray icon that follows the theme.** The right-click menu was
+  drawn at 100 % and stretched, so it looked blurry on a screen at 125 % or more; it is now sharp
+  at any scale, and dark when Windows apps are dark. The icon is the bird alone, white on a dark
+  taskbar and dark on a light one, switching when the theme changes, at the screen's own size
+  instead of a stretched 16 px. The DPI and profile popups are sharp too. Tested on Windows 11
+  (build 26300) at 150 % in dark mode, with simulated devices; the light theme and other scales
+  are untested.
 - Turbo on the middle button, back, forward and the four scroll directions shows its rate and
   can be changed in the editor; only left and right click turbo were recognised.
 

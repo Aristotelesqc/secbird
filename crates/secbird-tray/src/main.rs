@@ -20,6 +20,8 @@ mod settings;
 #[cfg(windows)]
 mod studio;
 #[cfg(windows)]
+mod theme;
+#[cfg(windows)]
 mod win;
 
 #[cfg(windows)]

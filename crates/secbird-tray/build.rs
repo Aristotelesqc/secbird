@@ -1,7 +1,9 @@
 fn main() {
     println!("cargo:rerun-if-changed=app.rc");
+    println!("cargo:rerun-if-changed=app.manifest");
     println!("cargo:rerun-if-changed=../../assets/secretarybird.ico");
-    println!("cargo:rerun-if-changed=../../assets/tray.ico");
+    println!("cargo:rerun-if-changed=../../assets/tray-on-dark.ico");
+    println!("cargo:rerun-if-changed=../../assets/tray-on-light.ico");
     if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("windows") {
         embed_resource::compile("app.rc", embed_resource::NONE);
     }

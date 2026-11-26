@@ -8,6 +8,7 @@ use std::ptr::{null, null_mut};
 use windows_sys::Win32::Foundation::*;
 use windows_sys::Win32::Graphics::Gdi::*;
 use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
+use windows_sys::Win32::UI::HiDpi::GetDpiForWindow;
 use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
 const CLASS_NAME: &str = "SecretarybirdOsd";
@@ -19,7 +20,8 @@ const FOREGROUND: COLORREF = 0x00F1_ECEC;
 thread_local! {
     static WINDOW: Cell<HWND> = const { Cell::new(null_mut()) };
     static TEXT: RefCell<Vec<u16>> = const { RefCell::new(Vec::new()) };
-    static FONT: Cell<HFONT> = const { Cell::new(null_mut()) };
+    /// The font, and the DPI it was made for.
+    static FONT: Cell<(HFONT, u32)> = const { Cell::new((null_mut(), 0)) };
 }
 
 fn wide(s: &str) -> Vec<u16> {
@@ -35,9 +37,15 @@ pub fn show(text: &str) {
         }
         TEXT.with(|t| *t.borrow_mut() = text.encode_utf16().collect());
 
+        // Real pixels (the process is PerMonitorV2), at the scale of the screen the popup
+        // is on: the main one, whose work area it sits in.
+        let dpi = match GetDpiForWindow(hwnd) {
+            0 => 96,
+            d => d,
+        };
+        let scale = dpi as f32 / 96.0;
+        let font = font(dpi);
         let screen = GetDC(null_mut());
-        let scale = GetDeviceCaps(screen, LOGPIXELSY as _) as f32 / 96.0;
-        let font = font(scale);
         let old = SelectObject(screen, font as _);
         let mut size: SIZE = zeroed();
         TEXT.with(|t| GetTextExtentPoint32W(screen, t.borrow().as_ptr(), t.borrow().len() as i32, &mut size));
@@ -56,10 +64,12 @@ pub fn show(text: &str) {
     }
 }
 
-unsafe fn font(scale: f32) -> HFONT {
-    if FONT.with(Cell::get).is_null() {
+/// The popup's font at `dpi`, made again when the scale changed.
+unsafe fn font(dpi: u32) -> HFONT {
+    let (old, made_for) = FONT.with(Cell::get);
+    if old.is_null() || made_for != dpi {
         let f = CreateFontW(
-            -(19.0 * scale).round() as i32,
+            -(19.0 * dpi as f32 / 96.0).round() as i32,
             0,
             0,
             0,
@@ -74,9 +84,12 @@ unsafe fn font(scale: f32) -> HFONT {
             (DEFAULT_PITCH | FF_DONTCARE) as u32,
             wide("Segoe UI").as_ptr(),
         );
-        FONT.with(|c| c.set(f));
+        if !old.is_null() {
+            DeleteObject(old as _);
+        }
+        FONT.with(|c| c.set((f, dpi)));
     }
-    FONT.with(Cell::get)
+    FONT.with(Cell::get).0
 }
 
 /// Created on first use: most sessions never show a popup.
@@ -122,7 +135,7 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             let brush = CreateSolidBrush(BACKGROUND);
             FillRect(dc, &rc, brush);
             DeleteObject(brush as _);
-            let old = SelectObject(dc, FONT.with(Cell::get) as _);
+            let old = SelectObject(dc, FONT.with(Cell::get).0 as _);
             SetBkMode(dc, TRANSPARENT as _);
             SetTextColor(dc, FOREGROUND);
             TEXT.with(|t| {

@@ -12,6 +12,7 @@ use std::time::{Duration, Instant};
 use windows_sys::core::GUID;
 use windows_sys::Win32::Graphics::Gdi::*;
 use windows_sys::Win32::System::Com::{CoCreateInstance, CoInitializeEx, CoUninitialize, CLSCTX_ALL, COINIT_MULTITHREADED};
+use windows_sys::Win32::UI::HiDpi::{SetThreadDpiAwarenessContext, DPI_AWARENESS_CONTEXT_UNAWARE};
 use windows_sys::Win32::UI::WindowsAndMessaging::{GetSystemMetrics, SM_CXSCREEN, SM_CYSCREEN};
 
 struct Worker {
@@ -155,6 +156,9 @@ const SCREEN_H: i32 = 18;
 
 fn screen_loop(stop: &AtomicBool, senses: &Mutex<Senses>) {
     unsafe {
+        // This thread sees the screen at 100 %, as Windows scales it down: a few pixels come
+        // out the same, and at 150 % it costs half the time of scaling the real pixels here.
+        SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_UNAWARE);
         let screen = GetDC(null_mut());
         let mem = CreateCompatibleDC(screen);
         let bmp = CreateCompatibleBitmap(screen, SCREEN_W, SCREEN_H);

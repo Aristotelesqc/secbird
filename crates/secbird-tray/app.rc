@@ -1,2 +1,4 @@
 1 ICON "../../assets/secretarybird.ico"
-2 ICON "../../assets/tray.ico"
+2 ICON "../../assets/tray-on-dark.ico"
+3 ICON "../../assets/tray-on-light.ico"
+1 24 "app.manifest"

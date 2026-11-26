@@ -2,7 +2,7 @@ use crate::engine::{ApplyReport, Battery, Engine, LightsRetry, DIM_FOR, RELIGHT_
 use secbird_core::{log, Kind};
 use std::collections::{HashMap, HashSet};
 use crate::settings::{autostart_enabled, open_config_folder, set_autostart, TraySettings};
-use crate::{apps, osd, server};
+use crate::{apps, osd, server, theme};
 use std::ffi::CString;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use secbird_core::update::Release;
@@ -114,6 +114,10 @@ const GUID_DEVINTERFACE_HID: GUID = GUID::from_u128(0x4d1e55b2_f16f_11cf_88cb_00
 
 /// "TaskbarCreated" is broadcast when Explorer restarts; the icon must be re-added.
 static TASKBAR_CREATED: AtomicU32 = AtomicU32::new(0);
+/// The icon in the notification area, owned here: swapped when the theme or the scale changes.
+/// Not in `App`: theme and scale changes are sent messages, which can come in while `App` is
+/// borrowed.
+static TRAY_ICON: AtomicPtr<c_void> = AtomicPtr::new(null_mut());
 /// The tray window, for the foreground hook (which gets no user data).
 static TRAY_HWND: AtomicPtr<c_void> = AtomicPtr::new(null_mut());
 /// Index into RETRY_DELAYS_MS of the next retry, and how many times the retries were started
@@ -135,7 +139,6 @@ static RETRY_IF_ASLEEP: AtomicBool = AtomicBool::new(false);
 
 struct App {
     hwnd: HWND,
-    icon: HICON,
     /// Shared with the editor's server thread.
     engine: Arc<Mutex<Engine>>,
     /// Started on first use; holds the tokenized URL.
@@ -353,8 +356,9 @@ pub fn run() {
             WINEVENT_OUTOFCONTEXT,
         );
 
-        let icon = load_icon();
-        add_icon(hwnd, icon);
+        // Dark menu when apps are dark, then the icon for the taskbar's theme and scale.
+        theme::dark_menus(hwnd);
+        show_icon(hwnd, true);
         let (events_tx, events) = channel();
         let (firmware_tx, firmware) = channel();
         let (updates_tx, updates) = channel();
@@ -362,7 +366,6 @@ pub fn run() {
         APP.with(|cell| {
             *cell.borrow_mut() = Some(App {
                 hwnd,
-                icon,
                 engine: Arc::new(Mutex::new(engine)),
                 editor_url: None,
                 profile_items: Vec::new(),
@@ -649,10 +652,20 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             0
         }
         m if m != 0 && m == TASKBAR_CREATED.load(Ordering::Relaxed) => {
-            with_app(|app| {
-                add_icon(app.hwnd, app.icon);
-                app.update_tooltip();
-            });
+            // Explorer restarted, maybe at another scale: load the icon again.
+            show_icon(hwnd, true);
+            with_app(|app| app.update_tooltip());
+            0
+        }
+        // Light or dark theme changed: the menu and the icon follow.
+        WM_SETTINGCHANGE if theme::is_theme_change(lparam) => {
+            theme::dark_menus(hwnd);
+            show_icon(hwnd, false);
+            0
+        }
+        // Scale or screens changed: the icon at the new size.
+        WM_DPICHANGED | WM_DISPLAYCHANGE => {
+            show_icon(hwnd, false);
             0
         }
         _ => DefWindowProcW(hwnd, msg, wparam, lparam),
@@ -989,7 +1002,7 @@ impl App {
             text.push_str("\nSynapse is running");
         }
         unsafe {
-            let mut nid = icon_data(self.hwnd, self.icon);
+            let mut nid = icon_data(self.hwnd);
             nid.uFlags = NIF_TIP;
             copy_wide(&mut nid.szTip, &text);
             Shell_NotifyIconW(NIM_MODIFY, &nid);
@@ -1022,7 +1035,7 @@ impl App {
     fn notify_click(&self, title: &str, body: &str, icon: NOTIFY_ICON_INFOTIP_FLAGS, click: Option<Click>) {
         self.balloon_click.replace(click);
         unsafe {
-            let mut nid = icon_data(self.hwnd, self.icon);
+            let mut nid = icon_data(self.hwnd);
             nid.uFlags = NIF_INFO;
             nid.dwInfoFlags = icon;
             copy_wide(&mut nid.szInfoTitle, title);
@@ -1372,25 +1385,36 @@ unsafe fn show_menu(hwnd: HWND) {
     }
 }
 
-unsafe fn icon_data(hwnd: HWND, icon: HICON) -> NOTIFYICONDATAW {
+unsafe fn icon_data(hwnd: HWND) -> NOTIFYICONDATAW {
     let mut nid: NOTIFYICONDATAW = zeroed();
     nid.cbSize = size_of::<NOTIFYICONDATAW>() as u32;
     nid.hWnd = hwnd;
     nid.uID = 1;
     nid.uCallbackMessage = WM_TRAY;
-    nid.hIcon = icon;
+    nid.hIcon = TRAY_ICON.load(Ordering::Relaxed);
     nid
 }
 
-unsafe fn add_icon(hwnd: HWND, icon: HICON) {
-    let mut nid = icon_data(hwnd, icon);
-    nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-    copy_wide(&mut nid.szTip, APP_NAME);
-    Shell_NotifyIconW(NIM_ADD, &nid);
+/// Load the icon for the taskbar's theme and the screen's scale, and show it: added when
+/// `add` (at start, and after Explorer restarts), else swapped in place.
+unsafe fn show_icon(hwnd: HWND, add: bool) {
+    let old = TRAY_ICON.swap(theme::tray_icon(hwnd), Ordering::Relaxed);
+    let mut nid = icon_data(hwnd);
+    if add {
+        nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+        copy_wide(&mut nid.szTip, APP_NAME);
+        Shell_NotifyIconW(NIM_ADD, &nid);
+    } else {
+        nid.uFlags = NIF_ICON;
+        Shell_NotifyIconW(NIM_MODIFY, &nid);
+    }
+    if !old.is_null() {
+        DestroyIcon(old);
+    }
 }
 
 unsafe fn remove_icon(hwnd: HWND) {
-    let nid = icon_data(hwnd, null_mut());
+    let nid = icon_data(hwnd);
     Shell_NotifyIconW(NIM_DELETE, &nid);
 }
 
@@ -1452,24 +1476,5 @@ fn set_clipboard(text: &str) -> bool {
         }
         GlobalFree(mem);
         false
-    }
-}
-
-
-/// The tray variant of the logo (white background, resource id 2 from build.rs), at the
-/// small-icon size Windows uses for the notification area. Resource 1 is the app icon.
-unsafe fn load_icon() -> HICON {
-    let icon = LoadImageW(
-        GetModuleHandleW(null()),
-        2 as _,
-        IMAGE_ICON,
-        GetSystemMetrics(SM_CXSMICON),
-        GetSystemMetrics(SM_CYSMICON),
-        LR_DEFAULTCOLOR,
-    );
-    if icon.is_null() {
-        LoadIconW(null_mut(), IDI_APPLICATION)
-    } else {
-        icon as HICON
     }
 }
