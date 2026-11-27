@@ -252,7 +252,17 @@
   .chips5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(54px, 1fr)); gap: 6px; }
   .chips5 .pill { border-radius: 8px; padding: 7px 0; text-align: center; }
   .chips5 .pill[aria-pressed=true] { background: var(--fill); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+  .dpi-head { display: flex; align-items: center; justify-content: space-between; gap: 8px 14px; flex-wrap: wrap; }
+  .dpi-head h3 { margin: 0; }
+  .dpi-link { font-size: 13px; color: var(--muted); cursor: pointer; user-select: none; }
+  .dpi-link:hover { color: var(--text); }
   #stageRows .dpi { font-size: 17px; width: 84px; }
+  .stage-row { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+  .stage-values { display: flex; gap: 8px; min-width: 0; }
+  .stage-axis { flex: 1 1 88px; min-width: 0; display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+  .stage-axis input.num { width: 100%; min-width: 0; font-size: 16px; font-weight: 650; color: var(--value); padding: 4px 8px; }
+  .stage-use { grid-column: 2; }
+  @media (max-width: 360px) { .stage-values { flex-wrap: wrap; } }
   .pills { display: flex; gap: 6px; flex-wrap: wrap; }
   .pill { background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; cursor: pointer; color: var(--muted); }
   .pill:hover { color: var(--text); }
@@ -687,6 +697,8 @@
   .pe-restore { margin-top: 14px; }
   .pe-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; }
   .pe-card > h3 { margin: 0 0 10px; font-size: 14px; font-weight: 650; }
+  .pe-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px 14px; flex-wrap: wrap; margin: 0 0 10px; }
+  .pe-card-head > h3 { margin: 0; font-size: 14px; font-weight: 650; }
   .pe-card .edbox { gap: 14px; }
   .pe-card.pe-compact { margin: 14px 0 0; padding: 12px 14px; }
   .pe-card.pe-compact > h3 { margin-bottom: 8px; }
@@ -695,7 +707,9 @@
   .pe-card.pe-compact .edbox h3 { margin-bottom: 4px; }
   .pe-card.pe-compact .dimgrid .tile { padding: 7px 10px; }
   .pe-stages { display: flex; gap: 10px; flex-wrap: wrap; }
-  .pe-st { width: 168px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 8px 10px 10px; background: var(--bg); cursor: pointer; display: grid; gap: 5px; }
+  .pe-st { width: 168px; max-width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 8px 8px 10px 10px; background: var(--bg); cursor: pointer; display: grid; gap: 5px; }
+  .pe-st-axes { display: grid; gap: 5px; }
+  .pe-st-axis { display: grid; grid-template-columns: 14px minmax(0, 1fr); align-items: center; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
   .pe-st:hover { border-color: var(--line-strong); }
   .pe-st.on { border-color: var(--lit-edge); background: var(--lit); }
   .pe-st-head { color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 4px; font-size: 12px; min-height: 24px; }
@@ -1396,7 +1410,7 @@ function railSummary(s) {
     box.append(fx ? effectLabel(fx) : lit.length === 1 ? '#' + lit[0].color : lit.length ? plural(lit.length, 'zone') + uiText(' lit') : uiText('Off'));
     return box;
   }
-  if (s.id === 'sens') return [dev.dpi && dev.dpi.x + ' DPI', dev.polling && hz(dev.polling.hz)].filter(Boolean).join(' · ');
+  if (s.id === 'sens') return [dev.dpi && dpiLabel(dev.dpi) + ' DPI', dev.polling && hz(dev.polling.hz)].filter(Boolean).join(' · ');
   if (s.id === 'buttons') {
     const n = Object.keys(p.buttons || {}).length, list = btnData[dev.id];
     if (!isBoard() && list && !list.length && !btnFailed[dev.id]) return uiText('Not supported');
@@ -1834,7 +1848,7 @@ function cellView(key, name) {
   if (key === 'dpi') {
     const d = active && dev.dpi ? [dev.dpi.x, dev.dpi.y] : p.dpi;
     if (!d) return [`<span class="unset">${esc(uiText('Not set'))}</span>`];
-    return [`<span class="big num">${d[0] === d[1] ? d[0] : d[0] + ' × ' + d[1]}</span> <small>DPI</small>`];
+    return [`<span class="big num">${esc(dpiLabel(d))}</span> <small>DPI</small>`];
   }
   if (key === 'polling') {
     const v = active && dev.polling ? dev.polling.hz : p.polling;
@@ -1843,7 +1857,7 @@ function cellView(key, name) {
   if (key === 'stages') {
     const st = stagesOf(name);
     if (!st) return [`<span class="unset">${esc(uiText('Not set'))}</span>`];
-    return [st.list.map((d, i) => { const v = d[0] === d[1] ? d[0] : d[0] + '×' + d[1];
+    return [st.list.map((d, i) => { const v = esc(dpiLabel(d));
       return i + 1 === st.active ? `<b class="num">${v}</b>` : `<span class="num">${v}</span>`; }).join(' · ')];
   }
   if (key === 'perf') {
@@ -3089,34 +3103,149 @@ function stopFinding(closing) {
 }
 window.addEventListener('pagehide', () => stopFinding(true));
 
+function dpiLabel(d) {
+  if (!d) return '';
+  const [x, y] = Array.isArray(d) ? d : [d.x, d.y];
+  const fmt = n => Number(n).toLocaleString(uiI18n.language);
+  return x === y ? fmt(x) : fmt(x) + ' × ' + fmt(y);
+}
+function dpiPair(current, value, axis, linked, range) {
+  if (typeof value === 'string' && !value.trim()) return null;
+  if (value === null || typeof value === 'boolean') return null;
+  const n = Math.round(Number(value));
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const { min = 100, max = 30000 } = range || {};
+  const v = Math.min(max, Math.max(min, n));
+  if (!axis || linked) return [v, v];
+  const curX = Array.isArray(current) ? current[0] : current.x;
+  const curY = Array.isArray(current) ? current[1] : current.y;
+  return axis === 'x' ? [v, curY] : [curX, v];
+}
+function dpiLinkStore() {
+  return dpiLinkStore.state || (dpiLinkStore.state = { linked: new Map(), userToggled: new Set(), senders: new WeakMap() });
+}
+function dpiDiffers(d = dev) {
+  if (!d) return false;
+  if (d.dpi && d.dpi.x !== d.dpi.y) return true;
+  const list = d.stages && d.stages.list;
+  return Array.isArray(list) && list.some(([x, y]) => x !== y);
+}
+function isDpiLinked(d = dev) {
+  if (!d) return true;
+  const { linked, userToggled } = dpiLinkStore();
+  // Differing values force link off initially even if remembered on, so nothing flattens by surprise.
+  if (dpiDiffers(d) && !userToggled.has(d.id)) {
+    linked.set(d.id, false);
+    return false;
+  }
+  if (!linked.has(d.id)) linked.set(d.id, remembered('dpi-link-' + d.id) !== '0');
+  return linked.get(d.id);
+}
+function setDpiLinked(d, on) {
+  if (!d) return;
+  const { linked, userToggled } = dpiLinkStore();
+  userToggled.add(d.id);
+  linked.set(d.id, !!on);
+  remember('dpi-link-' + d.id, on ? '1' : '0');
+}
+function dpiSplit(d = dev, extraList) {
+  return dpiDiffers(d) || (Array.isArray(extraList) && extraList.some(([x, y]) => x !== y)) || !isDpiLinked(d);
+}
+function dpiLinkControl(target, onToggle) {
+  const input = el('input', {
+    type: 'checkbox',
+    checked: isDpiLinked(target),
+    ariaLabel: uiText('Link X and Y'),
+    onchange: e => { setDpiLinked(target, e.target.checked); onToggle(); },
+  });
+  return el('label', { className: 'row dpi-link', title: uiText('When linked, changing one axis sets both') },
+    input, uiText('Link X and Y'));
+}
 function dpiEditor(box) {
-  const d = dev.dpi, step = Math.max(d.step || 50, 50);
-  const num = el('input', { type: 'number', className: 'dpi num', min: d.min, max: d.max, step: d.step, value: d.x, ariaLabel: 'DPI', id: 'dpiNum' });
-  const slider = el('input', { type: 'range', min: d.min, max: d.max, step: d.step, value: d.x, ariaLabel: 'DPI slider', id: 'dpiSlider' });
-  const pills = el('div', { className: 'chips5', id: 'dpiPills', role: 'group', ariaLabel: uiText('DPI presets') });
-  [400, 800, 1600, 3200, 6400].filter(v => v >= d.min && v <= d.max).forEach(v =>
-    pills.append(el('button', { className: 'pill num', textContent: v, ariaPressed: v === d.x, onclick: () => setDpi(v) })));
-  num.oninput = () => { num.dataset.dirty = '1'; };
-  num.onchange = e => { delete num.dataset.dirty; setDpi(e.target.value); };
-  num.onkeydown = e => { if (e.key === 'Enter') num.blur(); };
-  slider.oninput = e => setDpi(e.target.value);
-  // - / + move to the next multiple of the step, within the range.
-  const nudge = dir => setDpi(Math.min(d.max, Math.max(d.min, (Math.round((+num.value || dev.dpi.x) / step) + dir) * step)));
-  const stepBtn = (dir, ic, label) => el('button', { className: 'step', innerHTML: icon(ic), ariaLabel: label, title: label + ' (' + step + ')', onclick: () => nudge(dir) });
-  const fmt = n => n.toLocaleString(uiI18n.language);
-  box.append(
-    el('div', { className: 'readout' }, stepBtn(-1, 'minus', uiText('Lower DPI')),
-      el('label', {}, num, el('span', { className: 'unit', textContent: 'DPI' })), stepBtn(1, 'plus', uiText('Higher DPI'))),
-    el('div', { className: 'scale' }, slider, el('div', { className: 'ends num', ariaHidden: 'true' }, el('span', { textContent: fmt(d.min) }), el('span', { textContent: fmt(d.max) }))),
-    pills.childElementCount ? el('div', { className: 'edgroup' }, el('h3', { textContent: uiText('Presets') }), pills) : '',
-    el('p', { className: 'note', textContent: uiText('The DPI button on the mouse changes this too; this follows it.') }));
+  const target = dev;
+  const body = el('div', { className: 'edbox', id: 'dpiBody' });
+  box.innerHTML = '';
+  box.append(body);
+  let renderedSplit = null, dragging = false;
+  const draw = () => {
+    if (dev !== target) return;
+    const d = target.dpi, step = Math.max(d.step || 50, 50);
+    const fmt = n => n.toLocaleString(uiI18n.language);
+    const split = dpiSplit(target);
+    renderedSplit = split;
+    dragging = false;
+    body.innerHTML = '';
+    const syncMode = () => { if (dev === target && dpiSplit(target) !== renderedSplit) draw(); };
+    body.append(dpiLinkControl(target, draw));
+    const addControl = (axis, heading, numId, sliderId, numLabel, sliderLabel, lowLabel, highLabel) => {
+      const value = axis ? d[axis] : d.x;
+      const num = el('input', { type: 'number', className: 'dpi num', min: d.min, max: d.max, step: d.step,
+        value, ariaLabel: numLabel, id: numId });
+      const slider = el('input', { type: 'range', min: d.min, max: d.max, step: d.step,
+        value, ariaLabel: sliderLabel, id: sliderId });
+      num.oninput = () => { num.dataset.dirty = '1'; };
+      num.onchange = e => {
+        delete num.dataset.dirty;
+        if (!setDpi(e.target.value, axis)) showDpi(); else syncMode();
+      };
+      num.onkeydown = e => { if (e.key === 'Enter') num.blur(); };
+      slider.onpointerdown = () => { dragging = true; };
+      slider.onkeydown = () => { dragging = true; };
+      slider.oninput = e => setDpi(e.target.value, axis);
+      slider.onkeyup = slider.onblur = slider.onchange = () => { dragging = false; syncMode(); };
+      // - / + move to the next multiple of the step, within the range.
+      const nudge = dir => {
+        setDpi((Math.round((+num.value || target.dpi[axis || 'x']) / step) + dir) * step, axis);
+        syncMode();
+      };
+      const stepBtn = (dir, ic, label) => el('button', { className: 'step', innerHTML: icon(ic), ariaLabel: label,
+        title: label + ' (' + step + ')', onclick: () => nudge(dir) });
+      const readout = el('div', { className: 'readout' }, stepBtn(-1, 'minus', lowLabel),
+        el('label', {}, num, el('span', { className: 'unit', textContent: 'DPI' })), stepBtn(1, 'plus', highLabel));
+      const scale = el('div', { className: 'scale' }, slider, el('div', { className: 'ends num', ariaHidden: 'true' },
+        el('span', { textContent: fmt(d.min) }), el('span', { textContent: fmt(d.max) })));
+      if (heading) body.append(el('div', { className: 'edgroup' }, el('h3', { textContent: heading }), readout, scale));
+      else body.append(readout, scale);
+    };
+    if (split) {
+      addControl('x', uiText('X (horizontal)'), 'dpiNumX', 'dpiSliderX',
+        uiText('X DPI (horizontal)'), uiText('X DPI slider (horizontal)'), uiText`Lower ${'X'} DPI`, uiText`Higher ${'X'} DPI`);
+      addControl('y', uiText('Y (vertical)'), 'dpiNumY', 'dpiSliderY',
+        uiText('Y DPI (vertical)'), uiText('Y DPI slider (vertical)'), uiText`Lower ${'Y'} DPI`, uiText`Higher ${'Y'} DPI`);
+    } else {
+      addControl(null, null, 'dpiNum', 'dpiSlider', 'DPI', uiText('DPI slider'), uiText('Lower DPI'), uiText('Higher DPI'));
+    }
+    const pills = el('div', { className: 'chips5', id: 'dpiPills', role: 'group', ariaLabel: uiText('DPI presets') });
+    [400, 800, 1600, 3200, 6400].filter(v => v >= d.min && v <= d.max).forEach(v =>
+      pills.append(el('button', { className: 'pill num', textContent: v, ariaPressed: v === d.x && v === d.y,
+        onclick: () => { setDpi(v); syncMode(); } })));
+    if (pills.childElementCount) body.append(el('div', { className: 'edgroup' },
+      el('h3', { textContent: split ? uiText('Presets (both axes)') : uiText('Presets') }), pills));
+    body.append(el('p', { className: 'note', textContent: uiText('The DPI button on the mouse changes this too; this follows it.') }));
+  };
+  body._sync = () => {
+    if (dev !== target || dragging) return;
+    const active = document.activeElement;
+    if (active && body.contains(active) && active.dataset && active.dataset.dirty) return;
+    if (dpiSplit(target) !== renderedSplit) draw();
+  };
+  draw();
 }
 function showDpi() { // the mouse changed DPI by itself
   refreshCell('dpi'); refreshCell('stages');
+  const now = $('peNowDpi');
+  if (now && dev && dev.dpi) now.textContent = dpiLabel(dev.dpi) + ' DPI';
+  const body = $('dpiBody');
+  if (body && body._sync) body._sync();
   const n = $('dpiNum'), s = $('dpiSlider');
   if (n && !n.dataset.dirty) n.value = dev.dpi.x; // follow the mouse unless a new value is being typed
   if (s && document.activeElement !== s) s.value = dev.dpi.x;
-  document.querySelectorAll('#dpiPills .pill').forEach(p => p.ariaPressed = +p.textContent === dev.dpi.x);
+  for (const axis of ['x', 'y']) {
+    const nx = $('dpiNum' + axis.toUpperCase()), sx = $('dpiSlider' + axis.toUpperCase());
+    if (nx && !nx.dataset.dirty) nx.value = dev.dpi[axis]; // don't overwrite a value being typed
+    if (sx && document.activeElement !== sx) sx.value = dev.dpi[axis];
+  }
+  document.querySelectorAll('#dpiPills .pill').forEach(p => p.ariaPressed = +p.textContent === dev.dpi.x && +p.textContent === dev.dpi.y);
 }
 
 function pollingEditor(box) {
@@ -3143,41 +3272,83 @@ function stagesOf(name) {
 }
 
 function stagesEditor(box) {
-  const d = dev.dpi || { min: 100, max: 30000, step: 50 };
-  const st = stagesOf(dev.active), list = st.list.map(v => v.slice());
-  let active = st.active;
+  const target = dev, profile = target.profile;
+  const d = target.dpi || { min: 100, max: 30000, step: 50 };
+  const st = stagesOf(target.active);
+  let confirmedList = st.list.map(v => v.slice()), confirmedActive = st.active;
+  let list = confirmedList.map(v => v.slice()), active = confirmedActive;
+  const linkSlot = el('span');
+  const head = el('div', { className: 'dpi-head' }, el('h3', { textContent: uiText('Stages the DPI button cycles through') }), linkSlot);
   const rowsBox = el('div', { className: 'edgroup', id: 'stageRows' });
-  const add = el('button', { className: 'ghost', innerHTML: icon('plus') + uiText('Add stage') });
+  const add = el('button', { className: 'ghost', innerHTML: icon('plus') + uiText('Add stage'), ariaLabel: uiText('Add stage') });
   const draw = () => {
+    linkSlot.innerHTML = '';
+    linkSlot.append(dpiLinkControl(target, draw));
+    const split = dpiSplit(target, list);
     rowsBox.innerHTML = '';
     list.forEach((v, i) => {
-      const num = el('input', { type: 'number', className: 'dpi num', min: d.min, max: d.max, step: d.step, value: v[0],
-        ariaLabel: uiText('Stage ') + (i + 1) + ' DPI', onchange: e => { const n = Math.round(+e.target.value); if (n) { list[i] = [n, n]; save(); } } });
       const use = el('input', { type: 'radio', name: 'stageUse', checked: i + 1 === active, id: 'stageUse' + i,
         onchange: () => { active = i + 1; save(); } });
       const del = el('button', { className: 'ghost', innerHTML: icon('x'), title: uiText('Remove stage ') + (i + 1), ariaLabel: uiText('Remove stage ') + (i + 1),
         disabled: list.length === 1, onclick: () => { list.splice(i, 1); if (active > i + 1 || active > list.length) active = Math.max(1, active - 1); save(); } });
-      rowsBox.append(el('div', { className: 'row' }, el('span', { className: 'val num', textContent: i + 1 }), num, use,
-        el('label', { htmlFor: 'stageUse' + i, textContent: uiText('In use') }), del));
+      if (split) {
+        const values = el('div', { className: 'stage-values' });
+        for (const [at, axis] of [[0, 'x'], [1, 'y']]) {
+          const upper = axis.toUpperCase();
+          const num = el('input', { type: 'number', className: 'num', min: d.min, max: d.max, step: d.step, value: v[at],
+            ariaLabel: axis === 'x' ? uiText`Stage ${i + 1} X DPI (horizontal)` : uiText`Stage ${i + 1} Y DPI (vertical)`,
+            onchange: e => {
+              const pair = dpiPair(list[i], e.target.value, axis, isDpiLinked(target), d);
+              if (pair) { list[i] = pair; save(); } else draw();
+            } });
+          values.append(el('label', { className: 'stage-axis' }, upper, num));
+        }
+        rowsBox.append(el('div', { className: 'stage-row' }, el('span', { className: 'val num', textContent: i + 1 }), values, del,
+          el('label', { className: 'row stage-use' }, use, uiText('In use'))));
+      } else {
+        const num = el('input', { type: 'number', className: 'dpi num', min: d.min, max: d.max, step: d.step, value: v[0],
+          ariaLabel: uiText('Stage ') + (i + 1) + ' DPI', onchange: e => {
+            const pair = dpiPair(list[i], e.target.value, null, true, d);
+            if (pair) { list[i] = pair; save(); } else draw();
+          } });
+        rowsBox.append(el('div', { className: 'row' }, el('span', { className: 'val num', textContent: i + 1 }), num, use,
+          el('label', { htmlFor: 'stageUse' + i, textContent: uiText('In use') }), del));
+      }
     });
-    add.disabled = list.length >= dev.stages.max;
+    add.disabled = list.length >= target.stages.max;
   };
-  add.onclick = () => { const next = Math.min(d.max, list[list.length - 1][0] * 2); list.push([next, next]); save(); };
+  add.onclick = () => { list.push(list[list.length - 1].map(v => Math.min(d.max, v * 2))); save(); };
+  let revision = 0;
   const save = async () => {
+    const current = ++revision;
     draw();
     try {
-      const r = await api('/api/stages', { active, stages: list });
-      dev.stages.list = r.stages.list; dev.stages.active = r.stages.active;
-      dev.profile.dpi_stages = { active: r.stages.active, stages: r.stages.list };
-      if (dev.dpi) { dev.dpi.x = r.dpi[0]; dev.dpi.y = r.dpi[1]; dev.profile.dpi = r.dpi; }
-      r.stages.list.forEach((v, i) => { list[i] = v.slice(); });
-      draw(); refreshCell('stages'); refreshCell('dpi');
-      toast(uiText('DPI stages · saved to ') + dev.active);
-    } catch (e) { toast(e.message, true); }
+      const r = await api('/api/stages', { id: target.id, active, stages: list });
+      if (current !== revision) return;
+      confirmedList = r.stages.list.map(v => v.slice());
+      confirmedActive = r.stages.active;
+      target.stages.list = r.stages.list; target.stages.active = r.stages.active;
+      profile.dpi_stages = { active: r.stages.active, stages: r.stages.list };
+      if (target.dpi) { target.dpi.x = r.dpi[0]; target.dpi.y = r.dpi[1]; profile.dpi = r.dpi; }
+      list = confirmedList.map(v => v.slice());
+      active = confirmedActive;
+      draw();
+      if (dev === target) {
+        refreshCell('stages'); refreshCell('dpi');
+        toast(uiText('DPI stages · saved to ') + target.active);
+      }
+    } catch (e) {
+      if (current === revision) {
+        list = confirmedList.map(v => v.slice());
+        active = confirmedActive;
+        draw();
+      }
+      toast(e.message, true);
+    }
   };
   draw();
-  box.append(el('div', { className: 'edgroup' }, el('h3', { textContent: uiText('Stages the DPI button cycles through') }), rowsBox, el('div', { className: 'row' }, add)),
-    el('p', { className: 'note', textContent: uiText('Up to ') + dev.stages.max + uiText(' stages, stored on the mouse. The stage in use sets the DPI right away.') }));
+  box.append(el('div', { className: 'edgroup' }, head, rowsBox, el('div', { className: 'row' }, add)),
+    el('p', { className: 'note', textContent: uiText('Up to ') + target.stages.max + uiText(' stages, stored on the mouse. The stage in use sets the DPI right away.') }));
 }
 
 function sleepOf(name) {
@@ -3942,13 +4113,43 @@ async function copyToZones(src) {
   toast(name + (all ? uiText(' stays on ') + label(src) + uiText(': the other zones can’t run it') : uiText(' on all zones') + (skipped.length ? '. ' + skipped.join(', ') + uiText(' can’t run it') : '')), all);
 }
 const sendBright = live(([name, value]) => api('/api/brightness', { zone: name, value }));
-const sendDpi = live(v => api('/api/dpi', { x: v, y: v }).then(r => { dev.dpi.x = dev.dpi.y = r.dpi[0]; dev.profile.dpi = r.dpi; refreshCell('dpi'); }));
-function setDpi(v) {
-  v = Math.round(Number(v)); if (!v) return;
-  const n = $('dpiNum'), s = $('dpiSlider');
-  if (n) n.value = v; if (s) s.value = v;
-  document.querySelectorAll('#dpiPills .pill').forEach(p => p.ariaPressed = +p.textContent === v);
-  sendDpi(v);
+function setDpi(value, axis) {
+  const target = dev, profile = target.profile;
+  const previous = [target.dpi.x, target.dpi.y];
+  const pair = dpiPair(previous, value, axis, isDpiLinked(target), target.dpi);
+  if (!pair) return false;
+  // Keep pending edits to the other axis when moving between controls quickly.
+  target.dpi.x = pair[0]; target.dpi.y = pair[1];
+  if (dev === target) showDpi();
+  const { senders } = dpiLinkStore();
+  let state = senders.get(target);
+  if (!state) {
+    state = { revision: 0, confirmed: previous, pending: false };
+    state.send = live(async ({ pair, revision, profile }) => {
+      let r;
+      try { r = await api('/api/dpi', { id: target.id, x: pair[0], y: pair[1] }); }
+      catch (error) {
+        if (revision === state.revision) {
+          target.dpi.x = state.confirmed[0]; target.dpi.y = state.confirmed[1];
+          profile.dpi = state.confirmed;
+          state.pending = false;
+          if (dev === target) showDpi();
+        }
+        throw error;
+      }
+      state.confirmed = r.dpi;
+      if (revision === state.revision) {
+        target.dpi.x = r.dpi[0]; target.dpi.y = r.dpi[1]; profile.dpi = r.dpi;
+        state.pending = false;
+        if (dev === target) showDpi();
+      }
+    }, () => dev === target ? uiText('Saved to ') + target.active : null);
+    senders.set(target, state);
+  }
+  if (!state.pending) state.confirmed = previous;
+  state.pending = true;
+  state.send({ pair, revision: ++state.revision, profile });
+  return true;
 }
 
 // Colors on the keys: painted keys, else the whole-keyboard color, else off.
@@ -4127,12 +4328,16 @@ function renderPE(keepInsp) {
   peBar();
   const stage = $('peStage'), scroll = stage.scrollTop;
   stage.setAttribute('aria-labelledby', 'peTab-' + peTab);
-  stage.innerHTML = '';
-  ({ buttons: peButtonsStage, perf: pePerfStage, light: peLightStage, macros: peMacrosStage })[peTab](stage);
-  stage.scrollTop = scroll;
+  const keepDpi = keepInsp && peTab === 'perf' && !dev.stages && $('dpiBody') && stage.contains($('dpiBody'));
+  if (!keepDpi) {
+    stage.innerHTML = '';
+    ({ buttons: peButtonsStage, perf: pePerfStage, light: peLightStage, macros: peMacrosStage })[peTab](stage);
+    stage.scrollTop = scroll;
+  }
   // Keep an open control (a slider being dragged, a field being typed in) unless what it
   // edits changed: another button, layer, profile or tab.
   const sig = JSON.stringify([peTab, peAside, peSel, btnLayer, dev.active, peZone, peCat, !!btnData[dev.id], dev.lighting_control,
+    peTab === 'perf' && dev.dpi ? [dev.dpi.x, dev.dpi.y] : null,
     peTab === 'buttons' && peAside == null && peSelected() ? peSelected()[btnLayer] : null, peTab === 'macros' || peAside ? 0 : macroData[dev.id] === null]);
   if (keepInsp && sig === peInspSig && $('peInsp').childElementCount) return;
   peInspSig = sig;
@@ -4449,7 +4654,7 @@ function peInspector(box) {
   else if (peTab === 'light') peLightInsp(box);
   else if (peTab === 'perf') {
     box.append(el('h2', { className: 'pe-cap', textContent: uiText('Right now') }));
-    if (dev.dpi) box.append(el('div', { className: 'pe-now' }, el('small', { textContent: uiText('DPI the mouse is using') }), el('b', { className: 'num', textContent: dev.dpi.x.toLocaleString(uiI18n.language) + ' DPI' })));
+    if (dev.dpi) box.append(el('div', { className: 'pe-now' }, el('small', { textContent: uiText('DPI the mouse is using') }), el('b', { className: 'num', id: 'peNowDpi', textContent: dpiLabel(dev.dpi) + ' DPI' })));
     box.append(el('p', { className: 'pe-help', textContent: uiText('Click a stage to use it. The DPI button on the mouse goes through the stages in this order, and this follows it.') }));
   } else {
     box.append(el('h2', { className: 'pe-cap', textContent: uiText('Macros') }),
@@ -4583,26 +4788,31 @@ function peTurboOpts(o, button, a) {
 // Performance: DPI stages as cards (click one to use it), then polling, wheel and sleep.
 function pePerfStage(stage) {
   if (dev.stages) {
-    const card = el('section', { className: 'pe-card' }, el('h3', { textContent: uiText('DPI stages') }));
-    const d = dev.dpi || { min: 100, max: 30000, step: 50 };
-    const st = stagesOf(dev.active), list = st.list.map(v => v.slice());
+    const target = dev, profile = target.profile;
+    const d = target.dpi || { min: 100, max: 30000, step: 50 };
+    const st = stagesOf(target.active), list = st.list.map(v => v.slice());
     let active = st.active;
+    const split = dpiSplit(target, list);
+    const card = el('section', { className: 'pe-card' },
+      el('div', { className: 'pe-card-head' },
+        el('h3', { textContent: uiText('DPI stages') }),
+        dpiLinkControl(target, () => { if (dev === target) renderPE(); })));
+    let revision = 0;
     const save = async (msg, undo) => {
+      const current = ++revision;
       try {
-        const r = await api('/api/stages', { active, stages: list });
-        dev.stages.list = r.stages.list; dev.stages.active = r.stages.active;
-        dev.profile.dpi_stages = { active: r.stages.active, stages: r.stages.list };
-        if (dev.dpi) { dev.dpi.x = r.dpi[0]; dev.dpi.y = r.dpi[1]; dev.profile.dpi = r.dpi; }
-        toast(msg || uiText('DPI stages · saved to ') + dev.active, false, undo);
+        const r = await api('/api/stages', { id: target.id, active, stages: list });
+        if (current !== revision) return;
+        target.stages.list = r.stages.list; target.stages.active = r.stages.active;
+        profile.dpi_stages = { active: r.stages.active, stages: r.stages.list };
+        if (target.dpi) { target.dpi.x = r.dpi[0]; target.dpi.y = r.dpi[1]; profile.dpi = r.dpi; }
+        if (dev === target) toast(msg || uiText('DPI stages · saved to ') + target.active, false, undo);
       } catch (e) { toast(e.message, true); }
-      renderPE();
+      if (dev === target) renderPE();
     };
     const row = el('div', { className: 'pe-stages' });
     list.forEach((v, i) => {
-      const useStage = () => { if (active !== i + 1) { active = i + 1; save(uiText`Stage ${i + 1} in use · saved to ${dev.active}`); } };
-      const num = el('input', { type: 'number', className: 'num', min: d.min, max: d.max, step: d.step, value: v[0], ariaLabel: uiText('Stage ') + (i + 1) + ' DPI',
-        onclick: e => e.stopPropagation(), onkeydown: e => { if (e.key === 'Enter') num.blur(); },
-        onchange: () => { const n = Math.min(d.max, Math.max(d.min, Math.round(+num.value / (d.step || 50)) * (d.step || 50))); if (n) { list[i] = [n, n]; save(); } } });
+      const useStage = () => { if (active !== i + 1) { active = i + 1; save(uiText`Stage ${i + 1} in use · saved to ${target.active}`); } };
       const radio = el('input', { type: 'radio', name: 'peStageUse', checked: i + 1 === active,
         ariaLabel: uiText`Use stage ${i + 1}`, onchange: useStage });
       const labelEl = el('label', { className: 'pe-st-use', title: uiText('Use this stage') },
@@ -4610,15 +4820,15 @@ function pePerfStage(stage) {
       const del = list.length > 1 ? el('button', { className: 'x', type: 'button', innerHTML: icon('x'), title: uiText('Remove stage ') + (i + 1), ariaLabel: uiText('Remove stage ') + (i + 1),
         onclick: e => {
           e.stopPropagation();
-          const removed = list[i].slice(), prevActive = active, devId = dev.id, profile = dev.active;
+          const removed = list[i].slice(), prevActive = active, devId = target.id, profName = target.active;
           list.splice(i, 1);
           if (active > i + 1 || active > list.length) active = Math.max(1, active - 1);
-          save(uiText`Removed stage ${i + 1} · saved to ${dev.active}`, async () => {
-            if (!dev || dev.id !== devId || dev.active !== profile) { toast(uiText('The profile changed, so nothing was put back'), true); return; }
+          save(uiText`Removed stage ${i + 1} · saved to ${target.active}`, async () => {
+            if (!dev || dev.id !== devId || dev.active !== profName) { toast(uiText('The profile changed, so nothing was put back'), true); return; }
             const cur = stagesOf(dev.active).list.map(x => x.slice());
             cur.splice(Math.min(i, cur.length), 0, removed);
             try {
-              const r = await api('/api/stages', { active: prevActive, stages: cur });
+              const r = await api('/api/stages', { id: devId, active: prevActive, stages: cur });
               dev.stages.list = r.stages.list; dev.stages.active = r.stages.active;
               dev.profile.dpi_stages = { active: r.stages.active, stages: r.stages.list };
               if (dev.dpi) { dev.dpi.x = r.dpi[0]; dev.dpi.y = r.dpi[1]; dev.profile.dpi = r.dpi; }
@@ -4627,14 +4837,39 @@ function pePerfStage(stage) {
             renderPE();
           });
         } }) : null;
+      let inputs;
+      if (split) {
+        const axes = el('div', { className: 'pe-st-axes' });
+        for (const [at, axis] of [[0, 'x'], [1, 'y']]) {
+          const upper = axis.toUpperCase();
+          const num = el('input', { type: 'number', className: 'num', min: d.min, max: d.max, step: d.step, value: v[at],
+            ariaLabel: axis === 'x' ? uiText`Stage ${i + 1} X DPI (horizontal)` : uiText`Stage ${i + 1} Y DPI (vertical)`,
+            onclick: e => e.stopPropagation(), onkeydown: e => { if (e.key === 'Enter') num.blur(); },
+            onchange: () => {
+              const pair = dpiPair(list[i], num.value, axis, isDpiLinked(target), d);
+              if (pair) { list[i] = pair; save(); } else renderPE();
+            } });
+          axes.append(el('label', { className: 'pe-st-axis', onclick: e => e.stopPropagation() }, el('span', { textContent: upper }), num));
+        }
+        inputs = axes;
+      } else {
+        const num = el('input', { type: 'number', className: 'num', min: d.min, max: d.max, step: d.step, value: v[0], ariaLabel: uiText('Stage ') + (i + 1) + ' DPI',
+          onclick: e => e.stopPropagation(), onkeydown: e => { if (e.key === 'Enter') num.blur(); },
+          onchange: () => {
+            const pair = dpiPair(list[i], num.value, null, true, d);
+            if (pair) { list[i] = pair; save(); } else renderPE();
+          } });
+        inputs = num;
+      }
       row.append(el('div', { className: 'pe-st' + (i + 1 === active ? ' on' : ''), role: 'group', ariaLabel: uiText('Stage ') + (i + 1),
         onclick: e => { if (!e.target.closest('button, input, label')) useStage(); } },
         el('div', { className: 'pe-st-head' }, labelEl, del),
-        num));
+        inputs));
     });
-    if (list.length < dev.stages.max) row.append(el('button', { className: 'pe-st add', type: 'button', innerHTML: icon('plus') + ' ' + uiText('Add stage'),
-      onclick: () => { const next = Math.min(d.max, list[list.length - 1][0] * 2); list.push([next, next]); save(); } }));
-    card.append(row, el('p', { className: 'pe-help', textContent: uiText('Up to ') + dev.stages.max + uiText(' stages, stored on the mouse. The stage in use sets the DPI right away.') }));
+    if (list.length < target.stages.max) row.append(el('button', { className: 'pe-st add', type: 'button', innerHTML: icon('plus') + ' ' + uiText('Add stage'),
+      ariaLabel: uiText('Add stage'),
+      onclick: () => { list.push(list[list.length - 1].map(v => Math.min(d.max, v * 2))); save(); } }));
+    card.append(row, el('p', { className: 'pe-help', textContent: uiText('Up to ') + target.stages.max + uiText(' stages, stored on the mouse. The stage in use sets the DPI right away.') }));
     stage.append(card);
   } else if (dev.dpi) stage.append(peCard('DPI', dpiEditor));
   if (dev.polling) stage.append(peCard(uiText('Polling rate'), pollingEditor));
@@ -4960,7 +5195,7 @@ function renderOverview() {
     const p = d.profile || {}, keys = p.keys, perKey = keys && keys.length;
     const colors = perKey ? [...new Set(keys.filter(k => k !== '000000'))].slice(0, 8).map(k => ({ color: k })) : d.leds.map(l => zoneOf(p, l.name));
     if (d.lighting_control) colors.forEach(z => { const i = el('i'), paint = zonePaint(z); if (paint) i.style.background = paint; else i.className = 'off'; dots.append(i); });
-    const stats = [d.dpi && ['DPI', d.dpi.x], d.polling && [uiText('Polling'), hz(d.polling.hz)], perKey && [uiText('Lighting'), uiText('Per-key')]].filter(Boolean);
+    const stats = [d.dpi && ['DPI', dpiLabel(d.dpi)], d.polling && [uiText('Polling'), hz(d.polling.hz)], perKey && [uiText('Lighting'), uiText('Per-key')]].filter(Boolean);
     if (!stats.length) stats.push([uiText('Lighting'), d.lighting_control ? plural(d.leds.length, 'zone') : (d.leds.length || d.matrix ? uiText('Not controlled') : uiText('None')), 'quiet']);
     const foot = el('div', { className: 'dfoot' },
       el('div', { className: 'dstats num' }, ...stats.map(([label, value, quiet]) => el('div', {}, el('small', { textContent: label }), el('b', { className: quiet || '', textContent: value })))),

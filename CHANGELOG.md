@@ -43,6 +43,16 @@
   full-screen game.
 
 ### Fixed
+- **The editor no longer flattens a mouse's separate X and Y DPI.** Changing the DPI or a DPI
+  stage used to set both axes to the same value, so a mouse at 1150 × 1050 silently became
+  1150 × 1150. X and Y stay linked by default, with one control as before; untick **Link X and
+  Y** (remembered per mouse), or open a mouse that already has different values, to get separate
+  X (horizontal) and Y (vertical) fields. Ticking the link writes nothing; the next change sets
+  both axes. DPI shows as `1150 × 1050` wherever it differs. A DPI or stage change also goes to
+  the mouse it was made on, even if you switch devices before it completes. Idea from
+  Xnmk029's fork (upstream PR #55) and the upstream maintainer's review of it. Tested with the
+  simulated mice (with and without stages), mouse editor and classic view, dark and light, at
+  1366, 900 and 375 px; not yet on a real mouse.
 - **Sharp, dark tray menu and a tray icon that follows the theme.** The right-click menu was
   drawn at 100 % and stretched, so it looked blurry on a screen at 125 % or more; it is now sharp
   at any scale, and dark when Windows apps are dark. The icon is the bird alone, white on a dark
