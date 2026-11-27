@@ -624,7 +624,10 @@
     'Near the GPU': 'GPU 附近',
     'Right now': '当前',
     'Read from the laptop every 3 seconds while this section is open. The fans follow the performance mode; Secretarybird never sets their speed.': '打开此部分时，每 3 秒从笔记本读取一次。风扇随性能模式变化；Secretarybird 从不设置风扇转速。',
-    'The temperatures come from the laptop’s controller, which sits near the chips, so they read lower than the CPU’s own sensor.': '温度来自笔记本的控制器，它位于芯片附近，因此读数低于 CPU 自身的传感器。'
+    'The temperatures come from the laptop’s controller, which sits near the chips, so they read lower than the CPU’s own sensor.': '温度来自笔记本的控制器，它位于芯片附近，因此读数低于 CPU 自身的传感器。',
+    // Round 2: confirmations and profile cards (#13, #21)
+    'Save to mouse': '保存到鼠标',
+    'Unavailable': '不可用'
   });
   const nouns = Object.freeze({
     zone: '个灯区', device: '个设备', button: '个按键', macro: '个宏',
@@ -1575,7 +1578,24 @@
     "DPI stages · saved to {0}": "Paliers DPI · enregistrés dans {0}",
     "HyperShift button": "Bouton HyperShift",
     "Second DPI button": "Deuxième bouton DPI",
-    "Extra side button": "Bouton latéral supplémentaire"
+    "Extra side button": "Bouton latéral supplémentaire",
+    // Round 2: confirmations and profile cards (#13, #21)
+    "Save to mouse": "Enregistrer dans la souris",
+    // Round 2: guidance and keyboard (#10, #12)
+    "Mouse settings": "Réglages de la souris",
+    "What is HyperShift?": "Qu’est-ce que HyperShift\u00a0?",
+    "HyperShift is a second layer. While the HyperShift button is held, every button does its HyperShift action instead.": "HyperShift est une deuxième couche. Tant que le bouton HyperShift est maintenu, chaque bouton exécute son action HyperShift à la place.",
+    "Pick a button to choose what it does. HyperShift button: {0}.": "Clique sur un bouton pour choisir son action. Bouton HyperShift\u00a0: {0}.",
+    "Pick a button in Standard": "Choisir un bouton dans Standard",
+    "On-board memory…": "Mémoire de la souris…",
+    "Mouse on-board memory": "Mémoire embarquée de la souris",
+    "Use stage {0}": "Utiliser le palier {0}",
+    "Removed stage {0} · saved to {1}": "Palier {0} retiré · enregistré dans {1}",
+    "Record steps": "Capturer les étapes",
+    "Stop capturing": "Arrêter la capture",
+    "Write to device": "Écrire dans l’appareil",
+    // Round 2: drawing (#7, #8, #9)
+    "Unavailable": "Indisponible"
   };
   const fr = Object.freeze(FR_MESSAGES);
   // French nouns: [one, many]. Counts of 0 and 1 take the singular in French.

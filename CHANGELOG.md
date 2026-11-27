@@ -47,6 +47,31 @@
   it has an Undo button for 10 seconds that sends every remap again. Tested in the editor with
   the simulated mouse (`SECBIRD_SIM=all`).
 
+### Changed
+- **Mouse editor, second round** (#6). Tested in the editor with the simulated mouse
+  (`SECBIRD_SIM=all`), in French, dark and light, at 1366x768, 900 px and 375 px wide; not yet
+  with a real mouse.
+  - **Lighter labels on the drawing** (#7): each button's name and action as plain text, with
+    the box only on hover, focus and selection. Long actions wrap onto a second line instead of
+    being cut at 29 characters, and the leader lines are easier to see.
+  - **Less empty space** above the mouse drawing (#8).
+  - **Narrow windows** (#9): from 820 to 980 px the panel on the right slides in over the
+    drawing when a button is picked, with a close button and Escape; under 820 px the buttons
+    show as a list and the panel opens from the bottom.
+  - **HyperShift help** (#10): a "?" beside Standard / HyperShift explains it, the hint names
+    the button that holds HyperShift, and the HyperShift layer warns, with a shortcut, when no
+    button holds it. The scroll wheel settings also show under the drawing, and the toolbar no
+    longer changes height between tabs.
+  - **"Restore all" set apart**: at the far end of the toolbar, in red, after a separator, away
+    from "On-board memory…" (the button that was "Saved on the mouse…").
+  - **Keyboard** (#12): the tabs follow the arrow keys, Home and End; each DPI stage has a real
+    "use this stage" choice, a larger remove button and Undo after a removal; List view rows
+    move with the arrow keys and open with Space. The macro buttons say what they do ("Record
+    steps", "Write to device").
+  - **No more browser dialogs** (#13): deleting a profile in the classic view and in Compare,
+    the first "Save to mouse" and Settings → "Restore all" ask inside the page, with Cancel
+    focused and Escape to cancel. The classic view shows delete once, on the profile bar.
+
 ## [0.6.1] - 2026-11-21
 
 ### Added

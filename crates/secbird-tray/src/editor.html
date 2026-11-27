@@ -9,14 +9,14 @@
   /* Themes. Each sets every token; the accent means live, selected, changed or focused, and
      the value colour carries numbers. Auto follows Windows: Bridge when dark, Light when light. */
   :root { --fill: var(--accent); }
-  :root, :root[data-theme="bridge"] { --bg: #050505; --bar: #0d0d0e; --panel: #131314; --raise: #1b1b1d; --line: #242426; --line-strong: #4a4440; --text: #f4efe9; --muted: #b8aea3; --faint: #9c9287; --value: #ffb85d; --accent: #ff5412; --accent-text: #ff7a45; --on-accent: #000; --lit: #ff541224; --lit-edge: #ff5412; --toast: #1b1b1d; --zone-off: #242426; --body-fill: #131314; --body-stroke: #3a3632; --button-fill: #1b1b1d; --key-fill: #1b1b1d; --key-stroke: #34312e; --key-text: #f4efe999; --warn-line: #ffb85d55; --warn-bg: #ffb85d14; --warn-text: #ffb85d; --err: #ff4a5a; --err-text: #ffb4bb; --shadow: 0 12px 32px -14px #000000e6; --pe-chg: #5cd0ff; --pe-hs: #e09bff; --pe-hs-fill: #e09bff; --pe-hs-on: #000; color-scheme: dark; }
-  :root[data-theme="roast"] { --bg: #150d05; --bar: #1e1007; --panel: #201002; --raise: #2b1909; --line: #3a2916; --line-strong: #64492b; --text: #f5e0d3; --muted: #b58754; --faint: #ad8150; --value: #e2aa6b; --accent: #e6c08f; --accent-text: #efcf9f; --on-accent: #1e1007; --lit: #e6c08f26; --lit-edge: #e6c08f; --toast: #2b1909; --zone-off: #3a2916; --body-fill: #201002; --body-stroke: #4a2b09; --button-fill: #2b1909; --key-fill: #2b1909; --key-stroke: #4a2b09; --key-text: #f5e0d399; --warn-line: #f8ac6055; --warn-bg: #f8ac6014; --warn-text: #f8ac60; --err: #ff5a4e; --err-text: #ffb4a8; --shadow: 0 12px 32px -14px #000000d9; --pe-chg: #8fd3ff; --pe-hs: #c4adff; --pe-hs-fill: #c4adff; --pe-hs-on: #000; color-scheme: dark; }
-  @media (prefers-color-scheme: light) { :root:not([data-theme]) { --bg: #f4f4f7; --bar: #ffffff; --panel: #ffffff; --raise: #f0f0f4; --line: #e1e1e8; --line-strong: #c3c3cc; --text: #18181d; --muted: #5f5f6b; --faint: #6c6c78; --value: #18181d; --accent: #4f86ec; --accent-text: #1d4ed8; --on-accent: #0f2a66; --fill: #cfe0ff; --lit: #4f86ec1a; --lit-edge: #4f86ec; --toast: #ffffff; --zone-off: #d9d9df; --body-fill: #f1f1f4; --body-stroke: #c4c4cc; --button-fill: #e4e4ea; --key-fill: #ececf0; --key-stroke: #cfcfd7; --key-text: #00000099; --warn-line: #c9a20055; --warn-bg: #fff7d6; --warn-text: #6b5200; --err: #d70015; --err-text: #b3261e; --shadow: 0 10px 30px -14px #1b1b3040; --pe-chg: #a14a08; --pe-hs: #6741d9; --pe-hs-fill: #e9e3ff; --pe-hs-on: #3b2391; color-scheme: light; } }
-  :root[data-theme="classic"] { --bg: #0d0d10; --bar: #111115; --panel: #15151a; --raise: #1b1b21; --line: #25252d; --line-strong: #3a3a44; --text: #ececf1; --muted: #9a9aa6; --faint: #858591; --value: #ececf1; --accent: #5b9cff; --accent-text: #8bb8ff; --on-accent: #000; --lit: #5b9cff1f; --lit-edge: #5b9cff; --toast: #222229; --zone-off: #2a2a31; --body-fill: #141418; --body-stroke: #2b2b33; --button-fill: #1d1d23; --key-fill: #1b1b21; --key-stroke: #2e2e37; --key-text: #ffffff99; --warn-line: #ffd60a55; --warn-bg: #ffd60a12; --warn-text: #ffe58a; --err: #ff453a; --err-text: #ffb4ae; --shadow: 0 10px 30px -12px #000000cc; --pe-chg: #ffb35c; --pe-hs: #d0b8ff; --pe-hs-fill: #d0b8ff; --pe-hs-on: #000; color-scheme: dark; }
-  :root[data-theme="light"] { --bg: #f4f4f7; --bar: #ffffff; --panel: #ffffff; --raise: #f0f0f4; --line: #e1e1e8; --line-strong: #c3c3cc; --text: #18181d; --muted: #5f5f6b; --faint: #6c6c78; --value: #18181d; --accent: #4f86ec; --accent-text: #1d4ed8; --on-accent: #0f2a66; --fill: #cfe0ff; --lit: #4f86ec1a; --lit-edge: #4f86ec; --toast: #ffffff; --zone-off: #d9d9df; --body-fill: #f1f1f4; --body-stroke: #c4c4cc; --button-fill: #e4e4ea; --key-fill: #ececf0; --key-stroke: #cfcfd7; --key-text: #00000099; --warn-line: #c9a20055; --warn-bg: #fff7d6; --warn-text: #6b5200; --err: #d70015; --err-text: #b3261e; --shadow: 0 10px 30px -14px #1b1b3040; --pe-chg: #a14a08; --pe-hs: #6741d9; --pe-hs-fill: #e9e3ff; --pe-hs-on: #3b2391; color-scheme: light; }
-  :root[data-theme="workshop"] { --bg: #ede7dc; --bar: #e0d7c7; --panel: #f7f3ec; --raise: #e8e0d2; --line: #d6ccb9; --line-strong: #b3a68d; --text: #3d362a; --muted: #5c5141; --faint: #62564a; --value: #8a3f1b; --accent: #3f6e45; --accent-text: #2f5a35; --on-accent: #fff; --lit: #3f6e4533; --lit-edge: #3f6e45; --toast: #f7f3ec; --zone-off: #d6ccb9; --body-fill: #e8e0d2; --body-stroke: #b3a68d; --button-fill: #e0d7c7; --key-fill: #e8e0d2; --key-stroke: #cbbfa8; --key-text: #3d362a99; --warn-line: #a6672255; --warn-bg: #e7a2652a; --warn-text: #5a3412; --err: #c2181a; --err-text: #a3171a; --shadow: 0 12px 32px -16px #3d362a40; --pe-chg: #8a3f1b; --pe-hs: #5b3fb0; --pe-hs-fill: #e4dcf7; --pe-hs-on: #3a2675; color-scheme: light; }
-  :root[data-theme="neon"] { --bg: #160520; --bar: #1e0829; --panel: #250a33; --raise: #2f0d40; --line: #45185a; --line-strong: #6b2a85; --text: #f1e3d0; --muted: #c99ec6; --faint: #ad80ab; --value: #fbb550; --accent: #dd3290; --accent-text: #f26cb4; --on-accent: #000; --lit: #dd32902e; --lit-edge: #dd3290; --toast: #2f0d40; --zone-off: #45185a; --body-fill: #250a33; --body-stroke: #5a1f73; --button-fill: #2f0d40; --key-fill: #2f0d40; --key-stroke: #5a1f73; --key-text: #f1e3d099; --warn-line: #fbb55055; --warn-bg: #fbb55014; --warn-text: #fbb550; --err: #ff5a6e; --err-text: #ffb4c0; --shadow: 0 12px 32px -14px #000000d9; --pe-chg: #fbb550; --pe-hs: #7fd8ff; --pe-hs-fill: #7fd8ff; --pe-hs-on: #000; color-scheme: dark; }
-  :root[data-theme="acid"] { --bg: #050605; --bar: #0b0d0b; --panel: #111411; --raise: #181c18; --line: #222822; --line-strong: #3a4838; --text: #eaf2e8; --muted: #a6b4a3; --faint: #8e9c8b; --value: #b9f0a8; --accent: #44d62c; --accent-text: #5fe048; --on-accent: #000; --lit: #44d62c24; --lit-edge: #44d62c; --toast: #181c18; --zone-off: #222822; --body-fill: #111411; --body-stroke: #2f3a2e; --button-fill: #181c18; --key-fill: #181c18; --key-stroke: #2c352b; --key-text: #eaf2e899; --warn-line: #ffd25e55; --warn-bg: #ffd25e14; --warn-text: #ffd25e; --err: #ff4d5e; --err-text: #ffb4bb; --shadow: 0 12px 32px -14px #000000e6; --pe-chg: #ffd25e; --pe-hs: #c9b2ff; --pe-hs-fill: #c9b2ff; --pe-hs-on: #000; color-scheme: dark; }
+  :root, :root[data-theme="bridge"] { --bg: #050505; --bar: #0d0d0e; --panel: #131314; --raise: #1b1b1d; --line: #242426; --line-strong: #4a4440; --text: #f4efe9; --muted: #b8aea3; --faint: #9c9287; --value: #ffb85d; --accent: #ff5412; --accent-text: #ff7a45; --on-accent: #000; --lit: #ff541224; --lit-edge: #ff5412; --toast: #1b1b1d; --zone-off: #242426; --body-fill: #131314; --body-stroke: #3a3632; --button-fill: #1b1b1d; --key-fill: #1b1b1d; --key-stroke: #34312e; --key-text: #f4efe999; --warn-line: #ffb85d55; --warn-bg: #ffb85d14; --warn-text: #ffb85d; --err: #ff4a5a; --err-text: #ffb4bb; --shadow: 0 12px 32px -14px #000000e6; --pe-chg: #5cd0ff; --pe-hs: #e09bff; --pe-hs-fill: #e09bff; --pe-hs-on: #000; --pe-lead: #736b63; color-scheme: dark; }
+  :root[data-theme="roast"] { --bg: #150d05; --bar: #1e1007; --panel: #201002; --raise: #2b1909; --line: #3a2916; --line-strong: #64492b; --text: #f5e0d3; --muted: #b58754; --faint: #ad8150; --value: #e2aa6b; --accent: #e6c08f; --accent-text: #efcf9f; --on-accent: #1e1007; --lit: #e6c08f26; --lit-edge: #e6c08f; --toast: #2b1909; --zone-off: #3a2916; --body-fill: #201002; --body-stroke: #4a2b09; --button-fill: #2b1909; --key-fill: #2b1909; --key-stroke: #4a2b09; --key-text: #f5e0d399; --warn-line: #f8ac6055; --warn-bg: #f8ac6014; --warn-text: #f8ac60; --err: #ff5a4e; --err-text: #ffb4a8; --shadow: 0 12px 32px -14px #000000d9; --pe-chg: #8fd3ff; --pe-hs: #c4adff; --pe-hs-fill: #c4adff; --pe-hs-on: #000; --pe-lead: #926d44; color-scheme: dark; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme]) { --bg: #f4f4f7; --bar: #ffffff; --panel: #ffffff; --raise: #f0f0f4; --line: #e1e1e8; --line-strong: #c3c3cc; --text: #18181d; --muted: #5f5f6b; --faint: #6c6c78; --value: #18181d; --accent: #4f86ec; --accent-text: #1d4ed8; --on-accent: #0f2a66; --fill: #cfe0ff; --lit: #4f86ec1a; --lit-edge: #4f86ec; --toast: #ffffff; --zone-off: #d9d9df; --body-fill: #f1f1f4; --body-stroke: #c4c4cc; --button-fill: #e4e4ea; --key-fill: #ececf0; --key-stroke: #cfcfd7; --key-text: #00000099; --warn-line: #c9a20055; --warn-bg: #fff7d6; --warn-text: #6b5200; --err: #d70015; --err-text: #b3261e; --shadow: 0 10px 30px -14px #1b1b3040; --pe-chg: #a14a08; --pe-hs: #6741d9; --pe-hs-fill: #e9e3ff; --pe-hs-on: #3b2391; --pe-lead: #747480; color-scheme: light; } }
+  :root[data-theme="classic"] { --bg: #0d0d10; --bar: #111115; --panel: #15151a; --raise: #1b1b21; --line: #25252d; --line-strong: #3a3a44; --text: #ececf1; --muted: #9a9aa6; --faint: #858591; --value: #ececf1; --accent: #5b9cff; --accent-text: #8bb8ff; --on-accent: #000; --lit: #5b9cff1f; --lit-edge: #5b9cff; --toast: #222229; --zone-off: #2a2a31; --body-fill: #141418; --body-stroke: #2b2b33; --button-fill: #1d1d23; --key-fill: #1b1b21; --key-stroke: #2e2e37; --key-text: #ffffff99; --warn-line: #ffd60a55; --warn-bg: #ffd60a12; --warn-text: #ffe58a; --err: #ff453a; --err-text: #ffb4ae; --shadow: 0 10px 30px -12px #000000cc; --pe-chg: #ffb35c; --pe-hs: #d0b8ff; --pe-hs-fill: #d0b8ff; --pe-hs-on: #000; --pe-lead: #6d6d7a; color-scheme: dark; }
+  :root[data-theme="light"] { --bg: #f4f4f7; --bar: #ffffff; --panel: #ffffff; --raise: #f0f0f4; --line: #e1e1e8; --line-strong: #c3c3cc; --text: #18181d; --muted: #5f5f6b; --faint: #6c6c78; --value: #18181d; --accent: #4f86ec; --accent-text: #1d4ed8; --on-accent: #0f2a66; --fill: #cfe0ff; --lit: #4f86ec1a; --lit-edge: #4f86ec; --toast: #ffffff; --zone-off: #d9d9df; --body-fill: #f1f1f4; --body-stroke: #c4c4cc; --button-fill: #e4e4ea; --key-fill: #ececf0; --key-stroke: #cfcfd7; --key-text: #00000099; --warn-line: #c9a20055; --warn-bg: #fff7d6; --warn-text: #6b5200; --err: #d70015; --err-text: #b3261e; --shadow: 0 10px 30px -14px #1b1b3040; --pe-chg: #a14a08; --pe-hs: #6741d9; --pe-hs-fill: #e9e3ff; --pe-hs-on: #3b2391; --pe-lead: #747480; color-scheme: light; }
+  :root[data-theme="workshop"] { --bg: #ede7dc; --bar: #e0d7c7; --panel: #f7f3ec; --raise: #e8e0d2; --line: #d6ccb9; --line-strong: #b3a68d; --text: #3d362a; --muted: #5c5141; --faint: #62564a; --value: #8a3f1b; --accent: #3f6e45; --accent-text: #2f5a35; --on-accent: #fff; --lit: #3f6e4533; --lit-edge: #3f6e45; --toast: #f7f3ec; --zone-off: #d6ccb9; --body-fill: #e8e0d2; --body-stroke: #b3a68d; --button-fill: #e0d7c7; --key-fill: #e8e0d2; --key-stroke: #cbbfa8; --key-text: #3d362a99; --warn-line: #a6672255; --warn-bg: #e7a2652a; --warn-text: #5a3412; --err: #c2181a; --err-text: #a3171a; --shadow: 0 12px 32px -16px #3d362a40; --pe-chg: #8a3f1b; --pe-hs: #5b3fb0; --pe-hs-fill: #e4dcf7; --pe-hs-on: #3a2675; --pe-lead: #786b59; color-scheme: light; }
+  :root[data-theme="neon"] { --bg: #160520; --bar: #1e0829; --panel: #250a33; --raise: #2f0d40; --line: #45185a; --line-strong: #6b2a85; --text: #f1e3d0; --muted: #c99ec6; --faint: #ad80ab; --value: #fbb550; --accent: #dd3290; --accent-text: #f26cb4; --on-accent: #000; --lit: #dd32902e; --lit-edge: #dd3290; --toast: #2f0d40; --zone-off: #45185a; --body-fill: #250a33; --body-stroke: #5a1f73; --button-fill: #2f0d40; --key-fill: #2f0d40; --key-stroke: #5a1f73; --key-text: #f1e3d099; --warn-line: #fbb55055; --warn-bg: #fbb55014; --warn-text: #fbb550; --err: #ff5a6e; --err-text: #ffb4c0; --shadow: 0 12px 32px -14px #000000d9; --pe-chg: #fbb550; --pe-hs: #7fd8ff; --pe-hs-fill: #7fd8ff; --pe-hs-on: #000; --pe-lead: #966295; color-scheme: dark; }
+  :root[data-theme="acid"] { --bg: #050605; --bar: #0b0d0b; --panel: #111411; --raise: #181c18; --line: #222822; --line-strong: #3a4838; --text: #eaf2e8; --muted: #a6b4a3; --faint: #8e9c8b; --value: #b9f0a8; --accent: #44d62c; --accent-text: #5fe048; --on-accent: #000; --lit: #44d62c24; --lit-edge: #44d62c; --toast: #181c18; --zone-off: #222822; --body-fill: #111411; --body-stroke: #2f3a2e; --button-fill: #181c18; --key-fill: #181c18; --key-stroke: #2c352b; --key-text: #eaf2e899; --warn-line: #ffd25e55; --warn-bg: #ffd25e14; --warn-text: #ffd25e; --err: #ff4d5e; --err-text: #ffb4bb; --shadow: 0 12px 32px -14px #000000e6; --pe-chg: #ffd25e; --pe-hs: #c9b2ff; --pe-hs-fill: #c9b2ff; --pe-hs-on: #000; --pe-lead: #667564; color-scheme: dark; }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
   body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -97,10 +97,16 @@
   .profiles::-webkit-scrollbar { display: none; }
   /* Sideways-scrolling rows clip vertically too: room above and below so focus rings show whole. */
   .tabs, .profiles { padding-top: 5px; padding-bottom: 5px; margin-top: -5px; margin-bottom: -5px; }
+  .pitem { display: inline-flex; align-items: center; flex: none; border-radius: 8px; }
   .pbtn { position: relative; flex: none; white-space: nowrap; background: none; border: 0; border-radius: 8px; padding: 7px 12px 9px; color: var(--muted); cursor: pointer; font-weight: 600; }
   .pbtn:hover { color: var(--text); background: var(--raise); }
   .pbtn[aria-current=true] { color: var(--text); }
   .pbtn .g { font-weight: 400; color: var(--faint); font-size: 12px; margin-left: 6px; }
+  .pdel { flex: none; width: 24px; height: 24px; padding: 0; margin-left: 1px; display: grid; place-items: center; background: none; border: 1px solid transparent; border-radius: 6px; color: var(--faint); cursor: pointer; }
+  .pdel .ico { width: 12px; height: 12px; }
+  .pdel:hover { color: var(--err-text); border-color: var(--line-strong); }
+  .profiles .restore-ask { flex: none; flex-wrap: nowrap; margin-left: 4px; }
+  .profiles .restore-ask > span { white-space: nowrap; }
   .uline { position: absolute; left: 0; bottom: 0; height: 3px; width: 0; border-radius: 3px; background: var(--accent); pointer-events: none;
     transition: transform .35s cubic-bezier(.16, 1, .3, 1), width .35s cubic-bezier(.16, 1, .3, 1); }
   .padd { flex: none; background: none; border: 1px dashed var(--line-strong); border-radius: 8px; padding: 6px 11px; color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-left: 6px; }
@@ -574,6 +580,8 @@
   .pe-confirm p { margin: 0; font-size: 12.5px; color: var(--text); overflow-wrap: anywhere; }
   .pe-confirm .row { display: flex; gap: 6px; }
   .pe-confirm .ghost { flex: 1 1 0; justify-content: center; padding: 5px 8px; min-width: 0; }
+  .row > .pe-confirm { flex: 1 1 100%; }
+  .sheet thead .pe-confirm { max-width: 240px; }
   .restore-ask { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 4px 4px 4px 10px; border: 1px solid var(--err); border-radius: 9px;
     background: var(--panel); font-size: 12.5px; color: var(--text); max-width: 100%; min-width: 0; }
   .restore-ask > span { overflow-wrap: anywhere; min-width: 0; }
@@ -589,30 +597,49 @@
   .pe-tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 14px 10px; color: var(--muted); font-weight: 600; cursor: pointer; white-space: nowrap; }
   .pe-tab:hover { color: var(--text); }
   .pe-tab[aria-selected=true] { color: var(--text); border-bottom-color: var(--accent); }
-  .pe-bar { display: flex; align-items: center; gap: 10px; padding: 12px 18px; flex: none; flex-wrap: wrap; }
+  .pe-bar { display: flex; align-items: center; align-content: center; gap: 6px 10px; padding: 10px 18px; min-height: 82px; flex: none; flex-wrap: wrap; }
   .pe-bar .hint { color: var(--faint); font-size: 12.5px; margin: 0; }
   .pe-bar .grow { flex: 1; }
   .pe-bar .seg button[data-l=hypershift][aria-pressed=true] { background: var(--pe-hs-fill); color: var(--pe-hs-on); font-weight: 600; }
-  .pe-stage { flex: 1; min-height: 0; overflow: auto; padding: 0 18px 18px; }
-  svg.pe-mouse { width: 100%; height: 100%; min-height: 420px; max-height: 640px; display: block; }
+  .pe-hs-wrap { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+  .pe-q { width: 26px; height: 26px; padding: 0; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--bg); color: var(--muted); cursor: pointer; font-weight: 650; font-size: 13px; display: grid; place-items: center; flex: none; }
+  .pe-q:hover, .pe-q[aria-expanded=true] { color: var(--text); border-color: var(--accent); }
+  .pe-pop { position: absolute; top: calc(100% + 8px); left: 0; z-index: 15; width: min(320px, calc(100vw - 36px)); padding: 12px 14px; background: var(--panel); border: 1px solid var(--line-strong); border-radius: 10px; box-shadow: var(--shadow); display: grid; gap: 6px; }
+  .pe-pop-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .pe-pop-head b { font-size: 13.5px; font-weight: 650; color: var(--text); }
+  .pe-pop p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+  .pe-sep { width: 1px; height: 22px; background: var(--line); flex: none; }
+  .pe-danger-end { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; min-width: 0; max-width: 100%; }
+  .pe-bar-sub { flex: 1 0 100%; min-width: 0; }
+  .pe-warn { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; padding: 5px 10px; border: 1px solid var(--warn-line); background: var(--warn-bg); color: var(--warn-text); border-radius: 8px; font-size: 12.5px; }
+  .pe-warn .ghost { padding: 3px 10px; font-size: 12.5px; color: var(--text); border-color: var(--warn-line); background: var(--panel); }
+  .pe-warn .ghost:hover { border-color: var(--accent); }
+  .pe-stage { flex: 1; min-height: 0; overflow: auto; padding: 0 18px 16px; }
+  svg.pe-mouse { width: 100%; height: auto; max-height: 560px; display: block; }
   .pe-body { fill: var(--body-fill); stroke: var(--body-stroke); stroke-width: 3; }
   .pe-seam { fill: none; stroke: var(--body-stroke); stroke-width: 3; }
   .pe-hot { fill: var(--button-fill); stroke: var(--line-strong); stroke-width: 2; cursor: pointer; transition: fill .12s; }
   .pe-hot.chg { stroke: var(--pe-chg); }
   .pe-hot:hover, .pe-hot.on { fill: var(--lit); stroke: var(--lit-edge); }
-  .pe-lead { fill: none; stroke: var(--line-strong); stroke-width: 1.2; }
+  .pe-hot.off { opacity: .55; cursor: default; }
+  .pe-hot.off:not(.can):hover { fill: var(--button-fill); stroke: var(--line-strong); }
+  .pe-lead { fill: none; stroke: var(--pe-lead); stroke-width: 1.3; pointer-events: none; }
   .pe-lead.on { stroke: var(--lit-edge); stroke-width: 1.8; }
-  .pe-pin { fill: var(--line-strong); }
+  .pe-pin { fill: var(--pe-lead); pointer-events: none; }
   .pe-pin.chg { fill: var(--pe-chg); }
   .pe-pin.on { fill: var(--lit-edge); }
   .pe-call { cursor: pointer; }
-  .pe-call rect { fill: var(--panel); stroke: var(--line); }
-  .pe-call:hover rect { stroke: var(--line-strong); }
+  .pe-call.off:not([role="button"]) { cursor: default; }
+  .pe-call rect { fill: transparent; stroke: transparent; transition: fill .12s, stroke .12s; }
+  .pe-call:hover rect { fill: var(--panel); stroke: var(--line-strong); }
+  .pe-call.off:not([role="button"]):hover rect { fill: transparent; stroke: transparent; }
   .pe-call.on rect { stroke: var(--lit-edge); fill: var(--raise); stroke-width: 1.5; }
-  .pe-call:focus-visible { outline: none; } .pe-call:focus-visible rect { stroke: var(--accent); stroke-width: 2; }
+  .pe-call:focus-visible { outline: none; } .pe-call:focus-visible rect { fill: var(--panel); stroke: var(--accent); stroke-width: 2; }
+  .pe-call.on:focus-visible rect { fill: var(--raise); stroke: var(--accent); stroke-width: 2; }
   .pe-call .n { fill: var(--muted); font-size: 11.5px; }
   .pe-call .a { fill: var(--text); font-size: 13.5px; font-weight: 600; }
   .pe-call .a.chg { fill: var(--pe-chg); }
+  .pe-call.off .n, .pe-call.off .a { fill: var(--faint); font-weight: 400; }
   /* The changed dot: a shape, so a changed button never depends on its colour alone. */
   .pe-call .dot, .pe-dot { fill: var(--pe-chg); }
   .pe-dot-key { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--pe-chg); margin-right: 6px; vertical-align: 1px; }
@@ -626,10 +653,15 @@
   .pe-list td { padding: 9px 10px; border-bottom: 1px solid var(--line); cursor: pointer; }
   .pe-list tr:hover td { background: var(--panel); }
   .pe-list tr[aria-selected=true] td { background: var(--raise); }
+  .pe-list tr:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .pe-list .chg { color: var(--pe-chg); font-weight: 600; }
+  .pe-list .unset { color: var(--faint); }
   .pe-list td:first-child { color: var(--muted); }
   .pe-more { margin-top: 10px; }
   .pe-insp { background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding: 16px 18px 24px; min-width: 0; }
+  .pe-ihead { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 2px 0 8px; }
+  .pe-ihead .pe-cap { margin: 0 8px; }
+  .pe-x { display: none; }
   .pe-insp h3.pe-title { margin: 0 0 2px; font-size: 17px; font-weight: 650; }
   .pe-where { color: var(--muted); font-size: 12.5px; margin: 0 0 12px; }
   .pe-where .hsl { color: var(--pe-hs); font-weight: 600; }
@@ -656,14 +688,22 @@
   .pe-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; }
   .pe-card > h3 { margin: 0 0 10px; font-size: 14px; font-weight: 650; }
   .pe-card .edbox { gap: 14px; }
+  .pe-card.pe-compact { margin: 14px 0 0; padding: 12px 14px; }
+  .pe-card.pe-compact > h3 { margin-bottom: 8px; }
+  .pe-card.pe-compact .edbox { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 16px; align-items: start; }
+  .pe-card.pe-compact .edgroup { gap: 6px; }
+  .pe-card.pe-compact .edbox h3 { margin-bottom: 4px; }
+  .pe-card.pe-compact .dimgrid .tile { padding: 7px 10px; }
   .pe-stages { display: flex; gap: 10px; flex-wrap: wrap; }
-  .pe-st { width: 138px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px 10px; background: var(--bg); cursor: pointer; display: grid; gap: 4px; }
+  .pe-st { width: 168px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 8px 10px 10px; background: var(--bg); cursor: pointer; display: grid; gap: 5px; }
   .pe-st:hover { border-color: var(--line-strong); }
   .pe-st.on { border-color: var(--lit-edge); background: var(--lit); }
-  .pe-st small { color: var(--muted); display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-  .pe-st input { width: 100%; font-weight: 650; font-size: 15px; padding: 4px 8px; }
-  .pe-st .x { background: none; border: 0; color: var(--faint); cursor: pointer; padding: 0 2px; }
-  .pe-st .x:hover { color: var(--text); }
+  .pe-st-head { color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 4px; font-size: 12px; min-height: 24px; }
+  .pe-st-use { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; min-width: 0; flex: 1; }
+  .pe-st-use span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pe-st input.num { width: 100%; font-weight: 650; font-size: 15px; padding: 4px 8px; }
+  .pe-st .x { background: none; border: 1px solid transparent; border-radius: 6px; color: var(--faint); cursor: pointer; width: 24px; height: 24px; padding: 0; display: grid; place-items: center; flex: none; }
+  .pe-st .x:hover { color: var(--text); border-color: var(--line-strong); }
   .pe-st.add { place-items: center; color: var(--muted); border-style: dashed; min-height: 68px; }
   .pe-zone { cursor: pointer; transition: opacity .15s; }
   /* The picked zone gets a ring drawn behind it (a gap, then a line), so the zone keeps its own
@@ -674,7 +714,28 @@
   .pe-zone-gap.solid { fill: var(--bg); }
   .pe-zones { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 4px 0 14px; }
   @media (max-width: 1180px) { .pe { grid-template-columns: 196px minmax(0, 1fr) 320px; } }
-  @media (max-width: 980px) { .pe { grid-template-columns: 180px minmax(0, 1fr); } .pe-insp { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); } }
+  @media (max-width: 980px) {
+    .pe { grid-template-columns: 180px minmax(0, 1fr); }
+    .pe-insp { position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, calc(100vw - 48px)); z-index: 15;
+      border-left: 1px solid var(--line); box-shadow: var(--shadow); visibility: hidden;
+      transform: translateX(105%); transition: transform .25s cubic-bezier(.16, 1, .3, 1), visibility 0s linear .25s; }
+    .pe.pe-open .pe-insp { transform: none; visibility: visible; transition: transform .25s cubic-bezier(.16, 1, .3, 1), visibility 0s; }
+    .pe-x { display: grid; }
+  }
+  @media (max-width: 820px) {
+    .pe { display: block; }
+    .pe-profiles { border-right: 0; border-bottom: 1px solid var(--line); padding: 10px 12px; }
+    .pe-tabs { padding: 6px 12px 0; }
+    .pe-bar { padding: 10px 12px; }
+    .pe-bar .seg:not(:has([data-l])) { display: none; }
+    .pe-stage { padding: 0 12px 90px; overflow: visible; }
+    .pe.pe-open .pe-stage { padding-bottom: 60vh; }
+    .pe-list th, .pe-list td { padding: 8px 6px; font-size: 13px; overflow-wrap: anywhere; }
+    .pe-insp { top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 58vh;
+      border-left: 0; border-top: 1px solid var(--line); border-radius: 16px 16px 0 0; transform: translateY(105%); }
+    .pe.pe-open .pe-insp { transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .pe-call rect, .pe-insp, .pe.pe-open .pe-insp { transition: none; } }
 
   /* Medium windows: a narrower panel. */
   @media (max-width: 1180px) { .work { grid-template-columns: 172px minmax(0, 1fr) 330px; } .work.wide { grid-template-columns: 172px minmax(0, 1fr); } }
@@ -1198,15 +1259,40 @@ function renderDevbar() {
 }
 
 // Profile switcher: one click makes a profile live. The ember underline slides to it.
+let profileDeleting = null;
 function renderProfiles(adding) {
   const box = $('profiles');
   box.innerHTML = '';
+  if (profileDeleting && (profileDeleting.id !== dev.id || !dev.profiles.includes(profileDeleting.name) || dev.profiles.length < 2)) profileDeleting = null;
+  const asking = n => !!profileDeleting && profileDeleting.where === 'bar' && profileDeleting.name === n;
   dev.profiles.forEach(n => {
     const apps = (prof(n).apps || []).length;
     const b = el('button', { className: 'pbtn', ariaCurrent: n === dev.active, title: n === dev.active ? n + uiText(' is live') : uiText('Make ') + n + uiText(' live'),
       onclick: () => { if (n !== dev.active) activate(n); } }, n, apps ? el('span', { className: 'g num', textContent: apps === 1 ? uiText('1 game') : apps + uiText(' games') }) : null);
     b.dataset.p = n;
-    box.append(b);
+    const del = dev.profiles.length > 1 ? el('button', { className: 'pdel', type: 'button', innerHTML: icon('trash'),
+      title: uiText('Delete ') + n, ariaLabel: uiText('Delete ') + n, ariaExpanded: asking(n),
+      dataset: { p: n }, onclick: () => {
+        profileDeleting = asking(n) ? null : { id: dev.id, name: n, where: 'bar' };
+        renderProfiles();
+        const cancel = box.querySelector('.restore-ask .cancel');
+        if (cancel) { cancel.focus(); bringIntoView(box, cancel.closest('.restore-ask')); }
+      } }) : null;
+    box.append(el('span', { className: 'pitem' + (n === dev.active ? ' cur' : '') }, b, del));
+    if (asking(n)) {
+      const done = () => {
+        profileDeleting = null; renderProfiles();
+        const btn = [...box.querySelectorAll('.pdel')].find(x => x.dataset.p === n);
+        if (btn) btn.focus();
+      };
+      box.append(confirmBox({
+        inline: true,
+        question: profileDeleteQuestion(n) + uiText(' This can’t be undone.'),
+        confirmHtml: icon('trash') + uiText('Delete'),
+        onConfirm: () => { profileDeleting = null; removeProfile(n); },
+        onCancel: done,
+      }));
+    }
   });
   if (adding) {
     const input = el('input', { type: 'text', placeholder: uiText('Name, e.g. Valorant'), maxLength: 32, ariaLabel: uiText('New profile name') });
@@ -1216,7 +1302,7 @@ function renderProfiles(adding) {
     input.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); renderProfiles(); } };
     box.append(form); input.focus();
   } else {
-    box.append(el('button', { className: 'padd', innerHTML: icon('plus') + uiText('New'), title: uiText('New profile, a copy of ') + dev.active, onclick: () => renderProfiles(true) }));
+    box.append(el('button', { className: 'padd', innerHTML: icon('plus') + uiText('New'), title: uiText('New profile, a copy of ') + dev.active, onclick: () => { profileDeleting = null; renderProfiles(true); } }));
   }
   box.append(el('span', { className: 'uline', id: 'uline' }));
   requestAnimationFrame(placeUnderline);
@@ -1612,11 +1698,12 @@ function liveSummary() {
   return box;
 }
 
-// Esc closes the panel (and returns to its tile), or leaves Compare.
+// Esc closes the panel (and returns to its tile), closes the mouse inspector drawer, or leaves Compare.
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape' || e.target.classList.contains('combo')) return;
   if (showSettings) { showSettings = false; render(); return; }
   if (view === 'compare') { view = 'work'; render(); return; }
+  if (view === 'mouse' && !showAll && !showStudio && (peAside || (peInspOpen && peIsNarrow()))) { peCloseInsp(); return; }
   if (sel) closePanel();
 });
 
@@ -1836,7 +1923,30 @@ function profileHeader(n) {
   };
   games.append(add);
   th.append(title, games);
-  if (dev.profiles.length > 1) th.append(el('button', { className: 'del', textContent: uiText('Delete profile'), onclick: () => deleteProfile(n) }));
+  if (profileDeleting && (profileDeleting.id !== dev.id || !dev.profiles.includes(profileDeleting.name) || dev.profiles.length < 2)) profileDeleting = null;
+  if (dev.profiles.length > 1) {
+    if (profileDeleting && profileDeleting.where === 'compare' && profileDeleting.name === n) {
+      const done = () => {
+        profileDeleting = null; renderCompare();
+        const btn = [...$('sheet').querySelectorAll('thead .del')].find(x => x.dataset.p === n);
+        if (btn) btn.focus();
+      };
+      th.append(confirmBox({
+        question: profileDeleteQuestion(n) + uiText(' This can’t be undone.'),
+        confirmHtml: icon('trash') + uiText('Delete'),
+        onConfirm: () => { profileDeleting = null; removeProfile(n); },
+        onCancel: done,
+      }));
+    } else {
+      th.append(el('button', { className: 'del', type: 'button', textContent: uiText('Delete profile'), dataset: { p: n },
+        onclick: () => {
+          profileDeleting = { id: dev.id, name: n, where: 'compare' };
+          renderCompare();
+          const cancel = $('sheet').querySelector('thead .pe-confirm .cancel');
+          if (cancel) cancel.focus();
+        } }));
+    }
+  }
   return th;
 }
 
@@ -1861,7 +1971,7 @@ function buildEditor(host, r) {
   else if (r.key === 'scroll') scrollEditor(box);
   else if (r.key === 'onboard') onboardEditor(box);
   else if (r.key === 'macros') macrosEditor(box);
-  else if (r.key === 'apps') appsEditor(box);
+  else if (r.key === 'apps') appsEditor(box, true);
   else if (r.key === 'device') deviceEditor(box);
   else if (r.key.startsWith('btn:')) buttonEditor(box, r.key.slice(4));
 }
@@ -2052,7 +2162,7 @@ function audioEditor(host, part) {
 let audioEditSlot = null; // the EQ slot open in the panel; null: the one playing
 
 // The live profile's games and apps: while one is in front, this profile comes up.
-// `noDelete`: the mouse editor deletes from the profile's own card, so it leaves this out.
+// Profiles are deleted from the profile switcher / cards, so this panel leaves delete out.
 function appsEditor(box, noDelete) {
   const n = dev.active, apps = dev.profile.apps || [];
   const games = el('div', { className: 'games' });
@@ -2070,8 +2180,6 @@ function appsEditor(box, noDelete) {
     el('div', { className: 'edgroup' }, el('h3', { textContent: uiText('Add one') }),
       el('div', { className: 'row' }, input, list, el('button', { className: 'ghost', innerHTML: icon('plus') + uiText('Add'), onclick: add }))),
     el('p', { className: 'note', textContent: uiText('Running programs are suggested as you type. While one is in front, the tray switches to this profile, then back when you leave it.') }));
-  if (dev.profiles.length > 1 && !noDelete) box.append(el('div', { className: 'edgroup' }, el('h3', { textContent: uiText('This profile') }),
-    el('div', { className: 'row' }, el('button', { className: 'ghost danger', textContent: uiText('Delete ') + n, onclick: () => deleteProfile(n) }))));
 }
 
 function lightingControlEditor(box) {
@@ -3280,10 +3388,21 @@ function onboardEditor(box) {
   const done = (r, msg) => { btnData[dev.id] = r.buttons; onboardData[dev.id] = r.onboard; sel = 'onboard'; renderWork(); toast(msg); };
   const save = el('button', { className: 'ghost', textContent: o && o.profile === dev.active ? uiText('Save again') : uiText('Save ') + dev.active + uiText(' to the mouse'),
     onclick: async e => {
-      if (!o && !confirm(uiText`Write ${dev.active}'s button remaps into the mouse's memory? What it holds now is kept, and Put back restores it.`)) return;
+      const write = async () => {
+        try { done(await api('/api/save-to-mouse', {}), dev.active + uiText(' saved on the mouse')); return true; }
+        catch (err) { toast(err.message, true); return false; }
+      };
+      if (!o) {
+        confirmSwap(save, {
+          question: uiText`Write ${dev.active}'s button remaps into the mouse's memory? What it holds now is kept, and Put back restores it.`,
+          confirmLabel: uiText('Save to mouse'),
+          danger: false,
+          onConfirm: write,
+        });
+        return;
+      }
       e.target.disabled = true;
-      try { done(await api('/api/save-to-mouse', {}), dev.active + uiText(' saved on the mouse')); }
-      catch (err) { toast(err.message, true); e.target.disabled = false; }
+      if (!await write()) e.target.disabled = false;
     } });
   const putBack = o && el('button', { className: 'ghost', textContent: uiText('Put back what the mouse had'), onclick: async e => {
     e.target.disabled = true;
@@ -3637,8 +3756,8 @@ function macrosEditor(box) {
 
   const name = el('input', { type: 'text', placeholder: uiText('Name, e.g. Build order'), maxLength: 60, ariaLabel: uiText('Macro name') });
   const steps = el('textarea', { rows: 3, placeholder: 'tap:ctrl+c wait:50 click:left', ariaLabel: uiText('Macro steps'), spellcheck: false });
-  const rec = el('button', { className: 'ghost', textContent: uiText('Record') });
-  const save = el('button', { className: 'ghost', textContent: uiText('Save to device'), onclick: () => {
+  const rec = el('button', { className: 'ghost', textContent: uiText('Record steps') });
+  const save = el('button', { className: 'ghost', textContent: uiText('Write to device'), onclick: () => {
     if (!name.value.trim() || !steps.value.trim()) return toast(uiText('Give the macro a name and some steps'), true);
     macroCall({ action: 'new', name: name.value.trim(), script: steps.value.trim() }, uiText('Saved ') + name.value.trim());
   } });
@@ -3661,7 +3780,7 @@ function macrosEditor(box) {
   steps.addEventListener('contextmenu', e => { if (recording) e.preventDefault(); });
   rec.onclick = () => {
     recording = !recording;
-    rec.textContent = recording ? uiText('Stop recording') : uiText('Record');
+    rec.textContent = recording ? uiText('Stop capturing') : uiText('Record steps');
     if (recording) { out = []; last = 0; steps.value = ''; steps.focus(); toast(uiText('Recording: type and click in the box, then press Stop')); }
     else steps.value = steps.value.replace(/(^| )down:(\S+) up:\2(?= |$)/g, '$1tap:$2'); // tidy plain key taps
   };
@@ -3678,6 +3797,36 @@ async function macroCall(body, done) {
   } catch (e) { toast(e.message, true); }
 }
 
+// Shared in-page confirmation box: card (.pe-confirm) or inline (.restore-ask).
+let confirmSeq = 0;
+function confirmBox({ inline, question, confirmLabel, confirmHtml, danger = true, onConfirm, onCancel }) {
+  const id = 'confirmMsg-' + (++confirmSeq);
+  const cancel = el('button', { className: 'ghost cancel', type: 'button', textContent: uiText('Cancel'), onclick: onCancel });
+  const ok = el('button', { className: 'ghost' + (danger ? ' danger' : ''), type: 'button',
+    ...(confirmHtml ? { innerHTML: confirmHtml } : { textContent: confirmLabel }),
+    onclick: () => onConfirm(ok, cancel) });
+  const msg = el(inline ? 'span' : 'p', { id, textContent: question });
+  const box = el(inline ? 'span' : 'div', { className: inline ? 'restore-ask' : 'pe-confirm', role: 'group',
+    onkeydown: e => { if (e.key === 'Escape') { e.stopPropagation(); onCancel(); } } },
+    ...(inline ? [msg, ok, cancel] : [msg, el('div', { className: 'row' }, ok, cancel)]));
+  box.setAttribute('aria-labelledby', id);
+  return box;
+}
+function confirmSwap(trigger, opts) {
+  const box = confirmBox({
+    ...opts,
+    onCancel: () => { box.replaceWith(trigger); trigger.focus(); },
+    onConfirm: async (ok, cancel) => {
+      ok.disabled = cancel.disabled = true;
+      const keep = await opts.onConfirm();
+      if (!keep) { box.replaceWith(trigger); trigger.focus(); }
+    },
+  });
+  trigger.replaceWith(box);
+  box.querySelector('.cancel').focus();
+  return box;
+}
+
 // "Restore all" asks first, in place: one stray click used to wipe every remap of the profile.
 let restoreAsking = null;
 function restoreAllControl(rerender) {
@@ -3685,7 +3834,7 @@ function restoreAllControl(rerender) {
   if (!n) return '';
   const word = isBoard() ? uiText('key') : uiText('button');
   if (!restoreAsking || restoreAsking.id !== dev.id || restoreAsking.profile !== dev.active) {
-    return el('button', { className: 'ghost', textContent: uiText('Restore all'), title: uiText`Every changed ${word} back to what the ${holder()} stores`,
+    return el('button', { className: 'ghost danger', textContent: uiText('Restore all'), title: uiText`Every changed ${word} back to what the ${holder()} stores`,
       onclick: () => {
         restoreAsking = { id: dev.id, profile: dev.active }; rerender();
         const cancel = document.querySelector('.restore-ask .cancel'); if (cancel) cancel.focus();
@@ -3695,13 +3844,13 @@ function restoreAllControl(rerender) {
     restoreAsking = null; rerender();
     const b = [...document.querySelectorAll('button')].find(x => x.textContent === uiText('Restore all')); if (b) b.focus();
   };
-  const id = 'restoreAskMsg';
-  const box = el('span', { className: 'restore-ask', role: 'group', onkeydown: e => { if (e.key === 'Escape') { e.stopPropagation(); done(); } } },
-    el('span', { id, textContent: uiText`Put ${plural(n, isBoard() ? 'key' : 'remapped button')} of ${dev.active} back to what the ${holder()} stores?` }),
-    el('button', { className: 'ghost danger', type: 'button', textContent: uiText('Restore'), onclick: () => { restoreAsking = null; restoreAllButtons(); } }),
-    el('button', { className: 'ghost cancel', type: 'button', textContent: uiText('Cancel'), onclick: done }));
-  box.setAttribute('aria-labelledby', id);
-  return box;
+  return confirmBox({
+    inline: true,
+    question: uiText`Put ${plural(n, isBoard() ? 'key' : 'remapped button')} of ${dev.active} back to what the ${holder()} stores?`,
+    confirmLabel: uiText('Restore'),
+    onConfirm: () => { restoreAsking = null; restoreAllButtons(); },
+    onCancel: done,
+  });
 }
 
 async function restoreAllButtons() {
@@ -3850,7 +3999,13 @@ window.addEventListener('pointerup', () => painting = false);
 // Writes go through the same calls as the classic view (assign, /api/stages, zoneEditor…), so
 // every change is saved to the live profile right away, with Undo where the classic view has it.
 const usePE = () => !!dev && dev.kind === 'mouse' && remembered('classic') !== '1';
-let peTab = 'buttons', peSel = null, peList = false, peZone = null, peCat = null, peAside = null, peAdding = false, peDeleting = null, peInspSig = '';
+let peTab = 'buttons', peSel = null, peList = false, peZone = null, peCat = null, peAside = null, peAdding = false, peDeleting = null, peInspSig = '', peHsHelp = false;
+let peInspOpen = false, peLastAside = null, peLastDev = null;
+const peIsNarrow = () => matchMedia('(max-width: 980px)').matches;
+const peIsCompact = () => matchMedia('(max-width: 820px)').matches;
+matchMedia('(max-width: 820px)').addEventListener('change', () => {
+  if (dev && !showAll && !showSettings && !showStudio && view === 'mouse' && peTab === 'buttons') renderPE(true);
+});
 
 // Where each button sits on the drawing (a plain top view, the left flank showing), its
 // leader line's side, and a name by where it is. Buttons missing here go in a list below.
@@ -3883,7 +4038,7 @@ const PE_WIN = [['key:ctrl+c', uiText('Copy')], ['key:ctrl+v', uiText('Paste')],
   ['key:win+v', uiText('Clipboard history')], ['key:shift+win+s', uiText('Screenshot')], ['key:win+l', uiText('Lock')], ['key:ctrl+shift+esc', uiText('Task Manager')],
   ['key:alt+f4', uiText('Close window')]];
 const PE_WIN_LABEL = Object.fromEntries(PE_WIN);
-const peLabel = a => a == null ? uiText('Not set') : (actionLabel(a) + (PE_WIN_LABEL[a] ? ' · ' + PE_WIN_LABEL[a] : ''));
+const peLabel = a => a == null ? uiText('Not set') : /^unavailable$/i.test(String(a).trim()) ? uiText('Unavailable') : (actionLabel(a) + (PE_WIN_LABEL[a] ? ' · ' + PE_WIN_LABEL[a] : ''));
 const peCats = () => [
   ['mouse', uiText('Mouse'), BTN_CHOICES[0][1]],
   ['key', uiText('Key or shortcut')],
@@ -3917,7 +4072,7 @@ const svgEl = (tag, attrs = {}, text) => { const e = document.createElementNS('h
 
 // Open a setting from elsewhere (the preview at the top, a Compare cell).
 function peOpen(row) {
-  peAside = null;
+  peAside = null; peLastAside = null; peInspOpen = true; peLastDev = dev ? dev.id : null;
   if (row.startsWith('zone:')) { peTab = 'light'; peZone = row.slice(5); }
   else if (row.startsWith('btn:')) { peTab = 'buttons'; peSel = row.slice(4); }
   else if (['dpi', 'stages', 'polling', 'scroll', 'sleep'].includes(row)) peTab = 'perf';
@@ -3930,21 +4085,48 @@ function peOpen(row) {
 function renderPE(keepInsp) {
   const root = $('pe');
   if (!root.firstChild) root.append(el('aside', { className: 'pe-profiles', id: 'peProfiles', ariaLabel: uiText('Profiles') }),
-    el('div', { className: 'pe-main' }, el('nav', { className: 'pe-tabs', id: 'peTabs', role: 'tablist' }),
-      el('div', { className: 'pe-bar', id: 'peBar' }), el('div', { className: 'pe-stage', id: 'peStage' })),
+    el('div', { className: 'pe-main' }, el('nav', { className: 'pe-tabs', id: 'peTabs', role: 'tablist', ariaLabel: uiText('Mouse settings') }),
+      el('div', { className: 'pe-bar', id: 'peBar' }), el('div', { className: 'pe-stage', id: 'peStage', role: 'tabpanel' })),
     el('aside', { className: 'pe-insp', id: 'peInsp', ariaLabel: uiText('Edit') }));
+  if (dev && peLastDev !== dev.id) { peLastDev = dev.id; peInspOpen = false; }
+  if (peAside && peAside !== peLastAside) peInspOpen = true;
+  else if (!peAside && peLastAside) peInspOpen = false;
+  peLastAside = peAside;
   const tabs = [['buttons', uiText('Buttons')], ['perf', uiText('Performance')], dev.lighting_control != null && dev.leds.length && ['light', uiText('Lighting')],
     dev.macros && ['macros', uiText('Macros')]].filter(Boolean);
   if (!tabs.some(t => t[0] === peTab)) peTab = 'buttons';
   if (peTab === 'buttons') loadButtons(dev);
   if (dev.macros && macroData[dev.id] === undefined && (peTab === 'buttons' || peTab === 'macros')) loadMacros(dev);
+  const wasOpen = root.classList.contains('pe-open');
   root.classList.toggle('hs', peTab === 'buttons' && btnLayer === 'hypershift');
+  root.classList.toggle('pe-open', peInspOpen);
   peProfiles();
   $('peTabs').innerHTML = '';
-  tabs.forEach(([id, text]) => $('peTabs').append(el('button', { className: 'pe-tab', role: 'tab', textContent: text, ariaSelected: id === peTab,
-    onclick: () => { if (peTab !== id) { peTab = id; peAside = null; peCat = null; render(); } } })));
+  // Switching tabs closes the narrow-layout drawer and any help popover.
+  const goTab = id => { peTab = id; peAside = null; peLastAside = null; peCat = null; peHsHelp = false; peInspOpen = false; render(); };
+  tabs.forEach(([id, text], idx) => {
+    const b = el('button', { className: 'pe-tab', id: 'peTab-' + id, role: 'tab', textContent: text,
+      ariaSelected: id === peTab, tabIndex: id === peTab ? 0 : -1,
+      onclick: () => { if (peTab !== id) goTab(id); },
+      onkeydown: e => {
+        let next = -1;
+        if (e.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = tabs.length - 1;
+        if (next < 0) return;
+        e.preventDefault();
+        const targetId = tabs[next][0];
+        if (peTab !== targetId) goTab(targetId);
+        const btn = $('peTab-' + targetId);
+        if (btn) btn.focus();
+      } });
+    b.setAttribute('aria-controls', 'peStage');
+    $('peTabs').append(b);
+  });
   peBar();
   const stage = $('peStage'), scroll = stage.scrollTop;
+  stage.setAttribute('aria-labelledby', 'peTab-' + peTab);
   stage.innerHTML = '';
   ({ buttons: peButtonsStage, perf: pePerfStage, light: peLightStage, macros: peMacrosStage })[peTab](stage);
   stage.scrollTop = scroll;
@@ -3960,6 +4142,7 @@ function renderPE(keepInsp) {
   peInspector(insp);
   insp.scrollTop = top;
   if (typing && $('peCapture')) $('peCapture').focus({ preventScroll: true });
+  else if (peInspOpen && !wasOpen && peIsNarrow()) { const x = insp.querySelector('.pe-x, .xbtn'); if (x) x.focus({ preventScroll: true }); }
 }
 
 function peProfiles() {
@@ -3971,7 +4154,8 @@ function peProfiles() {
   const asking = n => !!peDeleting && peDeleting.name === n;
   dev.profiles.forEach(n => {
     const p = prof(n), keys = Object.keys(p.buttons || {});
-    const st = n === dev.active && dev.stages ? dev.stages.list.length : p.dpi_stages ? p.dpi_stages.stages.length : 0;
+    const savedStages = p.dpi_stages && (p.dpi_stages.stages || p.dpi_stages.list);
+    const st = n === dev.active && dev.stages ? dev.stages.list.length : Array.isArray(savedStages) ? savedStages.length : 0;
     const normal = keys.filter(k => !k.includes('/')).length, hyper = keys.length - normal, apps = (p.apps || []).length;
     const bits = [st && plural(st, 'DPI stage'), normal && plural(normal, 'button'), hyper && hyper + ' HyperShift', apps && (apps === 1 ? uiText('1 game') : apps + uiText(' games'))].filter(Boolean);
     const item = el('div', { className: 'pe-pitem' + (n === dev.active ? ' cur' : '') },
@@ -4007,15 +4191,29 @@ function peProfiles() {
 // can't be undone (the server has no way to bring a profile back), so this asks first.
 function peDeleteConfirm(name) {
   const done = () => { peDeleting = null; peProfiles(); const b = [...$('peProfiles').querySelectorAll('.pe-pdel')].find(x => x.dataset.p === name); if (b) b.focus(); };
-  const id = 'peDelMsg';
-  const cancel = el('button', { className: 'ghost cancel', type: 'button', textContent: uiText('Cancel'), onclick: done });
-  const box = el('div', { className: 'pe-confirm', role: 'group', onkeydown: e => { if (e.key === 'Escape') { e.stopPropagation(); done(); } } },
-    el('p', { id, textContent: profileDeleteQuestion(name) + uiText(' This can’t be undone.') }),
-    el('div', { className: 'row' }, el('button', { className: 'ghost danger', type: 'button', innerHTML: icon('trash') + uiText('Delete'),
-      onclick: () => { peDeleting = null; removeProfile(name); } }), cancel));
-  box.setAttribute('aria-labelledby', id);
-  return box;
+  return confirmBox({
+    question: profileDeleteQuestion(name) + uiText(' This can’t be undone.'),
+    confirmHtml: icon('trash') + uiText('Delete'),
+    onConfirm: () => { peDeleting = null; removeProfile(name); },
+    onCancel: done,
+  });
 }
+
+function closeHsHelp(refocus) {
+  peHsHelp = false;
+  const pop = $('peHsPop'), q = $('peHsQ');
+  if (pop) pop.hidden = true;
+  if (q) {
+    q.setAttribute('aria-expanded', 'false');
+    if (refocus) q.focus();
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && peHsHelp) { e.stopImmediatePropagation(); closeHsHelp(true); }
+}, true);
+document.addEventListener('pointerdown', e => {
+  if (peHsHelp && !e.target.closest('.pe-hs-wrap')) closeHsHelp(false);
+});
 
 function peBar() {
   const bar = $('peBar');
@@ -4024,18 +4222,58 @@ function peBar() {
     const layer = el('span', { className: 'seg', role: 'group', ariaLabel: uiText('Button layer') });
     [['normal', uiText('Standard')], ['hypershift', 'HyperShift']].forEach(([v, text]) => layer.append(el('button', { textContent: text, ariaPressed: btnLayer === v, dataset: { l: v },
       onclick: () => { if (btnLayer !== v) { btnLayer = v; peCat = null; renderPE(); } } })));
-    const hsBtn = peHolder();
+    const q = el('button', { className: 'pe-q', id: 'peHsQ', type: 'button', textContent: '?',
+      title: uiText('What is HyperShift?'), ariaLabel: uiText('What is HyperShift?'),
+      onclick: () => {
+        peHsHelp = !peHsHelp;
+        const pop = $('peHsPop');
+        if (pop) pop.hidden = !peHsHelp;
+        q.setAttribute('aria-expanded', String(peHsHelp));
+      } });
+    q.setAttribute('aria-expanded', String(peHsHelp));
+    q.setAttribute('aria-controls', 'peHsPop');
+    const pop = el('div', { className: 'pe-pop', id: 'peHsPop', role: 'dialog', hidden: !peHsHelp },
+      el('div', { className: 'pe-pop-head' },
+        el('b', { id: 'peHsPopTitle', textContent: 'HyperShift' }),
+        el('button', { className: 'xbtn', type: 'button', innerHTML: icon('x'), title: uiText('Close'), ariaLabel: uiText('Close'), onclick: () => closeHsHelp(true) })),
+      el('p', { textContent: uiText('HyperShift is a second layer. While the HyperShift button is held, every button does its HyperShift action instead.') }));
+    pop.setAttribute('aria-labelledby', 'peHsPopTitle');
+    const hsWrap = el('span', { className: 'pe-hs-wrap' }, layer, q, pop);
+
     const how = el('span', { className: 'seg', role: 'group', ariaLabel: uiText('Show as') });
     [[false, uiText('Drawing')], [true, uiText('List')]].forEach(([v, text]) => how.append(el('button', { textContent: text, ariaPressed: peList === v, onclick: () => { peList = v; renderPE(true); } })));
-    bar.append(layer, el('p', { className: 'hint', textContent: btnLayer === 'normal' ? uiText('Pick a button to choose what it does.')
-        : hsBtn ? uiText`What each button does while ${peName(hsBtn)} is held.` : uiText('No button holds HyperShift in this profile: set one to HyperShift in Standard first.') }),
-      el('span', { className: 'grow' }), how,
-      el('button', { className: 'ghost', textContent: uiText('Saved on the mouse…'), ariaPressed: peAside === 'onboard', title: uiText('Save the remaps into the mouse so they work without Secretarybird'),
-        onclick: () => { peAside = peAside === 'onboard' ? null : 'onboard'; renderPE(); } }),
-      restoreAllControl(() => peBar()));
-  } else if (peTab === 'perf') bar.append(el('p', { className: 'hint', textContent: uiText('DPI stages, polling rate and scroll wheel of ') + dev.active + '.' }));
-  else if (peTab === 'light') bar.append(el('p', { className: 'hint', textContent: dev.lighting_control ? uiText('Pick a zone on the mouse to set its color.') : uiText('Secretarybird leaves this mouse’s lighting alone.') }));
-  else bar.append(el('p', { className: 'hint', textContent: uiText('Macros live on the mouse and can be played by any button, in every profile.') }));
+    const onboardBtn = el('button', { className: 'ghost', textContent: uiText('On-board memory…'), ariaPressed: peAside === 'onboard',
+      title: uiText('Save the remaps into the mouse so they work without Secretarybird'),
+      onclick: () => { peAside = peAside === 'onboard' ? null : 'onboard'; renderPE(); } });
+    const restoreCtl = restoreAllControl(() => peBar());
+    bar.append(hsWrap, how, onboardBtn, el('span', { className: 'grow' }));
+    // The destructive control stays apart, at the far end, and never wraps away from its separator.
+    if (restoreCtl) bar.append(el('span', { className: 'pe-danger-end' }, el('span', { className: 'pe-sep', ariaHidden: 'true' }), restoreCtl));
+
+    const hsBtn = peHolder(), loaded = Array.isArray(btnData[dev.id]);
+    if (btnLayer === 'hypershift' && loaded && !hsBtn && peButtons().length) {
+      bar.append(el('div', { className: 'pe-bar-sub pe-warn', role: 'status' },
+        el('span', { textContent: uiText('No button holds HyperShift in this profile: set one to HyperShift in Standard first.') }),
+        el('button', { className: 'ghost', type: 'button', textContent: uiText('Pick a button in Standard'),
+          onclick: () => {
+            btnLayer = 'normal'; peAside = null; peCat = 'hs'; renderPE();
+            const first = $('peStage').querySelector('.pe-call, .pe-list tr[data-b]');
+            if (first) first.focus();
+          } })));
+    } else {
+      const hint = btnLayer === 'normal'
+        ? (hsBtn ? uiText`Pick a button to choose what it does. HyperShift button: ${peName(hsBtn)}.`
+          : uiText('Pick a button to choose what it does.'))
+        : (hsBtn ? uiText`What each button does while ${peName(hsBtn)} is held.`
+          : uiText('No button holds HyperShift in this profile: set one to HyperShift in Standard first.'));
+      bar.append(el('p', { className: 'hint pe-bar-sub', textContent: hint }));
+    }
+  } else {
+    peHsHelp = false;
+    if (peTab === 'perf') bar.append(el('p', { className: 'hint', textContent: uiText('DPI stages, polling rate and scroll wheel of ') + dev.active + '.' }));
+    else if (peTab === 'light') bar.append(el('p', { className: 'hint', textContent: dev.lighting_control ? uiText('Pick a zone on the mouse to set its color.') : uiText('Secretarybird leaves this mouse’s lighting alone.') }));
+    else bar.append(el('p', { className: 'hint', textContent: uiText('Macros live on the mouse and can be played by any button, in every profile.') }));
+  }
 }
 
 function peSelected() {
@@ -4043,7 +4281,52 @@ function peSelected() {
   if (!list.length) return null;
   return list.find(b => b.name === peSel) || list[0];
 }
-function pePick(name) { peSel = name; peAside = null; peCat = null; renderPE(); }
+function pePick(name) { peSel = name; peAside = null; peLastAside = null; peCat = null; peInspOpen = true; renderPE(); }
+const peBtnLocked = b => b[btnLayer] == null || /^unavailable$/i.test(String(b[btnLayer]).trim());
+function peMeasureText(stage) {
+  const probe = svgEl('svg', { className: 'pe-mouse', 'aria-hidden': 'true', style: 'position:absolute;width:900px;height:0;visibility:hidden;pointer-events:none' });
+  const cg = svgEl('g', { className: 'pe-call' }), t = svgEl('text');
+  cg.append(t); probe.append(cg); stage.append(probe);
+  const measure = (str, cls) => {
+    t.setAttribute('class', cls); t.textContent = str;
+    const len = typeof t.getComputedTextLength === 'function' ? t.getComputedTextLength() : 0;
+    return len > 0 ? len : str.length * (cls === 'n' ? 6.4 : 7.6);
+  };
+  const fitOne = (str, cls, maxW) => {
+    if (measure(str, cls) <= maxW) return str;
+    let lo = 1, hi = str.length;
+    while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (measure(str.slice(0, mid) + '…', cls) <= maxW) lo = mid; else hi = mid - 1; }
+    return str.slice(0, Math.max(1, lo)) + '…';
+  };
+  const wrapAction = (str, maxW) => {
+    if (measure(str, 'a') <= maxW) return [str];
+    const breaks = [];
+    for (let i = 1; i < str.length - 1; i++) {
+      if (str[i] === ' ') {
+        const a = str.slice(0, i).trimEnd(), b = str.slice(i + 1).trimStart();
+        if (a && b) breaks.push([a, b]);
+      } else if (str[i] === '+' || str[i] === '/' || str[i] === '-') {
+        breaks.push([str.slice(0, i + 1), str.slice(i + 1)]);
+      }
+    }
+    let best = null, bestDiff = Infinity;
+    for (const [a, b] of breaks) {
+      const wa = measure(a, 'a'), wb = measure(b, 'a');
+      if (wa <= maxW && wb <= maxW) {
+        const diff = Math.abs(wa - wb);
+        if (diff < bestDiff) { bestDiff = diff; best = [a, b]; }
+      }
+    }
+    if (best) return best;
+    for (let i = breaks.length - 1; i >= 0; i--) {
+      if (measure(breaks[i][0], 'a') <= maxW) return [breaks[i][0], fitOne(breaks[i][1], 'a', maxW)];
+    }
+    let lo = 1, hi = str.length - 1;
+    while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (measure(str.slice(0, mid), 'a') <= maxW) lo = mid; else hi = mid - 1; }
+    return [str.slice(0, lo), fitOne(str.slice(lo), 'a', maxW)];
+  };
+  return { measure, fitOne, wrapAction, done: () => probe.remove() };
+}
 
 function peButtonsStage(stage) {
   const list = btnData[dev.id];
@@ -4052,58 +4335,90 @@ function peButtonsStage(stage) {
   if (!shown.length) return stage.append(el('p', { className: 'hint', textContent: btnFailed[dev.id] ? uiText('Couldn’t read the buttons. Unplug and replug the mouse, then open this again.')
     : list.length ? uiText('This mouse has no HyperShift layer to change.') : uiText('Button remapping isn’t supported on this mouse. It doesn’t answer Razer’s button commands.') }));
   const cur = peSelected();
-  if (peList) {
+  if (peList || peIsCompact()) {
     const t = el('table', { className: 'pe-list' });
     t.append(el('tr', {}, el('th', { textContent: uiText('Button') }), el('th', { textContent: uiText('Standard') }), el('th', { textContent: 'HyperShift' })));
     [...list].sort((a, b) => Object.keys(PE_SPOTS).indexOf(a.name) - Object.keys(PE_SPOTS).indexOf(b.name)).forEach(b => {
       const cell = layer => b.remapped[layer]
         ? el('span', { className: 'chg' }, el('i', { className: 'pe-dot-key', ariaHidden: 'true' }), peLabel(b[layer]), el('span', { className: 'sr', textContent: uiText(' (changed)') }))
-        : el('span', { textContent: b[layer] == null ? '—' : peLabel(b[layer]) });
-      const tr = el('tr', { ariaSelected: cur && cur.name === b.name, tabIndex: 0, onclick: () => pePick(b.name), onkeydown: e => { if (e.key === 'Enter') pePick(b.name); } },
+        : el('span', { className: b[layer] == null || /^unavailable$/i.test(String(b[layer]).trim()) ? 'unset' : '', textContent: b[layer] == null ? '—' : peLabel(b[layer]) });
+      const tr = el('tr', { dataset: { b: b.name }, ariaSelected: cur && cur.name === b.name, tabIndex: 0, onclick: () => pePick(b.name),
+        onkeydown: e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault(); pePick(b.name);
+            const again = $('peStage').querySelector(`.pe-list tr[data-b="${CSS.escape(b.name)}"]`);
+            if (again) again.focus({ preventScroll: true });
+          } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const rows = [...t.querySelectorAll('tr[data-b]')], idx = rows.indexOf(tr);
+            const next = rows[e.key === 'ArrowDown' ? Math.min(rows.length - 1, idx + 1) : Math.max(0, idx - 1)];
+            if (next) next.focus();
+          }
+        } },
         el('td', { textContent: peName(b) }), el('td', {}, cell('normal')), el('td', {}, cell('hypershift')));
       t.append(tr);
     });
     return stage.append(t, el('p', { className: 'pe-help', textContent: uiText('Both layers side by side. A dot marks the buttons this profile changes.') }));
   }
-  const svg = svgEl('svg', { class: 'pe-mouse', viewBox: '0 0 900 470', role: 'group', 'aria-label': uiText('Mouse: pick a button to change what it does') });
+  const svg = svgEl('svg', { class: 'pe-mouse', viewBox: '0 8 900 454', role: 'group', 'aria-label': uiText('Mouse: pick a button to change what it does') });
   const g = svgEl('g', { transform: 'translate(200,0)' });
   g.append(svgEl('path', { d: PE_BODY, class: 'pe-body' }), svgEl('path', { d: 'M250 44v116M158 162c56 18 128 18 184 0', class: 'pe-seam' }));
-  const placed = shown.filter(b => PE_SPOTS[b.name]), rest = shown.filter(b => !PE_SPOTS[b.name]);
+  const placed = list.filter(b => PE_SPOTS[b.name]), rest = shown.filter(b => !PE_SPOTS[b.name]);
   const order = Object.keys(PE_SPOTS);
-  for (const side of ['L', 'R']) {
-    const col = placed.filter(b => PE_SPOTS[b.name].side === side).sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
-    const gap = Math.min(58, 440 / Math.max(col.length, 1));
-    col.forEach((b, i) => {
-      const spot = PE_SPOTS[b.name], on = cur && cur.name === b.name, chg = b.remapped[btnLayer];
-      const x = side === 'L' ? 0 : 690, y = 14 + i * gap, [px, py] = [spot.pin[0] + 200, spot.pin[1]];
-      const shape = spot.rect ? svgEl('rect', { x: spot.rect[0], y: spot.rect[1], width: spot.rect[2], height: spot.rect[3], rx: spot.rect[4] }) : svgEl('path', { d: spot.shape });
-      shape.setAttribute('class', 'pe-hot' + (on ? ' on' : '') + (chg ? ' chg' : ''));
-      if (spot.under) shape.setAttribute('stroke-dasharray', '3 3');
-      shape.append(svgEl('title', {}, peName(b)));
-      shape.onclick = () => pePick(b.name);
-      g.append(shape);
-      const cx = side === 'L' ? 220 : 690, cy = y + 24;
-      svg.append(svgEl('path', { d: `M${cx} ${cy}C${(cx + px) / 2} ${cy} ${(cx + px) / 2} ${py} ${px} ${py}`, class: 'pe-lead' + (on ? ' on' : '') }));
-      svg.append(svgEl('circle', { cx: px, cy: py, r: 3.5, class: 'pe-pin' + (chg ? ' chg' : '') + (on ? ' on' : '') }));
-      const what = peLabel(b[btnLayer]), short = what.length > 30 ? what.slice(0, 29) + '…' : what;
-      const c = svgEl('g', { class: 'pe-call' + (on ? ' on' : ''), transform: `translate(${x},${y})`, tabindex: 0, role: 'button',
-        'aria-pressed': String(!!on), 'aria-label': peName(b) + ': ' + what + (chg ? uiText(' (changed)') : '') });
-      c.append(svgEl('rect', { width: 210, height: 48, rx: 9 }), svgEl('title', {}, peName(b) + ': ' + what),
-        svgEl('text', { x: 12, y: 19, class: 'n' }, peName(b)), svgEl('text', { x: 12, y: 37, class: 'a' + (chg ? ' chg' : '') }, short));
-      if (chg) c.append(svgEl('circle', { cx: 197, cy: 14, r: 4.5, class: 'dot' }));
-      c.onclick = () => pePick(b.name);
-      c.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pePick(b.name); } };
-      svg.append(c);
-    });
-  }
-  if (placed.some(b => PE_SPOTS[b.name].under)) g.append(svgEl('text', { x: 250, y: 428, class: 'pe-under' }, uiText('underside')));
+  const leads = [], pins = [], calls = [];
+  const m = peMeasureText(stage);
+  try {
+    for (const side of ['L', 'R']) {
+      const col = placed.filter(b => PE_SPOTS[b.name].side === side).sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+      const items = col.map(b => {
+        const chg = b.remapped[btnLayer], locked = peBtnLocked(b), what = peLabel(b[btnLayer]);
+        const nameText = m.fitOne(peName(b), 'n', 236), lines = m.wrapAction(what, 252);
+        const h = lines.length > 1 ? 54 : 42, nameW = m.measure(nameText, 'n');
+        const actW = Math.max(...lines.map(l => m.measure(l, 'a')));
+        const w = Math.min(270, Math.max(96, Math.max(nameW + (chg ? 16 : 0), actW) + 20));
+        return { b, chg, locked, what, nameText, nameW, lines, h, w };
+      });
+      const sumH = items.reduce((s, x) => s + x.h, 0);
+      const gap = items.length > 1 ? Math.min(16, Math.max(3, (444 - 12 - sumH) / (items.length - 1))) : 0;
+      let y = 12;
+      items.forEach(({ b, chg, locked, what, nameText, nameW, lines, h, w }) => {
+        const spot = PE_SPOTS[b.name], canPick = b[btnLayer] != null, on = canPick && cur && cur.name === b.name;
+        const [px, py] = [spot.pin[0] + 200, spot.pin[1]];
+        const shape = spot.rect ? svgEl('rect', { x: spot.rect[0], y: spot.rect[1], width: spot.rect[2], height: spot.rect[3], rx: spot.rect[4] }) : svgEl('path', { d: spot.shape });
+        shape.setAttribute('class', 'pe-hot' + (on ? ' on' : '') + (chg ? ' chg' : '') + (locked ? ' off' : '') + (canPick ? ' can' : ''));
+        if (spot.under) shape.setAttribute('stroke-dasharray', '3 3');
+        shape.append(svgEl('title', {}, peName(b)));
+        if (canPick) shape.onclick = () => pePick(b.name);
+        g.append(shape);
+        const cx = side === 'L' ? 274 : 626, cy = y + h / 2, x = side === 'L' ? 274 - w : 626;
+        leads.push(svgEl('path', { d: `M${cx} ${cy}C${(cx + px) / 2} ${cy} ${(cx + px) / 2} ${py} ${px} ${py}`, class: 'pe-lead' + (on ? ' on' : '') }));
+        pins.push(svgEl('circle', { cx: px, cy: py, r: 3.5, class: 'pe-pin' + (chg ? ' chg' : '') + (on ? ' on' : '') }));
+        const attrs = { class: 'pe-call' + (on ? ' on' : '') + (locked ? ' off' : ''), transform: `translate(${x},${y})` };
+        if (canPick) Object.assign(attrs, { tabindex: 0, role: 'button', 'aria-pressed': String(!!on), 'aria-label': peName(b) + ': ' + what + (chg ? uiText(' (changed)') : '') });
+        const c = svgEl('g', attrs);
+        const tx = side === 'L' ? w - 10 : 10, anchor = side === 'L' ? 'end' : 'start';
+        c.append(svgEl('rect', { width: w, height: h, rx: 9 }), svgEl('title', {}, peName(b) + ': ' + what),
+          svgEl('text', { x: tx, y: 16, 'text-anchor': anchor, class: 'n' }, nameText),
+          svgEl('text', { x: tx, y: 33, 'text-anchor': anchor, class: 'a' + (chg ? ' chg' : '') }, lines[0]));
+        if (lines[1]) c.append(svgEl('text', { x: tx, y: 47, 'text-anchor': anchor, class: 'a' + (chg ? ' chg' : '') }, lines[1]));
+        if (chg) c.append(svgEl('circle', { cx: side === 'L' ? tx - nameW - 9 : tx + nameW + 9, cy: 12, r: 4, class: 'dot' }));
+        if (canPick) {
+          c.onclick = () => pePick(b.name);
+          c.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pePick(b.name); } };
+        }
+        calls.push(c);
+        y += h + gap;
+      });
+    }
+  } finally { m.done(); }
+  if (placed.some(b => PE_SPOTS[b.name].under)) g.append(svgEl('text', { x: 250, y: 423, class: 'pe-under' }, uiText('underside')));
+  svg.append(g, ...leads, ...pins, ...calls);
   // What the dot means, under the mouse, so it stays in view with the drawing.
-  if (shown.some(b => b.remapped[btnLayer])) {
-    const legend = svgEl('text', { x: 450, y: 462, class: 'pe-under' });
+  if (placed.some(b => b.remapped[btnLayer]) || shown.some(b => b.remapped[btnLayer])) {
+    const legend = svgEl('text', { x: 450, y: 453, class: 'pe-under' });
     legend.append(svgEl('tspan', { class: 'pe-dot' }, '● '), uiText('Changed in this profile'));
     svg.append(legend);
   }
-  svg.append(g);
   stage.append(svg);
   if (rest.length) {
     const grid = el('div', { className: 'tgrid pe-more' });
@@ -4111,25 +4426,45 @@ function peButtonsStage(stage) {
       el('span', { className: 'tl', textContent: peName(b) }), el('span', { className: 'tv', textContent: peLabel(b[btnLayer]) }))));
     stage.append(el('p', { className: 'subhead', textContent: uiText('Other buttons') }), grid);
   }
+  if (dev.scroll) stage.append(peScrollCard());
 }
 
+function peScrollCard() {
+  const card = peCard(uiText('Scroll wheel'), scrollEditor);
+  card.classList.add('pe-compact');
+  return card;
+}
+
+function peCloseInsp() {
+  peInspOpen = false;
+  if (peAside) { peAside = null; peLastAside = null; }
+  renderPE(true);
+  const back = document.querySelector('#peStage .pe-call.on, #peStage .pe-list tr[aria-selected=true], #peStage .pe-zones .pe-opt[aria-pressed=true]');
+  if (back) back.focus({ preventScroll: true });
+}
 function peInspector(box) {
   if (peAside === 'apps') return peAsideBox(box, uiText('Games and apps'), ed => appsEditor(ed, true));
-  if (peAside === 'onboard') return peAsideBox(box, uiText('Saved on the mouse'), onboardEditor);
-  if (peTab === 'buttons') return peButtonInsp(box);
-  if (peTab === 'light') return peLightInsp(box);
-  if (peTab === 'perf') {
+  if (peAside === 'onboard') return peAsideBox(box, uiText('Mouse on-board memory'), onboardEditor);
+  if (peTab === 'buttons') peButtonInsp(box);
+  else if (peTab === 'light') peLightInsp(box);
+  else if (peTab === 'perf') {
     box.append(el('h2', { className: 'pe-cap', textContent: uiText('Right now') }));
     if (dev.dpi) box.append(el('div', { className: 'pe-now' }, el('small', { textContent: uiText('DPI the mouse is using') }), el('b', { className: 'num', textContent: dev.dpi.x.toLocaleString(uiI18n.language) + ' DPI' })));
     box.append(el('p', { className: 'pe-help', textContent: uiText('Click a stage to use it. The DPI button on the mouse goes through the stages in this order, and this follows it.') }));
-    return;
+  } else {
+    box.append(el('h2', { className: 'pe-cap', textContent: uiText('Macros') }),
+      el('p', { className: 'pe-help', textContent: uiText('Record or type the steps, save the macro to the mouse, then pick it for a button: Buttons, then Macro.') }));
   }
-  box.append(el('h2', { className: 'pe-cap', textContent: uiText('Macros') }),
-    el('p', { className: 'pe-help', textContent: uiText('Record or type the steps, save the macro to the mouse, then pick it for a button: Buttons, then Macro.') }));
+  const closeBtn = el('button', { className: 'xbtn pe-x', innerHTML: icon('x'), title: uiText('Close (Esc)'), ariaLabel: uiText('Close'), onclick: peCloseInsp });
+  const cap = box.firstChild && box.firstChild.classList && box.firstChild.classList.contains('pe-cap') ? box.firstChild : null;
+  // Put the heading and the close button in one row: the row takes the heading's place first,
+  // since building it with the heading inside would move the heading out of `box`.
+  if (cap) { const head = el('div', { className: 'pe-ihead' }); cap.replaceWith(head); head.append(cap, closeBtn); }
+  else box.prepend(el('div', { className: 'pe-ihead' }, el('span'), closeBtn));
 }
 function peAsideBox(box, title, fill) {
   box.append(el('div', { className: 'row' }, el('h3', { className: 'pe-title', textContent: title, style: 'flex:1' }),
-    el('button', { className: 'xbtn', innerHTML: icon('x'), title: uiText('Close'), ariaLabel: uiText('Close'), onclick: () => { peAside = null; renderPE(); } })),
+    el('button', { className: 'xbtn', innerHTML: icon('x'), title: uiText('Close (Esc)'), ariaLabel: uiText('Close'), onclick: peCloseInsp })),
     el('p', { className: 'pe-where', textContent: uiText('Profile ') + dev.active }));
   const ed = el('div', { className: 'edbox' });
   box.append(ed);
@@ -4252,30 +4587,52 @@ function pePerfStage(stage) {
     const d = dev.dpi || { min: 100, max: 30000, step: 50 };
     const st = stagesOf(dev.active), list = st.list.map(v => v.slice());
     let active = st.active;
-    const save = async msg => {
+    const save = async (msg, undo) => {
       try {
         const r = await api('/api/stages', { active, stages: list });
         dev.stages.list = r.stages.list; dev.stages.active = r.stages.active;
         dev.profile.dpi_stages = { active: r.stages.active, stages: r.stages.list };
         if (dev.dpi) { dev.dpi.x = r.dpi[0]; dev.dpi.y = r.dpi[1]; dev.profile.dpi = r.dpi; }
-        toast(msg || uiText('DPI stages · saved to ') + dev.active);
+        toast(msg || uiText('DPI stages · saved to ') + dev.active, false, undo);
       } catch (e) { toast(e.message, true); }
       renderPE();
     };
     const row = el('div', { className: 'pe-stages' });
     list.forEach((v, i) => {
+      const useStage = () => { if (active !== i + 1) { active = i + 1; save(uiText`Stage ${i + 1} in use · saved to ${dev.active}`); } };
       const num = el('input', { type: 'number', className: 'num', min: d.min, max: d.max, step: d.step, value: v[0], ariaLabel: uiText('Stage ') + (i + 1) + ' DPI',
         onclick: e => e.stopPropagation(), onkeydown: e => { if (e.key === 'Enter') num.blur(); },
         onchange: () => { const n = Math.min(d.max, Math.max(d.min, Math.round(+num.value / (d.step || 50)) * (d.step || 50))); if (n) { list[i] = [n, n]; save(); } } });
-      row.append(el('div', { className: 'pe-st' + (i + 1 === active ? ' on' : ''), role: 'button', tabIndex: 0, ariaPressed: i + 1 === active,
-        title: uiText('Use this stage'), onclick: () => { if (active !== i + 1) { active = i + 1; save(uiText`Stage ${i + 1} in use · saved to ${dev.active}`); } },
-        onkeydown: e => { if (e.key === 'Enter' && e.target === e.currentTarget) e.currentTarget.click(); } },
-        el('small', {}, el('span', { textContent: uiText('Stage ') + (i + 1) + (i + 1 === active ? uiText(' · in use') : '') }),
-          list.length > 1 ? el('button', { className: 'x', innerHTML: icon('x'), title: uiText('Remove stage ') + (i + 1), ariaLabel: uiText('Remove stage ') + (i + 1),
-            onclick: e => { e.stopPropagation(); list.splice(i, 1); if (active > i + 1 || active > list.length) active = Math.max(1, active - 1); save(); } }) : null),
+      const radio = el('input', { type: 'radio', name: 'peStageUse', checked: i + 1 === active,
+        ariaLabel: uiText`Use stage ${i + 1}`, onchange: useStage });
+      const labelEl = el('label', { className: 'pe-st-use', title: uiText('Use this stage') },
+        radio, el('span', { textContent: uiText('Stage ') + (i + 1) + (i + 1 === active ? uiText(' · in use') : '') }));
+      const del = list.length > 1 ? el('button', { className: 'x', type: 'button', innerHTML: icon('x'), title: uiText('Remove stage ') + (i + 1), ariaLabel: uiText('Remove stage ') + (i + 1),
+        onclick: e => {
+          e.stopPropagation();
+          const removed = list[i].slice(), prevActive = active, devId = dev.id, profile = dev.active;
+          list.splice(i, 1);
+          if (active > i + 1 || active > list.length) active = Math.max(1, active - 1);
+          save(uiText`Removed stage ${i + 1} · saved to ${dev.active}`, async () => {
+            if (!dev || dev.id !== devId || dev.active !== profile) { toast(uiText('The profile changed, so nothing was put back'), true); return; }
+            const cur = stagesOf(dev.active).list.map(x => x.slice());
+            cur.splice(Math.min(i, cur.length), 0, removed);
+            try {
+              const r = await api('/api/stages', { active: prevActive, stages: cur });
+              dev.stages.list = r.stages.list; dev.stages.active = r.stages.active;
+              dev.profile.dpi_stages = { active: r.stages.active, stages: r.stages.list };
+              if (dev.dpi) { dev.dpi.x = r.dpi[0]; dev.dpi.y = r.dpi[1]; dev.profile.dpi = r.dpi; }
+              toast(uiText('Undone'));
+            } catch (err) { toast(err.message, true); }
+            renderPE();
+          });
+        } }) : null;
+      row.append(el('div', { className: 'pe-st' + (i + 1 === active ? ' on' : ''), role: 'group', ariaLabel: uiText('Stage ') + (i + 1),
+        onclick: e => { if (!e.target.closest('button, input, label')) useStage(); } },
+        el('div', { className: 'pe-st-head' }, labelEl, del),
         num));
     });
-    if (list.length < dev.stages.max) row.append(el('button', { className: 'pe-st add', innerHTML: icon('plus') + ' ' + uiText('Add stage'),
+    if (list.length < dev.stages.max) row.append(el('button', { className: 'pe-st add', type: 'button', innerHTML: icon('plus') + ' ' + uiText('Add stage'),
       onclick: () => { const next = Math.min(d.max, list[list.length - 1][0] * 2); list.push([next, next]); save(); } }));
     card.append(row, el('p', { className: 'pe-help', textContent: uiText('Up to ') + dev.stages.max + uiText(' stages, stored on the mouse. The stage in use sets the DPI right away.') }));
     stage.append(card);
@@ -4313,7 +4670,7 @@ function peLightStage(stage) {
     shape.style.opacity = c ? 0.35 + 0.65 * ((z.brightness ?? 100) / 100) : 1;
     shape.setAttribute('class', 'pe-zone');
     shape.append(svgEl('title', {}, label(n)));
-    shape.onclick = () => { peZone = n; renderPE(); };
+    shape.onclick = () => { peZone = n; peInspOpen = true; renderPE(); };
     return [...ring, shape];
   };
   if (names.includes('underglow')) g.append(...paint(svgEl('path', { d: 'M250 30C178 30 146 88 143 170c-3 88 4 164 28 232 20 52 138 52 158 0 24-68 31-144 28-232C354 88 322 30 250 30z', fill: 'none', 'stroke-width': 10 }), 'underglow'));
@@ -4322,7 +4679,7 @@ function peLightStage(stage) {
   if (names.includes('logo')) g.append(...paint(svgEl('circle', { cx: 250, cy: 300, r: 28 }), 'logo'));
   svg.append(g);
   const chips = el('div', { className: 'pe-zones' });
-  names.forEach(n => chips.append(el('button', { className: 'pe-opt', ariaPressed: n === peZone, textContent: label(n), onclick: () => { peZone = n; renderPE(); } })));
+  names.forEach(n => chips.append(el('button', { className: 'pe-opt', ariaPressed: n === peZone, textContent: label(n), onclick: () => { peZone = n; peInspOpen = true; renderPE(); } })));
   stage.append(chips, svg);
   if (dev.leds.length > 1) stage.append(el('div', { className: 'pe-zones' }, el('button', { className: 'ghost', textContent: uiText('Same on all zones'),
     title: uiText('The colour or effect of the zone you changed last, on every zone'), onclick: () => { const src = zoneLighting(peZone) ? peZone : sourceZone(); if (src) copyToZones(src); else toast(uiText('Pick a color or effect for one zone first'), true); } })));
@@ -4371,16 +4728,13 @@ function profileDeleteQuestion(name) {
   const other = name === dev.active ? dev.profiles.find(p => p !== name) : null;
   return uiText`Delete the profile "${name}"?` + (other ? uiText` "${other}" becomes active.` : uiText(' Games tied to it go back to the active profile.'));
 }
-async function deleteProfile(name) {
-  if (confirm(profileDeleteQuestion(name))) await removeProfile(name);
-}
 async function removeProfile(name) {
   const other = name === dev.active ? dev.profiles.find(p => p !== name) : null;
   try {
     if (other) await api('/api/profile', { action: 'use', name: other });
     const r = await api('/api/profile', { action: 'delete', name }); adopt(r.device);
     if (other && dev.kind === 'mouse') btnData[dev.id] = undefined;
-    sel = null; render(); toast(uiText('Deleted ') + name);
+    profileDeleting = null; peDeleting = null; sel = null; render(); toast(uiText('Deleted ') + name);
   } catch (err) { toast(err.message, true); }
 }
 async function saveApps(name, apps, msg) {
@@ -4559,18 +4913,26 @@ function renderSettings() {
     reportBtn.disabled = false; reportBtn.textContent = uiText('Copy report and open GitHub');
   } });
   const mice = devices.filter(d => d.kind === 'mouse');
-  const help = group(uiText('Help'),
-    row(uiText('Device report'), uiText('A read-only description of your devices for a GitHub issue, when one is missing or misbehaves. Serial numbers are shortened.'), reportBtn),
-    mice.length ? row(uiText('Restore all mouse buttons'), uiText('Every remapped button on every mouse back to what the mouse stores (factory or Synapse), and the remaps forgotten.'),
-      el('button', { className: 'ghost', textContent: uiText('Restore all'), onclick: async () => {
-        if (!confirm(uiText('Put every mouse button back to what the mouse stores?'))) return;
+  const restoreAllBtn = el('button', { className: 'ghost', textContent: uiText('Restore all'), onclick: () => {
+    confirmSwap(restoreAllBtn, {
+      inline: true,
+      question: uiText('Put every mouse button back to what the mouse stores?'),
+      confirmLabel: uiText('Restore'),
+      onConfirm: async () => {
         try {
           const r = await api('/api/restore-all-buttons', {});
           btnData = {};
           toast(r.results.map(x => x.error ? x.device + ': ' + x.error : x.device + ': ' + plural(x.restored, 'button') + uiText(' restored')).join(' · ') || uiText('No mouse with remappable buttons'), r.results.some(x => x.error));
           load();
-        } catch (e) { toast(e.message, true); }
-      } })) : null,
+          return true;
+        } catch (e) { toast(e.message, true); return false; }
+      },
+    });
+  } });
+  const help = group(uiText('Help'),
+    row(uiText('Device report'), uiText('A read-only description of your devices for a GitHub issue, when one is missing or misbehaves. Serial numbers are shortened.'), reportBtn),
+    mice.length ? row(uiText('Restore all mouse buttons'), uiText('Every remapped button on every mouse back to what the mouse stores (factory or Synapse), and the remaps forgotten.'),
+      restoreAllBtn) : null,
     row(uiText('Razer Synapse'), a.synapse.length ? uiText('Running (') + a.synapse.join(', ') + uiText('). It can overwrite these settings. `secbird debloat` stops it starting with Windows.') : uiText('Not running. Good: nothing will overwrite your settings.')),
     row(uiText('About'), 'Secretarybird ' + a.version + uiText('. Not affiliated with Razer. It goes online only for the daily version check and, if on, the weekly firmware check.'),
       el('a', { href: a.repository, target: '_blank', rel: 'noopener noreferrer', textContent: 'GitHub' })));
