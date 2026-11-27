@@ -3562,7 +3562,7 @@ const BTN_CHOICES = [
   [uiText('Media'), [['media:volume-up', uiText('Volume up')], ['media:volume-down', uiText('Volume down')], ['media:mute', uiText('Mute')],
     ['media:play-pause', uiText('Play / pause')], ['media:next-track', uiText('Next track')], ['media:previous-track', uiText('Previous track')]]],
   [uiText('Macro'), [['macro', uiText('Play a macro…')]]],
-  [uiText('Other'), [['hypershift', uiText('HyperShift (hold)')], ['profile-cycle-up', uiText('Next on-board profile')],
+  [uiText('Other'), [['hypershift', uiText('HyperShift (hold)')], ['secbird-profile-next', uiText('Next Secretarybird profile')], ['profile-cycle-up', uiText('Next on-board profile')],
     ['scroll-mode:1', uiText('Switch wheel free-spin')], ['disabled', uiText('Disabled')]]],
 ];
 const CHOICE_LABEL = Object.fromEntries(BTN_CHOICES.flatMap(g => g[1]));
@@ -4049,7 +4049,7 @@ const peCats = () => [
   ['turbo', uiText('Turbo')],
   ['hs', 'HyperShift', [['hypershift', uiText('HyperShift (hold)')]]],
   ['wheel', uiText('Scroll wheel'), [['scroll-mode:1', uiText('Switch wheel free-spin')]]],
-  ['onboard', uiText('On-board profiles'), [['profile-cycle-up', uiText('Next on-board profile')]]],
+  ['profiles', uiText('Profiles'), [['secbird-profile-next', uiText('Next Secretarybird profile')], ['profile-cycle-up', uiText('Next on-board profile')]]],
   ['off', uiText('Disabled'), [['disabled', uiText('Disabled')]]],
 ].filter(Boolean);
 function peCatOf(a) {
@@ -4062,7 +4062,7 @@ function peCatOf(a) {
   if (choice === 'macro') return 'macro';
   if (a === 'hypershift') return 'hs';
   if (/^scroll-mode/.test(a)) return 'wheel';
-  if (/^profile/.test(a)) return 'onboard';
+  if (/^profile/.test(a) || a === 'secbird-profile-next') return 'profiles';
   if (a === 'disabled') return 'off';
   return BTN_CHOICES[0][1].some(([v]) => v === a) ? 'mouse' : null;
 }

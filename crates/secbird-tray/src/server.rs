@@ -368,8 +368,10 @@ fn buttons_json(dev: &Device, store: &mut Store) -> Value {
             let name = input.name();
             let hyper = dev.input(input, Layer::HyperShift).map(|a| a.to_string()).ok();
             let is_remapped = |layer| remapped.contains_key(&setting_key(&name, layer));
-            // What the device itself holds: the live value unless the active profile remapped it.
-            let saved = |layer, live: Option<String>| match is_remapped(layer) {
+            // What the device itself holds: the live value unless the active profile remapped it,
+            // or the tray took it (the profile button sending "next Secretarybird profile").
+            let taken = |live: &Option<String>| live.as_deref() == Some(secbird_core::buttons::PROFILE_NEXT_NAME);
+            let saved = |layer, live: Option<String>| match is_remapped(layer) || taken(&live) {
                 true => original(&setting_key(&name, layer)).or_else(|| dev.saved_input(input, layer).map(|a| a.to_string()).ok()),
                 false => live,
             };

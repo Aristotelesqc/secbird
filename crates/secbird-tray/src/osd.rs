@@ -1,6 +1,7 @@
 //! The small popup above the clock: a DPI change, a profile switch, the on-board profile.
 //! It shows for a moment and fades away. It never takes focus and lets clicks through, and
-//! it isn't shown at all while a full-screen program (a game, a presentation) is in front.
+//! it shows over full-screen windows and borderless games, but not over a game in exclusive
+//! full screen or in presentation mode.
 //!
 //! Plain GDI on a layered window, whose alpha does the fades. It follows Windows' app theme
 //! and accent colour, and is drawn in real pixels at the scale of the screen it is on (the
@@ -17,7 +18,7 @@ use windows_sys::Win32::Graphics::Gdi::*;
 use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows_sys::Win32::UI::HiDpi::{GetDpiForMonitor, MDT_EFFECTIVE_DPI};
 use windows_sys::Win32::UI::Shell::{
-    SHQueryUserNotificationState, QUNS_BUSY, QUNS_PRESENTATION_MODE, QUNS_RUNNING_D3D_FULL_SCREEN,
+    SHQueryUserNotificationState, QUNS_PRESENTATION_MODE, QUNS_RUNNING_D3D_FULL_SCREEN,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
@@ -54,6 +55,8 @@ pub struct Popup {
 pub enum Why<'a> {
     /// Picked in the tray menu.
     Menu,
+    /// The mouse's profile button.
+    Button,
     /// This program came to the front, and a profile is tied to it.
     Auto(&'a str),
     /// That program left the front: back to the profile in use before it.
@@ -88,6 +91,7 @@ impl Popup {
         Popup {
             caption: match why {
                 Why::Menu => "Profile".into(),
+                Why::Button => "Profile button".into(),
                 Why::Auto(exe) => format!("Auto · {exe}"),
                 Why::Back(exe) => format!("Auto · back from {exe}"),
             },
@@ -116,7 +120,7 @@ impl Popup {
 }
 
 /// Show `popup` (replacing what is shown: the bar moves to its new place), then fade it out
-/// after a moment. Nothing while a full-screen program is in front.
+/// after a moment. Nothing over a game in exclusive full screen.
 pub fn show(popup: Popup) {
     if full_screen_in_front() {
         return;
@@ -190,11 +194,14 @@ fn scaled(dpi: u32, v: f32) -> i32 {
     (v * dpi as f32 / 96.0).round() as i32
 }
 
-/// A full-screen program is in front (a game, a video, a presentation): no popup over it.
+/// No popup over a game in exclusive full screen (a window on top would make it drop out of
+/// that mode, or flicker), nor while Windows is in presentation mode. Borderless full-screen
+/// games and full-screen windows (`QUNS_BUSY`) do get it on top: what the user just did with
+/// a button, or the profile a game just switched to, should show where they look.
 fn full_screen_in_front() -> bool {
     let mut state = 0;
     let ok = unsafe { SHQueryUserNotificationState(&mut state) } == 0;
-    ok && matches!(state, QUNS_BUSY | QUNS_RUNNING_D3D_FULL_SCREEN | QUNS_PRESENTATION_MODE)
+    ok && matches!(state, QUNS_RUNNING_D3D_FULL_SCREEN | QUNS_PRESENTATION_MODE)
 }
 
 /// Windows' "Animation effects" (Accessibility > Visual effects). Off: no fades, no moving bar.

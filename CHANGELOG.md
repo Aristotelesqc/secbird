@@ -19,14 +19,25 @@
   (`SECBIRD_SIM=all`). The drawing is original, with no Razer artwork.
 - **French editor.** Settings → Editor → Language: Français, or "system language" on a French
   Windows. Covers every message the editor has.
+- **The mouse's profile button switches Secretarybird profiles.** Out of Synapse's driver
+  mode, the button under the mouse only cycled its on-board slots, so on a mouse with one slot
+  it did nothing. While the tray runs, it now moves that mouse to its next profile (in the
+  tray menu's order), and the popup shows which one is in use. With a game in front that has
+  its own profile, the pick holds until another program comes to the front. A profile that
+  sets the button to something else keeps it; "Next Secretarybird profile" is also in the
+  editor's actions (Profiles), for any button. Behind it, the button sends Ctrl+Alt+Shift+F24,
+  a combo no keyboard has, which the tray takes as a hotkey; on exit the button goes back to
+  its own setting. Tested with the simulated mouse (three profiles, the popup, the editor);
+  not yet on a real mouse, and the pick over a game's profile only by reading the code.
 - **Clearer DPI and profile popups.** The small popup above the clock is now a card in
   Windows' light or dark theme: a DPI change shows the DPI in large type, a bar in Windows'
   accent colour filled up to the mouse's highest DPI, the stage ("Stage 2 of 5") and the
   mouse's name; a profile change shows the profile, the device and why ("Auto · game.exe",
   "Auto · back from game.exe"); an on-board profile change shows its number and the DPI that
   came with it. It now also shows when you pick a profile in the tray menu, but not for changes
-  made in the editor, on plug-in or wake, nor while a full-screen game or presentation is in
-  front. It fades in and out (at once when Windows' animation effects are off), and a second
+  made in the editor, on plug-in or wake. It shows over full-screen windows and borderless
+  games, but not over a game in exclusive full screen (it would knock it out of that mode)
+  nor in presentation mode. It fades in and out (at once when Windows' animation effects are off), and a second
   press updates it in place. Tested on Windows 11 (build 26300) at 150 % with the simulated
   mouse, in dark and light; not yet with a real mouse's buttons, on several screens or over a
   full-screen game.
