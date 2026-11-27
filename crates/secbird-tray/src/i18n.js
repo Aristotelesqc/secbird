@@ -627,7 +627,18 @@
     'The temperatures come from the laptop’s controller, which sits near the chips, so they read lower than the CPU’s own sensor.': '温度来自笔记本的控制器，它位于芯片附近，因此读数低于 CPU 自身的传感器。',
     // Round 2: confirmations and profile cards (#13, #21)
     'Save to mouse': '保存到鼠标',
-    'Unavailable': '不可用'
+    'Unavailable': '不可用',
+    // X/Y DPI
+    'Link X and Y': '联动 X 和 Y',
+    'When linked, changing one axis sets both': '联动时，修改任一轴会同时设置两轴',
+    'X (horizontal)': 'X（水平）',
+    'Y (vertical)': 'Y（垂直）',
+    'X DPI (horizontal)': 'X 轴 DPI（水平）',
+    'Y DPI (vertical)': 'Y 轴 DPI（垂直）',
+    'X DPI slider (horizontal)': 'X 轴 DPI 滑块（水平）',
+    'Y DPI slider (vertical)': 'Y 轴 DPI 滑块（垂直）',
+    'Stage {0} X DPI (horizontal)': '第 {0} 档 X 轴 DPI（水平）',
+    'Stage {0} Y DPI (vertical)': '第 {0} 档 Y 轴 DPI（垂直）'
   });
   const nouns = Object.freeze({
     zone: '个灯区', device: '个设备', button: '个按键', macro: '个宏',
@@ -1595,7 +1606,18 @@
     "Stop capturing": "Arrêter la capture",
     "Write to device": "Écrire dans l’appareil",
     // Round 2: drawing (#7, #8, #9)
-    "Unavailable": "Indisponible"
+    "Unavailable": "Indisponible",
+    // X/Y DPI
+    "Link X and Y": "Lier X et Y",
+    "When linked, changing one axis sets both": "Quand X et Y sont liés, changer l’un change l’autre",
+    "X (horizontal)": "X (horizontal)",
+    "Y (vertical)": "Y (vertical)",
+    "X DPI (horizontal)": "DPI X (horizontal)",
+    "Y DPI (vertical)": "DPI Y (vertical)",
+    "X DPI slider (horizontal)": "Curseur DPI X (horizontal)",
+    "Y DPI slider (vertical)": "Curseur DPI Y (vertical)",
+    "Stage {0} X DPI (horizontal)": "Palier {0}\u00a0: DPI X (horizontal)",
+    "Stage {0} Y DPI (vertical)": "Palier {0}\u00a0: DPI Y (vertical)"
   };
   const fr = Object.freeze(FR_MESSAGES);
   // French nouns: [one, many]. Counts of 0 and 1 take the singular in French.
