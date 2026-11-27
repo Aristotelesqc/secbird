@@ -1939,6 +1939,30 @@ mod tests {
     }
 
     #[test]
+    fn profile_button_can_send_next_secretarybird_profile() {
+        use crate::buttons::{Input, Layer, PROFILE_BUTTON_ID, PROFILE_NEXT};
+        // Basilisk V3 factory: the profile button cycles on-board slots.
+        let sim = Sim::mouse();
+        let dev = open(&sim, MOUSE_PID);
+        assert!(dev.has_profile_button(), "found by its on-board profile action");
+        assert!(!dev.profile_button_is_next());
+        dev.set_input(Input::Button(PROFILE_BUTTON_ID), Layer::Normal, PROFILE_NEXT).unwrap();
+        assert!(dev.profile_button_is_next());
+        assert_eq!(dev.slot_button(1, PROFILE_BUTTON_ID, Layer::Normal).unwrap(), crate::buttons::Action::ProfileCycleUp, "saved slot untouched");
+        dev.reset_input(Input::Button(PROFILE_BUTTON_ID), Layer::Normal).unwrap();
+        assert!(!dev.profile_button_is_next(), "back to the factory setting");
+
+        // A mouse that lists its buttons: the list decides.
+        sim.state().button_list = Some(vec![1, 2, 3]);
+        assert!(!dev.has_profile_button());
+        sim.state().button_list = Some(vec![1, 2, 3, PROFILE_BUTTON_ID]);
+        assert!(dev.has_profile_button());
+        // Not a mouse: no profile button.
+        let kb = open(&Sim::keyboard(), KEYBOARD_PID);
+        assert!(!kb.has_profile_button());
+    }
+
+    #[test]
     fn wireless_reports_battery() {
         let dev = open(&Sim::wireless_mouse(), WIRELESS_MOUSE_PID);
         assert_eq!(dev.battery().unwrap(), Some(75));

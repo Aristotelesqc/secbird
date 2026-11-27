@@ -21,6 +21,9 @@ use windows_sys::Win32::System::RemoteDesktop::{WTSRegisterSessionNotification, 
 use windows_sys::Win32::System::SystemServices::GUID_CONSOLE_DISPLAY_STATE;
 use windows_sys::Win32::System::Threading::CreateMutexW;
 use windows_sys::Win32::UI::Accessibility::{SetWinEventHook, HWINEVENTHOOK};
+use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
+    RegisterHotKey, UnregisterHotKey, MOD_ALT, MOD_CONTROL, MOD_NOREPEAT, MOD_SHIFT, VK_F24,
+};
 use windows_sys::Win32::UI::Shell::*;
 use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
@@ -49,6 +52,9 @@ const SIM_DPI_BUTTON: usize = 1;
 const SIM_DPI: usize = 2;
 const SIM_ONBOARD: usize = 3;
 const SIM_MENU: usize = 4;
+const SIM_PROFILE_BUTTON: usize = 5;
+/// The hotkey the mouse's profile button sends ([`secbird_core::buttons::PROFILE_NEXT`]).
+const HOTKEY_PROFILE_NEXT: i32 = 1;
 const CLASS_NAME: &str = "SecretarybirdTray";
 const MUTEX_NAME: &str = "Local\\Secretarybird.Tray";
 /// Development, with `SECBIRD_SIM_ONLY=1` (see [`secbird_core::sim::only`]): a tray that only
@@ -411,6 +417,13 @@ pub fn run() {
             })
         });
         log::append("tray started");
+        // The mouse's profile button sends this combo (see `buttons::PROFILE_NEXT`). A
+        // SECBIRD_SIM_ONLY tray leaves it to the real one beside it.
+        if !secbird_core::sim::only()
+            && RegisterHotKey(hwnd, HOTKEY_PROFILE_NEXT, MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, VK_F24 as u32) == 0
+        {
+            log::append("profile button: Ctrl+Alt+Shift+F24 is taken by another program, so the button can't switch profiles");
+        }
         with_app(|app| app.announce_updated());
         with_app(|app| app.rescan());
         start_retries(hwnd, false);
@@ -454,6 +467,10 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
         }
         WM_DEVICE_EVENT => {
             with_app(|app| app.device_events());
+            0
+        }
+        WM_HOTKEY if wparam as i32 == HOTKEY_PROFILE_NEXT => {
+            with_app(|app| app.profile_button());
             0
         }
         WM_FIRMWARE => {
@@ -665,7 +682,12 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             0
         }
         WM_DESTROY => {
-            with_app(|app| remove_icon(app.hwnd));
+            with_app(|app| {
+                remove_icon(app.hwnd);
+                // No tray to catch the profile button's combo: it cycles on-board slots again.
+                UnregisterHotKey(app.hwnd, HOTKEY_PROFILE_NEXT);
+                app.engine().release_profile_buttons();
+            });
             PostQuitMessage(0);
             0
         }
@@ -967,10 +989,30 @@ impl App {
                 unsafe { DestroyMenu(self.build_menu()) };
                 return self.handle_command(ID_PROFILE_BASE + value as u32);
             }
+            // The profile button: what its hotkey does.
+            SIM_PROFILE_BUTTON => return self.profile_button(),
             _ => return,
         };
         let _ = self.events_tx.send(event);
         self.device_events();
+    }
+
+    /// The mouse's profile button (its hotkey): the next profile, shown in the popup over
+    /// whatever is in front, a game included.
+    fn profile_button(&mut self) {
+        let reports = self.engine().next_profile();
+        if reports.is_empty() {
+            return;
+        }
+        let what: Vec<String> = reports.iter().map(|r| format!("{} -> {}", r.device, r.profile)).collect();
+        log::append(&format!("profile button: {}", what.join(", ")));
+        if !TraySettings::load().popups_off {
+            let names: Vec<String> = reports.iter().map(|r| r.profile.clone()).collect();
+            let devices: Vec<String> = reports.iter().map(|r| r.device.clone()).collect();
+            osd::show(osd::Popup::profile(&names, &devices, osd::Why::Button));
+        }
+        self.notify_failures(&reports);
+        self.update_tooltip();
     }
 
     /// Switch devices to the profile tied to the program now in front, or back.
@@ -1471,7 +1513,7 @@ impl App {
 /// started with `SECBIRD_SIM_ONLY=1` do what a real mouse does by itself, to see the popups
 /// without one. Events, sent in turn: `dpi-button` (the next DPI stage), `dpi <x> [<y>]`
 /// (a DPI that is no stage), `onboard <slot>`, `menu <n>` (the tray menu's profile item n,
-/// from 0). A tray that sees real devices has another window class and never gets them.
+/// from 0), `profile-button` (the mouse's profile button). A tray that sees real devices has another window class and never gets them.
 pub fn send_sim_events(args: &[String]) -> Result<(), String> {
     let tray = unsafe { FindWindowW(wide(SIM_ONLY_CLASS_NAME).as_ptr(), null()) };
     if tray.is_null() {
@@ -1489,7 +1531,10 @@ pub fn send_sim_events(args: &[String]) -> Result<(), String> {
             }
             "onboard" => (SIM_ONBOARD, number(args.next())? as usize),
             "menu" => (SIM_MENU, number(args.next())? as usize),
-            other => return Err(format!("unknown event {other}: dpi-button, dpi <x> [<y>], onboard <slot> or menu <n>")),
+            "profile-button" => (SIM_PROFILE_BUTTON, 0),
+            other => {
+                return Err(format!("unknown event {other}: dpi-button, dpi <x> [<y>], onboard <slot>, menu <n> or profile-button"))
+            }
         };
         unsafe { PostMessageW(tray, WM_SIM_EVENT, kind, value as LPARAM) };
     }

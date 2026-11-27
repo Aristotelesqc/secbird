@@ -181,6 +181,7 @@
     'Play / pause': '播放 / 暂停', 'Next track': '下一曲', 'Previous track': '上一曲',
     'Macro': '宏', 'Play a macro…': '播放宏…', 'Other': '其他',
     'HyperShift (hold)': 'HyperShift（按住）', 'Next on-board profile': '下一个板载配置',
+    'Next Secretarybird profile': '下一个 Secretarybird 配置',
     'Switch wheel free-spin': '切换滚轮自由滚动', 'Disabled': '禁用',
     'Num ': '数字键盘 ', 'Key ': '按键 ', ' · while held': ' · 按住时播放',
     ' · toggle': ' · 开关模式', 'Macro ': '宏 ', ' action': ' 操作',
@@ -1247,6 +1248,8 @@
     "Other": "Autre",
     "HyperShift (hold)": "HyperShift (maintenir)",
     "Next on-board profile": "Profil embarqué suivant",
+    // Profile button
+    "Next Secretarybird profile": "Profil Secretarybird suivant",
     "Switch wheel free-spin": "Basculer la molette libre / crantée",
     "Disabled": "Désactivé",
     "Num ": "Pavé num. ",
