@@ -743,22 +743,30 @@ impl App {
 
     fn rescan(&mut self) {
         let apply_all = std::mem::take(&mut self.apply_all_pending);
-        let (reports, new_names, gone, synapse) = {
+        let (reports, new_names, released_names, gone, synapse) = {
             let mut engine = self.engine();
             let before: Vec<(String, String)> = engine.devices().iter().map(|d| (d.key(), engine.label(d))).collect();
             let new = engine.rescan();
             let names: Vec<String> =
                 engine.devices().iter().filter(|d| new.contains(&d.key())).map(|d| engine.label(d)).collect();
+            // Out of driver mode: send the profile again, as for a device just plugged in.
+            let released = engine.take_released();
+            let released_names: Vec<String> =
+                engine.devices().iter().filter(|d| released.contains(&d.key())).map(|d| engine.label(d)).collect();
             let now = engine.all_keys();
             let gone: Vec<String> = before.into_iter().filter(|(key, _)| !now.contains(key)).map(|(_, name)| name).collect();
-            let targets = if apply_all { now } else { new };
-            (engine.apply(&targets), names, gone, engine.synapse().to_vec())
+            let mut targets = if apply_all { now } else { new };
+            targets.extend(released.into_iter().filter(|k| !targets.contains(k)).collect::<Vec<_>>());
+            (engine.apply(&targets), names, released_names, gone, engine.synapse().to_vec())
         };
         if !gone.is_empty() {
             log::append(&format!("gone: {}", gone.join(", ")));
         }
         if !new_names.is_empty() {
             log::append(&format!("found: {}", new_names.join(", ")));
+        }
+        if !released_names.is_empty() {
+            log::append(&format!("out of Synapse's driver mode, so its own button remaps work: {}", released_names.join(", ")));
         }
         self.follow_sleepers();
         self.notify_failures(&reports);

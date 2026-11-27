@@ -177,6 +177,25 @@ impl Device {
         Ok(String::from_utf8_lossy(&raw[..end]).trim().to_string())
     }
 
+    /// The device mode (`00:84`): [`cmd::NORMAL_MODE`], or [`cmd::DRIVER_MODE`] while
+    /// Synapse drives the device.
+    pub fn device_mode(&self) -> Result<u8> {
+        Ok(self.get(cmd::DEVICE_MODE, cmd::DEVICE_MODE_SIZE, &[])?.args()[0])
+    }
+
+    /// Put a device that is still in driver mode back in normal mode. In driver mode a
+    /// mouse leaves its buttons to Synapse and ignores its own remaps, and Synapse leaves it
+    /// there when it stops (seen on a Basilisk V3 after Synapse was turned off). A plain
+    /// setting, as Synapse sends on every start, not a firmware write. Returns whether the
+    /// mode was changed.
+    pub fn leave_driver_mode(&self) -> Result<bool> {
+        if self.device_mode()? != cmd::DRIVER_MODE {
+            return Ok(false);
+        }
+        self.transact(cmd::DEVICE_MODE, cmd::DEVICE_MODE_SIZE, &[cmd::NORMAL_MODE, 0x00])?;
+        Ok(true)
+    }
+
     pub fn dpi(&self) -> Result<(u16, u16)> {
         let r = self.get(cmd::DPI, cmd::DPI_SIZE, &[cmd::NOSTORE])?;
         let a = r.args();

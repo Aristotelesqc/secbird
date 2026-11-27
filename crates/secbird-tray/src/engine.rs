@@ -12,6 +12,8 @@ pub struct Engine {
     unsupported: Vec<Unsupported>,
     /// Synapse processes seen at the last rescan.
     synapse: Vec<String>,
+    /// Devices a rescan took out of the driver mode Synapse left them in, not yet applied.
+    released: Vec<String>,
     /// The program in front, when some profile is tied to it.
     foreground: Option<String>,
     /// Programs tied to any profile, and the profiles.json timestamp they were read at.
@@ -107,6 +109,7 @@ impl Engine {
             devices: Vec::new(),
             unsupported: Vec::new(),
             synapse: Vec::new(),
+            released: Vec::new(),
             foreground: None,
             apps: HashSet::new(),
             apps_read: None,
@@ -255,6 +258,11 @@ impl Engine {
 
     pub fn synapse(&self) -> &[String] {
         &self.synapse
+    }
+
+    /// Devices taken out of driver mode since the last call: their remaps need sending again.
+    pub fn take_released(&mut self) -> Vec<String> {
+        std::mem::take(&mut self.released)
     }
 
     /// Battery of every wireless device that answers.
@@ -470,6 +478,16 @@ impl Engine {
             })
             .collect();
         self.synapse = secbird_core::debloat::synapse_running();
+        // Synapse puts devices in driver mode and leaves them there when it stops; a mouse
+        // in driver mode ignores its own remaps. Only when Synapse isn't running, so the two
+        // never fight over the mode. A device that doesn't answer the mode is left alone.
+        if self.synapse.is_empty() {
+            for dev in &self.devices {
+                if dev.leave_driver_mode().unwrap_or(false) && !self.released.contains(&dev.key()) {
+                    self.released.push(dev.key());
+                }
+            }
+        }
         if self.listed() != listed_before {
             self.list_seq += 1;
         }

@@ -60,6 +60,8 @@ pub const MACRO_DELETE_SIZE: u8 = 0x02;
 /// Device mode: `[mode, param]`; 0x00 = normal, 0x03 = driver mode.
 pub const DEVICE_MODE: Command = Command::new(0x00, 0x04);
 pub const DEVICE_MODE_SIZE: u8 = 0x02;
+pub const NORMAL_MODE: u8 = 0x00;
+pub const DRIVER_MODE: u8 = 0x03;
 
 /// Polling rate (up to 1000 Hz): `[code]`, see [`polling_code`].
 pub const POLLING: Command = Command::new(0x00, 0x05);

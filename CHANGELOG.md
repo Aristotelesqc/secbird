@@ -41,6 +41,14 @@
   are untested.
 - Turbo on the middle button, back, forward and the four scroll directions shows its rate and
   can be changed in the editor; only left and right click turbo were recognised.
+- **Button remaps that did nothing after Synapse.** Synapse puts a mouse in "driver mode",
+  where it leaves its buttons to Synapse and ignores its own remaps, and leaves it there when
+  it stops. The tray now puts such a device back in normal mode whenever it looks for devices
+  (start, plug-in, wake, "Apply again") while Synapse isn't running, sends its profile again,
+  and says so in the log. While Synapse runs, the mode is left to it. Found on a Basilisk V3
+  (0099) whose remaps read back correctly but did nothing, after Synapse was turned off; a
+  replug fixed it by hand. The new code is tested on the simulated mouse; on the real one, only
+  that a mouse already in normal mode is left as it is.
 - **"Restore all" asks first and can be undone.** One click on it used to put every remapped
   button of the profile back at once, so a stray click wiped a profile's remaps. It now asks in
   place ("Put 8 remapped buttons of PC back to what the mouse stores?"), and the message after
