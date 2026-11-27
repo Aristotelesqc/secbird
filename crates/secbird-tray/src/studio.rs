@@ -142,9 +142,10 @@ impl Studio {
         }
     }
 
-    /// Re-read every device's scene when profiles.json changed. `foreground` picks the
-    /// profile in use, as for everything else.
-    fn read_scenes(&mut self, devices: &[Device], foreground: Option<&str>, path: &std::path::Path) {
+    /// Re-read every device's scene when profiles.json changed. `manual` (a profile picked
+    /// with the mouse's profile button, by device key), then `foreground`, pick the profile
+    /// in use, as for everything else.
+    fn read_scenes(&mut self, devices: &[Device], foreground: Option<&str>, manual: &HashMap<String, String>, path: &std::path::Path) {
         let stamp = std::fs::metadata(path).and_then(|m| m.modified()).ok();
         if !self.dirty && stamp == self.read_at {
             return;
@@ -159,7 +160,10 @@ impl Studio {
             if p.lighting_off {
                 continue;
             }
-            let name = p.effective(foreground).to_string();
+            let name = match manual.get(&key).filter(|n| p.profiles.contains_key(*n)) {
+                Some(n) => n.clone(),
+                None => p.effective(foreground).to_string(),
+            };
             let Some(scene) = p.profiles.get(&name).and_then(|p| p.studio.clone()).filter(Scene::is_on) else {
                 continue;
             };
@@ -186,10 +190,18 @@ impl Studio {
 
     /// One frame for every device with a scene. `away` and `paused` stop drawing (the
     /// lights are down, or the editor's light finder is showing one light).
-    pub fn tick(&mut self, devices: &[Device], foreground: Option<&str>, path: &std::path::Path, away: bool, paused: bool) {
+    pub fn tick(
+        &mut self,
+        devices: &[Device],
+        foreground: Option<&str>,
+        manual: &HashMap<String, String>,
+        path: &std::path::Path,
+        away: bool,
+        paused: bool,
+    ) {
         self.tick = self.tick.wrapping_add(1);
         if self.dirty || self.running.is_empty() || self.tick.is_multiple_of(READ_EVERY) {
-            self.read_scenes(devices, foreground, path);
+            self.read_scenes(devices, foreground, manual, path);
         }
         if away || paused {
             // Start over when back: the device may have lost the stream meanwhile.
@@ -304,7 +316,7 @@ mod tests {
 
         // Ticks 1801 and 1802 of this minute are not the device's; 1803 is, and the battery's.
         for (tick, level) in [(BATTERY_EVERY + 1, 75), (BATTERY_EVERY + 2, 75), (BATTERY_EVERY + 3, 100)] {
-            studio.tick(&devices, None, no_profiles, false, false);
+            studio.tick(&devices, None, &HashMap::new(), no_profiles, false, false);
             assert_eq!((studio.tick, studio.running[&key].battery), (tick, Some(level)));
         }
     }

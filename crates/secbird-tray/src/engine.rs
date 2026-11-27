@@ -25,6 +25,8 @@ pub struct Engine {
     /// was in front, by device key: they win over that program's profile until another
     /// program comes to the front. Never saved.
     manual: RefCell<HashMap<String, String>>,
+    /// The tray holds the profile button's hotkey, so it may take profile buttons.
+    profile_hotkey: Cell<bool>,
     /// Programs tied to any profile, and the profiles.json timestamp they were read at.
     apps: HashSet<String>,
     apps_read: Option<SystemTime>,
@@ -121,6 +123,7 @@ impl Engine {
             released: Vec::new(),
             foreground: None,
             manual: RefCell::new(HashMap::new()),
+            profile_hotkey: Cell::new(false),
             apps: HashSet::new(),
             apps_read: None,
             live_dpi: HashMap::new(),
@@ -148,19 +151,35 @@ impl Engine {
         }
     }
 
+    /// The tray holds the profile button's hotkey ([`Engine::set_profile_hotkey`]). Until it
+    /// does (the editor alone with `--serve`, or another program holds the combo), profile
+    /// buttons keep their own setting.
+    pub fn set_profile_hotkey(&self, held: bool) {
+        self.profile_hotkey.set(held);
+    }
+
     /// The tray handles the profile button of a mouse whose profile `name` leaves that button
     /// alone: it sends "next Secretarybird profile" instead of cycling on-board slots.
-    fn takes_profile_button(p: &DeviceProfiles, name: &str, dev: &Device) -> bool {
+    fn takes_profile_button(&self, p: &DeviceProfiles, name: &str, dev: &Device) -> bool {
         let set_here = p.profiles.get(name).is_some_and(|pr| pr.buttons.contains_key(PROFILE_BUTTON));
-        !set_here && dev.has_profile_button()
+        self.profile_hotkey.get() && !set_here && dev.has_profile_button()
     }
 
     /// The mouse's profile button to "next Secretarybird profile", when profile `name`
     /// leaves it alone. `None` when the tray doesn't take that button.
-    fn send_profile_button(p: &DeviceProfiles, name: &str, dev: &Device) -> Option<Result<bool>> {
-        Self::takes_profile_button(p, name, dev).then(|| {
+    fn send_profile_button(&self, p: &DeviceProfiles, name: &str, dev: &Device) -> Option<Result<bool>> {
+        self.takes_profile_button(p, name, dev).then(|| {
             dev.set_input(Input::Button(buttons::PROFILE_BUTTON_ID), Layer::Normal, buttons::PROFILE_NEXT)
         })
+    }
+
+    /// The editor put buttons back to what the mouse stores (a reset, "Restore"): the
+    /// profile button goes back to "next Secretarybird profile" when the tray takes it.
+    pub fn retake_profile_button(&self, dev: &Device) -> Option<Result<bool>> {
+        let mut store = Self::store().ok()?;
+        let p = store.for_device(dev);
+        let name = self.current(p, dev);
+        self.send_profile_button(p, &name, dev)
     }
 
     /// The profile button was pressed (the tray got its hotkey): every mouse whose profile
@@ -645,7 +664,7 @@ impl Engine {
                         .into_iter()
                         .filter_map(|a| a.result.err().map(|e| format!("{}: {e}", a.setting)))
                         .collect();
-                    if let Some(Err(e)) = Self::send_profile_button(p, &name, dev) {
+                    if let Some(Err(e)) = self.send_profile_button(p, &name, dev) {
                         failures.push(format!("profile button: {e}"));
                     }
                     ApplyReport { device: dev.name(), profile: name, failures }
@@ -671,7 +690,7 @@ impl Engine {
             .filter_map(|dev| {
                 let p = store.for_device(dev);
                 let name = self.current(p, dev);
-                let button_lost = Self::takes_profile_button(p, &name, dev) && !dev.profile_button_is_next();
+                let button_lost = self.takes_profile_button(p, &name, dev) && !dev.profile_button_is_next();
                 if !p.buttons_lost(&name, dev) && !button_lost {
                     return None;
                 }
@@ -680,7 +699,7 @@ impl Engine {
                     .into_iter()
                     .filter_map(|a| a.result.err().map(|e| format!("{}: {e}", a.setting)))
                     .collect();
-                if let Some(Err(e)) = Self::send_profile_button(p, &name, dev) {
+                if let Some(Err(e)) = self.send_profile_button(p, &name, dev) {
                     failures.push(format!("profile button: {e}"));
                 }
                 Some((dev.key(), ApplyReport { device: self.label(dev), profile: name, failures }))
@@ -732,7 +751,7 @@ impl Engine {
         let path = config_dir().join("profiles.json");
         let ended = {
             let mut studio = self.studio.borrow_mut();
-            studio.tick(&self.devices, self.foreground(), &path, self.away.is_some(), paused);
+            studio.tick(&self.devices, self.foreground(), &self.manual.borrow(), &path, self.away.is_some(), paused);
             for key in std::mem::take(&mut studio.gave_up) {
                 secbird_core::log::append(&format!("lighting: {} stopped taking frames, trying again every 5 s", self.names(&[key])));
             }

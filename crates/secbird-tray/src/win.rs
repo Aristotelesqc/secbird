@@ -62,6 +62,16 @@ const MUTEX_NAME: &str = "Local\\Secretarybird.Tray";
 /// one and neither hands the other its editor.
 const SIM_ONLY_CLASS_NAME: &str = "SecretarybirdTraySimOnly";
 const SIM_ONLY_MUTEX_NAME: &str = "Local\\Secretarybird.Tray.SimOnly";
+
+/// The tray window class this process talks to: a SECBIRD_SIM_ONLY editor never reaches
+/// the real tray beside it.
+fn own_class() -> &'static str {
+    if secbird_core::sim::only() {
+        SIM_ONLY_CLASS_NAME
+    } else {
+        CLASS_NAME
+    }
+}
 const TIMER_RESCAN: usize = 1;
 /// Extra rescans after start and wake: devices often answer late at boot.
 const TIMER_RETRY: usize = 2;
@@ -228,7 +238,7 @@ static REQUESTED_UPDATE: Mutex<Option<Release>> = Mutex::new(None);
 /// and shows its progress. `false` when no tray is running (the editor alone, `--serve`).
 pub fn request_update(r: Release) -> bool {
     unsafe {
-        let tray = FindWindowW(wide(CLASS_NAME).as_ptr(), null());
+        let tray = FindWindowW(wide(own_class()).as_ptr(), null());
         if tray.is_null() {
             return false;
         }
@@ -241,7 +251,7 @@ pub fn request_update(r: Release) -> bool {
 /// the tray follow who is asleep now. Nothing to do when no tray is running (`--serve`).
 pub fn rescanned() {
     unsafe {
-        let tray = FindWindowW(wide(CLASS_NAME).as_ptr(), null());
+        let tray = FindWindowW(wide(own_class()).as_ptr(), null());
         if !tray.is_null() {
             PostMessageW(tray, WM_RESCANNED, 0, 0);
         }
@@ -417,13 +427,16 @@ pub fn run() {
             })
         });
         log::append("tray started");
-        // The mouse's profile button sends this combo (see `buttons::PROFILE_NEXT`). A
-        // SECBIRD_SIM_ONLY tray leaves it to the real one beside it.
-        if !secbird_core::sim::only()
-            && RegisterHotKey(hwnd, HOTKEY_PROFILE_NEXT, MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, VK_F24 as u32) == 0
-        {
-            log::append("profile button: Ctrl+Alt+Shift+F24 is taken by another program, so the button can't switch profiles");
+        // The mouse's profile button sends this combo (see `buttons::PROFILE_NEXT`); the tray
+        // takes profile buttons only while it holds the hotkey. A SECBIRD_SIM_ONLY tray leaves
+        // the real hotkey to the real tray beside it, and drives its simulated mice with
+        // `--sim-event profile-button`.
+        let held = secbird_core::sim::only()
+            || RegisterHotKey(hwnd, HOTKEY_PROFILE_NEXT, MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, VK_F24 as u32) != 0;
+        if !held {
+            log::append("profile button: Ctrl+Alt+Shift+F24 is taken by another program, so the button keeps its own setting");
         }
+        with_app(|app| app.engine().set_profile_hotkey(held));
         with_app(|app| app.announce_updated());
         with_app(|app| app.rescan());
         start_retries(hwnd, false);
@@ -1513,7 +1526,8 @@ impl App {
 /// started with `SECBIRD_SIM_ONLY=1` do what a real mouse does by itself, to see the popups
 /// without one. Events, sent in turn: `dpi-button` (the next DPI stage), `dpi <x> [<y>]`
 /// (a DPI that is no stage), `onboard <slot>`, `menu <n>` (the tray menu's profile item n,
-/// from 0), `profile-button` (the mouse's profile button). A tray that sees real devices has another window class and never gets them.
+/// from 0), `profile-button` (the mouse's profile button). A tray that sees real devices
+/// has another window class and never gets them.
 pub fn send_sim_events(args: &[String]) -> Result<(), String> {
     let tray = unsafe { FindWindowW(wide(SIM_ONLY_CLASS_NAME).as_ptr(), null()) };
     if tray.is_null() {

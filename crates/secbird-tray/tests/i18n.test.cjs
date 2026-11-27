@@ -94,6 +94,55 @@ test('French covers every editor message and keeps placeholders', () => {
   }
   const html = fs.readFileSync(path.join(__dirname, '../src/editor.html'), 'utf8');
   const keys = [...html.matchAll(/uiText\(\s*'((?:[^'\\]|\\.)*)'\s*\)/g)].map(m => m[1].replace(/\\'/g, "'"));
-  const missing = keys.filter(k => !(k in i18n.frMessages));
+  // Tagged templates (uiText`Stage ${n} in use`) are looked up as 'Stage {0} in use'.
+  const templates = templateKeys(html);
+  assert.ok(templates.length > 10, 'found the tagged templates');
+  const missing = [...keys, ...templates].filter(k => !(k in i18n.frMessages));
   assert.deepEqual(missing, [], 'untranslated: ' + missing.join(' | '));
 });
+
+// The table keys of every uiText`...` in `src`: each ${...} becomes {0}, {1}, ... Follows
+// nested braces, strings and templates inside the ${...}.
+function templateKeys(src) {
+  const keys = [];
+  let i = 0;
+  while ((i = src.indexOf('uiText`', i)) !== -1) {
+    i += 'uiText`'.length;
+    let key = '', n = 0;
+    while (i < src.length && src[i] !== '`') {
+      if (src[i] === '\\') { key += src[i + 1]; i += 2; continue; }
+      if (src[i] === '$' && src[i + 1] === '{') { i = skipExpression(src, i + 2); key += `{${n++}}`; continue; }
+      key += src[i++];
+    }
+    i++;
+    keys.push(key);
+  }
+  return keys;
+}
+// Past the `}` that closes a ${ whose body starts at `i`.
+function skipExpression(src, i) {
+  let depth = 1;
+  while (i < src.length) {
+    const c = src[i];
+    if (c === '`') { i = skipTemplate(src, i + 1); continue; }
+    if (c === '\'' || c === '"') {
+      i++;
+      while (i < src.length && src[i] !== c) i += src[i] === '\\' ? 2 : 1;
+      i++;
+      continue;
+    }
+    if (c === '{') depth++;
+    else if (c === '}' && --depth === 0) return i + 1;
+    i++;
+  }
+  return i;
+}
+// Past the closing backtick of a template whose body starts at `i`.
+function skipTemplate(src, i) {
+  while (i < src.length && src[i] !== '`') {
+    if (src[i] === '\\') { i += 2; continue; }
+    if (src[i] === '$' && src[i + 1] === '{') { i = skipExpression(src, i + 2); continue; }
+    i++;
+  }
+  return i + 1;
+}

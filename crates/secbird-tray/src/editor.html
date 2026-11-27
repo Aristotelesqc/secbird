@@ -749,7 +749,7 @@
       border-left: 0; border-top: 1px solid var(--line); border-radius: 16px 16px 0 0; transform: translateY(105%); }
     .pe.pe-open .pe-insp { transform: none; }
   }
-  @media (prefers-reduced-motion: reduce) { .pe-call rect, .pe-insp, .pe.pe-open .pe-insp { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .pe-call rect, .pe-insp, .pe.pe-open .pe-insp, .pe-hot, .pe-zone { transition: none; } }
 
   /* Medium windows: a narrower panel. */
   @media (max-width: 1180px) { .work { grid-template-columns: 172px minmax(0, 1fr) 330px; } .work.wide { grid-template-columns: 172px minmax(0, 1fr); } }
@@ -4038,7 +4038,10 @@ async function restoreAllButtons() {
 // button is in place before the HyperShift layer's remaps.
 async function putBackButtons(id, profile, remaps) {
   if (!dev || dev.id !== id || dev.active !== profile) { toast(uiText('The profile changed, so nothing was put back'), true); return; }
-  const order = Object.entries(remaps).sort(([a], [b]) => a.includes('/') - b.includes('/'));
+  // Standard layer first, and within it the remaps that give a button left click: a button
+  // that held the only left click can't be remapped until another one has it.
+  const rank = ([key, action]) => (key.includes('/') ? 2 : 0) + (action === 'left' ? 0 : 1);
+  const order = Object.entries(remaps).sort((a, b) => rank(a) - rank(b));
   const done = {};
   let r, failed;
   for (const [key, action] of order) {
@@ -4571,6 +4574,7 @@ function peButtonsStage(stage) {
   const placed = list.filter(b => PE_SPOTS[b.name]), rest = shown.filter(b => !PE_SPOTS[b.name]);
   const order = Object.keys(PE_SPOTS);
   const leads = [], pins = [], calls = [];
+  let bottom = 0; // lowest callout edge: the frame and the legend make room below it
   const m = peMeasureText(stage);
   try {
     for (const side of ['L', 'R']) {
@@ -4612,6 +4616,7 @@ function peButtonsStage(stage) {
           c.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pePick(b.name); } };
         }
         calls.push(c);
+        bottom = Math.max(bottom, y + h);
         y += h + gap;
       });
     }
@@ -4619,8 +4624,11 @@ function peButtonsStage(stage) {
   if (placed.some(b => PE_SPOTS[b.name].under)) g.append(svgEl('text', { x: 250, y: 423, class: 'pe-under' }, uiText('underside')));
   svg.append(g, ...leads, ...pins, ...calls);
   // What the dot means, under the mouse, so it stays in view with the drawing.
+  // Many two-line callouts on one side can reach below the usual frame: grow it to fit.
+  const legendY = Math.max(453, bottom + 14);
+  svg.setAttribute('viewBox', `0 8 900 ${Math.max(454, legendY + 9 - 8)}`);
   if (placed.some(b => b.remapped[btnLayer]) || shown.some(b => b.remapped[btnLayer])) {
-    const legend = svgEl('text', { x: 450, y: 453, class: 'pe-under' });
+    const legend = svgEl('text', { x: 450, y: legendY, class: 'pe-under' });
     legend.append(svgEl('tspan', { class: 'pe-dot' }, '● '), uiText('Changed in this profile'));
     svg.append(legend);
   }

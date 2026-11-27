@@ -237,8 +237,12 @@ impl Server {
                 .and_then(|s| serde_json::to_value(&s).map_err(|e| Error::Db(e.to_string()))),
             ("POST", path) => {
                 let result = post(&mut engine, path, &req.body);
-                // A change made here: the device's answer to it gets no DPI popup.
-                engine.hush_dpi();
+                // A change made here that moves the DPI: the device's answer gets no popup.
+                // Only those: the editor polls some routes (Studio frames, laptop sensors)
+                // all the time, and hushing on them would hide the DPI button's popups.
+                if DPI_CHANGES.contains(&path) {
+                    engine.hush_dpi();
+                }
                 result
             }
             _ => return Response::text("404 Not Found", "Not found"),
@@ -395,6 +399,10 @@ fn buttons_json(dev: &Device, store: &mut Store) -> Value {
     });
     json!({ "buttons": list, "onboard": onboard })
 }
+
+/// POST routes after which the device may report a DPI change of its own (see
+/// [`Engine::hush_dpi`]). A profile switch goes through [`Engine::apply`], which hushes too.
+const DPI_CHANGES: &[&str] = &["/api/dpi", "/api/stages", "/api/profile", "/api/import", "/api/save-to-mouse", "/api/put-back"];
 
 fn post(engine: &mut Engine, path: &str, body: &[u8]) -> Result<Value, Error> {
     let b: Body = serde_json::from_slice(body).map_err(|e| Error::InvalidArg(e.to_string()))?;
@@ -556,6 +564,7 @@ fn post(engine: &mut Engine, path: &str, body: &[u8]) -> Result<Value, Error> {
             "/api/buttons" => Ok(buttons_json(dev, &mut store)),
             "/api/buttons-restore" => {
                 actions::restore_all_buttons(dev, &mut store)?;
+                engine.retake_profile_button(dev);
                 Ok(buttons_json(dev, &mut store))
             }
             "/api/save-to-mouse" => {
@@ -615,7 +624,12 @@ fn post(engine: &mut Engine, path: &str, body: &[u8]) -> Result<Value, Error> {
                     "" => None,
                     text => Some(text.parse()?),
                 };
+                let reset = action.is_none();
                 actions::set_button(dev, &mut store, &b.button, layer, action)?;
+                if reset {
+                    // Back to what the mouse stores: the tray may take the profile button again.
+                    engine.retake_profile_button(dev);
+                }
                 Ok(buttons_json(dev, &mut store))
             }
             "/api/profile" => {
@@ -628,14 +642,12 @@ fn post(engine: &mut Engine, path: &str, body: &[u8]) -> Result<Value, Error> {
                     other => return Err(Error::InvalidArg(format!("unknown action '{other}'"))),
                 }
                 let switched = b.action == "use";
-                let profiles = profiles.clone();
                 store.save()?;
+                // Through the engine, as the tray menu does: it ends a profile-button pick,
+                // keeps the lights down while away, takes the profile button and restarts
+                // Studio.
                 let failures: Vec<String> = if switched {
-                    profiles
-                        .apply(&profiles.active, dev)
-                        .into_iter()
-                        .filter_map(|a| a.result.err().map(|e| format!("{}: {e}", a.setting)))
-                        .collect()
+                    engine.switch_profile(&dev.key(), &b.name)?.into_iter().flat_map(|r| r.failures).collect()
                 } else {
                     Vec::new()
                 };
