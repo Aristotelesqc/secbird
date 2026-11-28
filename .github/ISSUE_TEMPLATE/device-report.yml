@@ -1,5 +1,5 @@
 name: Device report
-description: Tell us how Secretarybird works with your Razer device (working or not)
+description: Tell us how Occam works with your Razer device (working or not)
 labels: [device]
 body:
   - type: markdown
@@ -8,7 +8,7 @@ body:
         Thanks! Reports like this are how devices get marked as verified and new features
         (like Blade fan and power controls) get built.
 
-        **Easiest:** right-click the Secretarybird tray icon → **Make a device report…**. It copies
+        **Easiest:** right-click the Occam tray icon → **Make a device report…**. It copies
         the report and opens this page; paste it into the report box below.
 
         The report only sends read commands to your devices and shortens serial numbers.
@@ -37,8 +37,8 @@ body:
   - type: textarea
     id: report
     attributes:
-      label: Output of `secbird report`
-      description: 'From the tray menu (Make a device report…), or run `secbird report` in a terminal. The installed copy is in %LOCALAPPDATA%\Programs\Secretarybird.'
+      label: Output of `occam-rzr report`
+      description: 'From the tray menu (Make a device report…), or run `occam-rzr report` in a terminal. The installed copy is in %LOCALAPPDATA%\Programs\Occam.'
       render: text
     validations:
       required: true
@@ -50,6 +50,6 @@ body:
   - type: input
     id: version
     attributes:
-      label: Secretarybird version
-      description: "`secbird --version`, or hover the tray icon"
+      label: Occam version
+      description: "`occam-rzr --version`, or hover the tray icon"
       placeholder: "0.1.0"

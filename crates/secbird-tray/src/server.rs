@@ -206,7 +206,7 @@ impl Server {
                     .replace("{{EDITOR_LANGUAGE}}", settings.editor_language());
                 Response { status: "200 OK", content_type: "text/html; charset=utf-8", body: page.into_bytes() }
             } else {
-                Response::text("403 Forbidden", "Open the editor from the Secretarybird tray menu.")
+                Response::text("403 Forbidden", "Open the editor from the Occam tray menu.")
             };
         }
         if !req.path.starts_with("/api/") {
@@ -373,7 +373,7 @@ fn buttons_json(dev: &Device, store: &mut Store) -> Value {
             let hyper = dev.input(input, Layer::HyperShift).map(|a| a.to_string()).ok();
             let is_remapped = |layer| remapped.contains_key(&setting_key(&name, layer));
             // What the device itself holds: the live value unless the active profile remapped it,
-            // or the tray took it (the profile button sending "next Secretarybird profile").
+            // or the tray took it (the profile button sending "next Occam profile").
             let taken = |live: &Option<String>| live.as_deref() == Some(secbird_core::buttons::PROFILE_NEXT_NAME);
             let saved = |layer, live: Option<String>| match is_remapped(layer) || taken(&live) {
                 true => original(&setting_key(&name, layer)).or_else(|| dev.saved_input(input, layer).map(|a| a.to_string()).ok()),
@@ -774,13 +774,13 @@ fn app_post(engine: &mut Engine, path: &str, b: &Body) -> Option<Result<Value, E
             }
             let r = secbird_core::update::check()?.ok_or_else(|| Error::InvalidArg("you already have the latest version".into()))?;
             if !crate::win::request_update(r.clone()) {
-                return Err(Error::Unsupported("the tray isn't running, so it can't update; start Secretarybird and try again".into()));
+                return Err(Error::Unsupported("the tray isn't running, so it can't update; start Occam and try again".into()));
             }
             Ok(json!({ "version": r.version }))
         })(),
         "/api/import" => (|| {
             let incoming: Store = serde_json::from_value(b.data.clone())
-                .map_err(|e| Error::InvalidArg(format!("not a Secretarybird export: {e}")))?;
+                .map_err(|e| Error::InvalidArg(format!("not an Occam export: {e}")))?;
             let mut store = Store::load(&config_dir().join("profiles.json"))?;
             let added = store.import_for(incoming, &engine.all_keys());
             store.save()?;

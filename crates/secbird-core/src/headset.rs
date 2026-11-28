@@ -31,7 +31,7 @@ pub fn is_headset(pid: u16) -> bool {
 pub const BATTERY: u8 = 0x21;
 pub const CHARGING: u8 = 0x2A;
 
-/// Every setting, in the order the editor and `secbird report` list them: the name
+/// Every setting, in the order the editor and `occam-rzr report` list them: the name
 /// [`Device::audio_read`] takes, the label a person sees, and the GET command behind it.
 pub const SETTINGS: &[(&str, &str, u8)] = &[
     ("anc", "noise cancelling", 0x12),

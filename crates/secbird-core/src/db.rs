@@ -114,7 +114,7 @@ pub struct DeviceSpec {
 /// Bluetooth ids and the product each belongs to, from Synapse's AvailableDevices.json
 /// (`bleId`), leaving out ids that are also the cable or receiver id. Synapse 4 reaches some
 /// of these over its own GATT service; OpenRazer reaches the Orochi V2 over Bluetooth with
-/// the usual feature reports, which Secretarybird tries under the descriptor's report id
+/// the usual feature reports, which Occam tries under the descriptor's report id
 /// (#10, #51, see `crate::transport::NumberedReport`).
 const BLUETOOTH: &[(u16, u16)] = &[
     (0x0061, 0x0062), (0x0076, 0x0080), (0x0082, 0x0083), (0x008E, 0x007C), (0x0092, 0x008F),

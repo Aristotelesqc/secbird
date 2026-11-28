@@ -8,7 +8,9 @@ use windows_sys::Win32::System::Registry::*;
 use windows_sys::Win32::UI::Shell::ShellExecuteW;
 use windows_sys::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
 
-const APP_NAME: &str = "Secretarybird";
+const APP_NAME: &str = secbird_core::APP_NAME;
+/// The Run value from before the rename (see [`migrate_autostart`]).
+const OLD_APP_NAME: &str = "Secretarybird";
 const RUN_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Run";
 
 fn wide(s: &str) -> Vec<u16> {
@@ -27,7 +29,7 @@ pub struct TraySettings {
     /// Device key -> firmware version already announced, so each is announced once.
     #[serde(default)]
     pub firmware_notified: std::collections::BTreeMap<String, String>,
-    /// Don't check GitHub for a newer Secretarybird. The check is on unless turned off.
+    /// Don't check GitHub for a newer Occam. The check is on unless turned off.
     #[serde(default)]
     pub updates_off: bool,
     /// Unix time of the last daily new-version check.
@@ -108,16 +110,37 @@ impl TraySettings {
 }
 
 pub fn autostart_enabled() -> bool {
+    has_run_value(APP_NAME)
+}
+
+fn has_run_value(name: &str) -> bool {
     unsafe {
         let mut key: HKEY = null_mut();
         if RegOpenKeyExW(HKEY_CURRENT_USER, wide(RUN_KEY).as_ptr(), 0, KEY_READ, &mut key) != ERROR_SUCCESS {
             return false;
         }
-        let found =
-            RegQueryValueExW(key, wide(APP_NAME).as_ptr(), null(), null_mut(), null_mut(), null_mut()) == ERROR_SUCCESS;
+        let found = RegQueryValueExW(key, wide(name).as_ptr(), null(), null_mut(), null_mut(), null_mut()) == ERROR_SUCCESS;
         RegCloseKey(key);
         found
     }
+}
+
+/// First start after the rename: "Start with Windows" was the `Secretarybird` Run value.
+/// It becomes an `Occam` value that starts this copy, so the old exe isn't started too.
+pub fn migrate_autostart() {
+    if !has_run_value(OLD_APP_NAME) {
+        return;
+    }
+    unsafe {
+        let mut key: HKEY = null_mut();
+        if RegOpenKeyExW(HKEY_CURRENT_USER, wide(RUN_KEY).as_ptr(), 0, KEY_SET_VALUE, &mut key) != ERROR_SUCCESS {
+            return;
+        }
+        RegDeleteValueW(key, wide(OLD_APP_NAME).as_ptr());
+        RegCloseKey(key);
+    }
+    set_autostart(true);
+    secbird_core::log::append("Start with Windows moved from the Secretarybird entry to Occam");
 }
 
 pub fn set_autostart(enable: bool) {

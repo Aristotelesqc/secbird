@@ -1,6 +1,6 @@
-# Contributing to Secretarybird
+# Contributing to Occam
 
-Thanks for wanting to help. Secretarybird replaces Razer Synapse with something small,
+Thanks for wanting to help. Occam replaces Razer Synapse with something small,
 open and honest, and it only gets there with people who own devices we don't. This guide
 says what we are building, the rules every change keeps, how the code is laid out, and
 how to get a pull request merged.
@@ -37,9 +37,9 @@ having nothing to hide.
   exact `sc.exe` / `reg.exe` commands before running them
   ([`debloat.rs`](crates/secbird-core/src/debloat.rs)). The only other system change is the
   "start with Windows" entry under the user's own `Run` key, which is a visible setting.
-- **Reads are reads.** `secbird report` sends only GET commands and says so. Commands that
+- **Reads are reads.** `occam-rzr report` sends only GET commands and says so. Commands that
   write to a device are named as writes.
-- **Nothing leaves the PC.** Settings live in `%APPDATA%\Secretarybird` as readable JSON;
+- **Nothing leaves the PC.** Settings live in `%APPDATA%\Occam` as readable JSON;
   the log is a plain capped text file. Serial numbers in reports are shortened.
 - **Say what it costs.** If a feature uses CPU, memory, battery or the network, the UI says
   how much, measured (see the RGB Studio note).
@@ -68,8 +68,8 @@ Synapse runs several services and hundreds of megabytes. We don't.
 
 | Today (0.6, Windows) | Size | Memory |
 |---|---|---|
-| Tray app (`secbird-tray.exe`) | 1.5 MB | about 13 MB working set, 2 MB private |
-| Command line (`secbird.exe`) | 1.0 MB | runs and exits |
+| Tray app (`occam-rzr-tray.exe`) | 1.5 MB | about 13 MB working set, 2 MB private |
+| Command line (`occam-rzr.exe`) | 1.0 MB | runs and exits |
 
 Keep it there:
 
@@ -94,7 +94,7 @@ of new code. So the code grows by facts, not by special cases.
   [`devices.json`](crates/secbird-core/devices.json), keyed by USB product id. A new device
   that speaks the same protocol as its family needs only an entry there: one file, one
   small PR, easy to review. See [Adding a device](#adding-a-device).
-- **Users don't have to wait for us.** A `devices.json` in `%APPDATA%\Secretarybird` is
+- **Users don't have to wait for us.** A `devices.json` in `%APPDATA%\Occam` is
   merged on top of the built-in list ([`db.rs`](crates/secbird-core/src/db.rs)), so someone
   with a brand-new device can add it and try it the same day, without rebuilding.
 - **When a new device needs code, add a capability, not a case.** If the new mouse has a
@@ -116,7 +116,7 @@ protocol should be something the next person can verify.
 - **Every protocol fact has a source** in a comment: a device report and its issue number, a
   Synapse capture, OpenRazer, or a test on named hardware. "Seen on a Naga V3 Pro on a Mouse
   Dock Pro (#62)" beats "should work".
-- **Every device entry is checked against a `secbird report`** before it ships.
+- **Every device entry is checked against a `occam-rzr report`** before it ships.
 - **Every feature has a simulator test.** The simulator ([`sim.rs`](crates/secbird-core/src/sim.rs))
   answers the protocol the way the real device did, so behaviour is pinned down without
   hardware, and anyone can run the editor against it.
@@ -131,7 +131,7 @@ protocol should be something the next person can verify.
 ```
 crates/
   secbird-core/   the library: protocol, devices, profiles. No UI. Windows + Linux.
-  secbird/        the command line (secbird.exe). Thin: parses arguments, calls the core.
+  secbird/        the command line (occam-rzr.exe). Thin: parses arguments, calls the core.
   secbird-tray/   the Windows tray app, which also serves the editor.
 ```
 
@@ -152,7 +152,7 @@ crates/
 | `studio.rs` | RGB Studio: layered effects rendered on the PC and streamed |
 | `profile.rs` | Profiles: what is saved, and applying them to a device |
 | `actions.rs` | "Change a setting and save it to the profile", shared by the CLI and tray |
-| `report.rs` | `secbird report`: the read-only diagnostic people paste into issues |
+| `report.rs` | `occam-rzr report`: the read-only diagnostic people paste into issues |
 | `sim.rs` | Simulated devices for tests and for running the editor without hardware |
 | `update.rs`, `firmware.rs`, `net.rs` | The only network code |
 | `debloat.rs` | Finding and turning off Razer's services, shown before it runs |
@@ -202,10 +202,10 @@ Run the editor against simulated devices, without touching your real settings:
 ```powershell
 $env:APPDATA = "$PWD\scratch-appdata"   # keep your real profiles.json out of it
 $env:SECBIRD_SIM = "all"                 # or a list: "mouse,keyboard,headset"
-.\target\release\secbird-tray.exe --serve
+.\target\release\occam-rzr-tray.exe --serve
 ```
 
-It prints a local URL; open it in a browser. `secbird list` and `secbird report` see the
+It prints a local URL; open it in a browser. `occam-rzr list` and `occam-rzr report` see the
 same simulated devices. The presets are listed in `sim.rs` (`PRESETS`).
 
 To try the tray itself (icon, menu, popups) while your own tray runs with your real devices,
@@ -226,9 +226,9 @@ node --check ed.js
 
 ## Adding a device
 
-1. Plug it in and run `secbird report` (or tray menu → **Make a device report…**). It only
+1. Plug it in and run `occam-rzr report` (or tray menu → **Make a device report…**). It only
    reads.
-2. Open a [device report](https://github.com/infinityInfinite/secbird/issues/new?template=device-report.yml)
+2. Open a [device report](https://github.com/Aristotelesqc/occam-rzr/issues/new?template=device-report.yml)
    with the output, and say what works and what doesn't.
 3. The entry in `devices.json` is made from that report. If you open a PR with the entry
    yourself, link the report; entries without one aren't merged.
@@ -278,7 +278,7 @@ Small and finished beats large and half-done. One feature per pull request.
 
 - [ ] No new network calls, or each one is an HTTPS GET, documented, and behind a setting.
 - [ ] No new dependency, or the PR says why and what it pulls in.
-- [ ] Nothing new is written outside `%APPDATA%\Secretarybird` (or `~/.config/Secretarybird`).
+- [ ] Nothing new is written outside `%APPDATA%\Occam` (or `~/.config/Occam`).
 - [ ] Any change to the system (services, registry, files elsewhere) is shown to the user
       before it runs, as a command they could run themselves.
 - [ ] New editor API routes go through the existing token, Host and Origin checks.

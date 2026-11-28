@@ -1,9 +1,12 @@
 # Rules for agents working on this fork
 
-This is Aristotelesqc's fork of Secretarybird (upstream: infinityInfinite/secbird). It stands
-on its own: whether upstream would accept a change doesn't matter, and the fork may be renamed
-(#31). Upstream's `CONTRIBUTING.md` is a guide worth reading, not a set of rules. Follow it
-when it costs little, and when you depart from it, say so in the commit.
+This is Occam (repository and files: `occam-rzr`), Aristotelesqc's fork of Secretarybird
+(upstream: infinityInfinite/secbird), which stays its engine. It stands on its own: whether
+upstream would accept a change doesn't matter. People see **Occam**; the repository, the
+executables and the settings folder are **occam-rzr**; the crates keep upstream's names
+(`secbird-core`, `secbird-tray`, `secbird`) so upstream merges stay simple.
+Upstream's `CONTRIBUTING.md` is a guide worth reading, not a set of rules. Follow it when it
+costs little, and when you depart from it, say so in the commit.
 
 ## Goal
 Make the editor as pleasant to use as Synapse's customise screen, without any of Synapse's
@@ -13,7 +16,7 @@ stable and fast, and measure size, memory and startup when a change can affect t
 ## Never
 - **Real devices:** never touch the owner's real Razer devices or their real settings during
   development:
-  - no writes to `%APPDATA%\Secretarybird`;
+  - no writes to `%APPDATA%\occam-rzr` (nor the old `%APPDATA%\Secretarybird`);
   - no changes to the installed copy outside this repo;
   - never stop the tray that is running;
   - no full tray that can see real devices while it uses test profiles.
@@ -28,10 +31,10 @@ stable and fast, and measure size, memory and startup when a change can affect t
   own lock. A test tray can then run beside the real one.
 - **Isolated settings:** point `APPDATA` at a scratch folder, so test profiles never mix with
   real ones.
-- **Editor only:** `secbird-tray.exe --serve` serves just the editor and prints its URL. It has
+- **Editor only:** `occam-rzr-tray.exe --serve` serves just the editor and prints its URL. It has
   no tray and applies nothing at start.
 - **Real devices:** test on them only when the owner asks. Back up `profiles.json` first
-  (`secbird export`, or copy it), make one change, check it, and put it back.
+  (`occam-rzr export`, or copy it), make one change, check it, and put it back.
 - **Before a commit, all of these must pass:**
   - `cargo test --workspace`;
   - `cargo clippy --all-targets -- -D warnings`;

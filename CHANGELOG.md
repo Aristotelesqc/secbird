@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Changed
+- **Secretarybird is now Occam.** The fork becomes its own project, with Secretarybird as its
+  engine (credited in the README and NOTICE). You see **Occam** in the tray, the popups and the
+  editor; the executables are `occam-rzr.exe` and `occam-rzr-tray.exe`, and the settings folder
+  is `%APPDATA%\occam-rzr` (`~/.config/occam-rzr` on Linux). On first start, Occam copies the old
+  `Secretarybird` settings folder into the new one (profiles, tray settings, log) and leaves the
+  old one as it was; "Start with Windows" moves from the `Secretarybird` entry to an `Occam`
+  one. Occam won't start while a Secretarybird tray is still running, so two trays never fight
+  over the same devices. The installer has its own id, so it never installs over Secretarybird.
+  The README says "Occam's Razer", next to the line that Occam isn't affiliated with Razer.
+  Tested with simulated devices and a copy of the settings in a scratch folder; the real
+  migration (your settings, the Run entry) happens on the next install.
+
 ### Added
 - **Mouse editor.** Mice open on a new screen in the editor:
   - the profile list on the left;

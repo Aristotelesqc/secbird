@@ -107,7 +107,7 @@ pub struct ApplyReport {
 }
 
 impl Engine {
-    /// The text of `secbird report`, for the tray's "Make a device report" item. Only reads.
+    /// The text of `occam-rzr report`, for the tray's "Make a device report" item. Only reads.
     pub fn report_text(&mut self) -> String {
         let _ = self.api.refresh_devices();
         let db = Db::load(Some(&config_dir().join("devices.json"))).unwrap_or_default();
@@ -159,13 +159,13 @@ impl Engine {
     }
 
     /// The tray handles the profile button of a mouse whose profile `name` leaves that button
-    /// alone: it sends "next Secretarybird profile" instead of cycling on-board slots.
+    /// alone: it sends "next Occam profile" instead of cycling on-board slots.
     fn takes_profile_button(&self, p: &DeviceProfiles, name: &str, dev: &Device) -> bool {
         let set_here = p.profiles.get(name).is_some_and(|pr| pr.buttons.contains_key(PROFILE_BUTTON));
         self.profile_hotkey.get() && !set_here && dev.has_profile_button()
     }
 
-    /// The mouse's profile button to "next Secretarybird profile", when profile `name`
+    /// The mouse's profile button to "next Occam profile", when profile `name`
     /// leaves it alone. `None` when the tray doesn't take that button.
     fn send_profile_button(&self, p: &DeviceProfiles, name: &str, dev: &Device) -> Option<Result<bool>> {
         self.takes_profile_button(p, name, dev).then(|| {
@@ -174,7 +174,7 @@ impl Engine {
     }
 
     /// The editor put buttons back to what the mouse stores (a reset, "Restore"): the
-    /// profile button goes back to "next Secretarybird profile" when the tray takes it.
+    /// profile button goes back to "next Occam profile" when the tray takes it.
     pub fn retake_profile_button(&self, dev: &Device) -> Option<Result<bool>> {
         let mut store = Self::store().ok()?;
         let p = store.for_device(dev);
@@ -574,7 +574,7 @@ impl Engine {
                     Some(spec) => (spec.name.clone(), "Not answering. Is Synapse running?"),
                     None => match db.bluetooth_name(pid) {
                         Some(name) => (name, BLUETOOTH),
-                        None => (format!("Razer device {pid:04X}"), "Unknown model. Run secbird report"),
+                        None => (format!("Razer device {pid:04X}"), "Unknown model. Run occam-rzr report"),
                     },
                 };
                 Unsupported { pid, name, reason, kind: spec.map(|s| s.kind) }

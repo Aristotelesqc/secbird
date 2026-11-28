@@ -22,7 +22,7 @@ use windows_sys::Win32::UI::Shell::{
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
-const CLASS_NAME: &str = "SecretarybirdOsd";
+const CLASS_NAME: &str = "OccamOsd";
 const TIMER_HIDE: usize = 1;
 /// One step of a fade or of the bar moving; only runs while one is under way.
 const TIMER_FRAME: usize = 2;
@@ -259,8 +259,8 @@ const fn rgb(r: u8, g: u8, b: u8) -> COLORREF {
     r as u32 | (g as u32) << 8 | (b as u32) << 16
 }
 
-/// Secretarybird's own surfaces for Windows' light or dark apps, with Windows' accent for
-/// the caption and the bar (Secretarybird's when Windows doesn't say).
+/// Occam's own surfaces for Windows' light or dark apps, with Windows' accent for
+/// the caption and the bar (Occam's when Windows doesn't say).
 fn colors() -> Colors {
     let light = dev_theme().unwrap_or_else(theme::apps_light);
     if light {
@@ -556,7 +556,7 @@ unsafe fn window() -> HWND {
         let hwnd = CreateWindowExW(
             WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TRANSPARENT,
             class.as_ptr(),
-            wide("Secretarybird").as_ptr(),
+            wide("Occam").as_ptr(),
             WS_POPUP,
             0,
             0,

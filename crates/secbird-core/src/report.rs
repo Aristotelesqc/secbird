@@ -1,4 +1,4 @@
-//! `secbird report`: a read-only description of connected Razer hardware that users
+//! `occam-rzr report`: a read-only description of connected Razer hardware that users
 //! can share, so devices we don't own can be added to the database.
 //!
 //! Only GET commands are sent. Nothing on the device changes.
@@ -300,7 +300,7 @@ fn shorten(serial: &str) -> String {
 
 impl std::fmt::Display for Report {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "Secretarybird report (secbird {}, {})", self.secbird, self.os)?;
+        writeln!(f, "Occam report (occam-rzr {}, {})", self.secbird, self.os)?;
         writeln!(f, "Only read (GET) commands were sent; nothing on the device was changed.")?;
         writeln!(f, "Serial numbers are shortened for privacy.\n")?;
 

@@ -3,7 +3,7 @@
      boxes at each screen's real scale instead of drawing them at 100 % and stretching them.
      Common Controls 6: themed message boxes, which also scale per screen. -->
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
-  <assemblyIdentity type="win32" name="Secretarybird.Tray" version="1.0.0.0"/>
+  <assemblyIdentity type="win32" name="OccamRzr.Tray" version="1.0.0.0"/>
   <dependency>
     <dependentAssembly>
       <assemblyIdentity type="win32" name="Microsoft.Windows.Common-Controls" version="6.0.0.0"

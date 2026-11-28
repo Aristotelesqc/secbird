@@ -27,7 +27,7 @@ use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
 use windows_sys::Win32::UI::Shell::*;
 use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
-const APP_NAME: &str = "Secretarybird";
+const APP_NAME: &str = "Occam";
 const WM_TRAY: u32 = WM_APP + 1;
 /// Sent by a second launch: open the editor of the instance already running.
 const WM_OPEN_EDITOR: u32 = WM_APP + 2;
@@ -55,13 +55,13 @@ const SIM_MENU: usize = 4;
 const SIM_PROFILE_BUTTON: usize = 5;
 /// The hotkey the mouse's profile button sends ([`secbird_core::buttons::PROFILE_NEXT`]).
 const HOTKEY_PROFILE_NEXT: i32 = 1;
-const CLASS_NAME: &str = "SecretarybirdTray";
-const MUTEX_NAME: &str = "Local\\Secretarybird.Tray";
+const CLASS_NAME: &str = "OccamTray";
+const MUTEX_NAME: &str = "Local\\Occam.Tray";
 /// Development, with `SECBIRD_SIM_ONLY=1` (see [`secbird_core::sim::only`]): a tray that only
 /// sees simulated devices gets its own lock and window class, so it runs beside the real
 /// one and neither hands the other its editor.
-const SIM_ONLY_CLASS_NAME: &str = "SecretarybirdTraySimOnly";
-const SIM_ONLY_MUTEX_NAME: &str = "Local\\Secretarybird.Tray.SimOnly";
+const SIM_ONLY_CLASS_NAME: &str = "OccamTraySimOnly";
+const SIM_ONLY_MUTEX_NAME: &str = "Local\\Occam.Tray.SimOnly";
 
 /// The tray window class this process talks to: a SECBIRD_SIM_ONLY editor never reaches
 /// the real tray beside it.
@@ -186,7 +186,7 @@ struct App {
     firmware: Receiver<Vec<FirmwareNews>>,
     updates_tx: Sender<UpdateResult>,
     updates: Receiver<UpdateResult>,
-    /// A newer Secretarybird, once a check found one: offered at the top of the menu.
+    /// A newer Occam, once a check found one: offered at the top of the menu.
     update: Option<Release>,
     /// What clicking the last notification does.
     balloon_click: RefCell<Option<Click>>,
@@ -310,6 +310,11 @@ fn copy_wide(dst: &mut [u16], s: &str) {
     dst[src.len()] = 0;
 }
 
+/// A tray from before the rename (window class `SecretarybirdTray`) is running.
+fn old_tray_running() -> bool {
+    unsafe { !FindWindowW(wide("SecretarybirdTray").as_ptr(), null()).is_null() }
+}
+
 pub fn run() {
     unsafe {
         let sim_only = secbird_core::sim::only();
@@ -319,7 +324,7 @@ pub fn run() {
             let running = FindWindowW(wide(class_name).as_ptr(), null());
             if std::env::var_os("SECBIRD_SIM").is_some() && !sim_only {
                 let text = wide(
-                    "Secretarybird is already running, so SECBIRD_SIM has no effect.
+                    "Occam is already running, so SECBIRD_SIM has no effect.
 
                      Quit it from the tray menu (Exit), then start it again from this terminal.",
                 );
@@ -331,6 +336,22 @@ pub fn run() {
                 PostMessageW(running, WM_OPEN_EDITOR, 0, 0);
             }
             return;
+        }
+        // The same tray under its old name would control the same devices twice.
+        if !sim_only && old_tray_running() {
+            let text = wide(
+                "Secretarybird, the older name of this app, is still running. Two trays would fight over \
+                 the same devices.\n\nQuit Secretarybird from its tray menu (Exit), then start Occam again.",
+            );
+            MessageBoxW(null_mut(), text.as_ptr(), wide(APP_NAME).as_ptr(), MB_ICONWARNING);
+            return;
+        }
+        if let Ok(true) = secbird_core::migrate_config() {
+            log::append("settings copied from the Secretarybird folder (left in place)");
+        }
+        // The Run key isn't under APPDATA: a SECBIRD_SIM_ONLY test tray leaves it alone.
+        if !sim_only {
+            crate::settings::migrate_autostart();
         }
 
         let engine = match Engine::new() {
@@ -519,10 +540,10 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
                 if wparam == 1 {
                     app.balloon(
                         "Device report copied",
-                        "Paste it (Ctrl+V) into \"Output of secbird report\" on the page that just opened. It only holds read results; serial numbers are shortened.",
+                        "Paste it (Ctrl+V) into \"Output of occam-rzr report\" on the page that just opened. It only holds read results; serial numbers are shortened.",
                     )
                 } else {
-                    app.balloon("Could not copy the device report", "Run `secbird report` in a terminal instead.")
+                    app.balloon("Could not copy the device report", "Run `occam-rzr report` in a terminal instead.")
                 }
             });
             0
@@ -1073,7 +1094,7 @@ impl App {
             log::append(&format!("Synapse running: {}", running.join(", ")));
             self.balloon(
                 "Razer Synapse is running",
-                "It can overwrite Secretarybird's settings. Close it, or run `secbird debloat` to stop it starting with Windows.",
+                "It can overwrite Occam's settings. Close it, or run `occam-rzr debloat` to stop it starting with Windows.",
             );
         }
     }
@@ -1267,7 +1288,7 @@ impl App {
                     if manual || settings.update_notified != r.version {
                         settings.update_notified = r.version.clone();
                         settings.save();
-                        let title = format!("Secretarybird {} is out", r.version);
+                        let title = format!("Occam {} is out", r.version);
                         if secbird_core::update::installed() {
                             let body = format!("You have {current}. Click to update now; your settings and profiles are kept.");
                             self.notify_click(&title, &body, NIIF_INFO, Some(Click::Update(r.clone())));
@@ -1281,7 +1302,7 @@ impl App {
                 Ok(None) => {
                     self.update = None;
                     if manual {
-                        self.notify("You're up to date", &format!("Secretarybird {current} is the latest version."), NIIF_INFO, None);
+                        self.notify("You're up to date", &format!("Occam {current} is the latest version."), NIIF_INFO, None);
                     }
                 }
                 Err(e) if manual => self.balloon("Could not check for updates", &e),
@@ -1301,7 +1322,7 @@ impl App {
         }
         self.updating = true;
         self.notify(
-            &format!("Updating to Secretarybird {}", r.version),
+            &format!("Updating to Occam {}", r.version),
             "Downloading. It installs by itself and starts again in a few seconds; your settings and profiles are kept.",
             NIIF_INFO,
             None,
@@ -1330,7 +1351,7 @@ impl App {
                 self.updating = false;
                 let (why, url) = e.rsplit_once('\n').unwrap_or((&e, ""));
                 let body = format!("{why}\nClick for the download page.");
-                self.notify("Couldn't update Secretarybird", &body, NIIF_WARNING, Some(url.to_string()).filter(|u| !u.is_empty()));
+                self.notify("Couldn't update Occam", &body, NIIF_WARNING, Some(url.to_string()).filter(|u| !u.is_empty()));
             }
         }
     }
@@ -1349,11 +1370,11 @@ impl App {
         if updated {
             let url = format!("{}/releases/tag/v{current}", env!("CARGO_PKG_REPOSITORY"));
             open_url(&url);
-            self.notify(&format!("Updated to Secretarybird {current}"), "What's new is open in your browser.", NIIF_INFO, None);
+            self.notify(&format!("Updated to Occam {current}"), "What's new is open in your browser.", NIIF_INFO, None);
         }
     }
 
-    /// Build `secbird report` (a few seconds of read-only USB requests) on a background
+    /// Build `occam-rzr report` (a few seconds of read-only USB requests) on a background
     /// thread, put it on the clipboard and open the GitHub device report form.
     fn make_report(&mut self) {
         let engine = self.engine.clone();
@@ -1395,11 +1416,11 @@ impl App {
         self.profile_items.clear();
         if let Some(r) = &self.update {
             let label = if self.updating {
-                format!("Updating to Secretarybird {}…", r.version)
+                format!("Updating to Occam {}…", r.version)
             } else if secbird_core::update::installed() {
-                format!("Update to Secretarybird {}", r.version)
+                format!("Update to Occam {}", r.version)
             } else {
-                format!("Get Secretarybird {}…", r.version)
+                format!("Get Occam {}…", r.version)
             };
             let grey = if self.updating { MF_GRAYED } else { 0 };
             append(menu, MF_STRING | grey, ID_GET_UPDATE as usize, &label);
@@ -1486,7 +1507,7 @@ impl App {
                 if s.firmware_weekly {
                     self.balloon(
                         "Weekly firmware check on",
-                        "Once a week Secretarybird asks apps.razer.com whether newer firmware is out for your devices. It never installs anything.",
+                        "Once a week Occam asks apps.razer.com whether newer firmware is out for your devices. It never installs anything.",
                     );
                     self.check_firmware(true);
                 }

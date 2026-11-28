@@ -254,7 +254,7 @@ pub fn is_elevated() -> bool {
 }
 
 /// Running Razer Synapse processes (Synapse 2, 3 or 4). Synapse keeps re-sending its
-/// own settings, so it fights with Secretarybird over the same devices.
+/// own settings, so it fights with Occam over the same devices.
 pub fn synapse_running() -> Vec<String> {
     let mut names: Vec<String> = win::process_names().into_iter().filter(|n| is_synapse(n)).collect();
     names.sort();
@@ -543,7 +543,7 @@ mod tests {
         for n in ["RazerAppEngine.exe", "Razer Synapse 3.exe", "Razer Synapse Service.exe", "RzSynapse.exe"] {
             assert!(is_synapse(n), "{n}");
         }
-        for n in ["secbird-tray.exe", "razer_elevation_service.exe", "GameManagerService3.exe"] {
+        for n in ["occam-rzr-tray.exe", "razer_elevation_service.exe", "GameManagerService3.exe"] {
             assert!(!is_synapse(n), "{n}");
         }
         assert!(win::process_names().iter().any(|n| n.eq_ignore_ascii_case("cargo.exe") || n.ends_with(".exe")));

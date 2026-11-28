@@ -1,9 +1,9 @@
 //! Is there newer firmware for a device? Asks Razer's public product manifest, the same file
 //! Synapse reads (`apps.razer.com/synapse/products/<pid>/mw/manifest.json`, field
-//! `latestFirmwareInfo`). Only reads: Secretarybird never flashes firmware, it links to
+//! `latestFirmwareInfo`). Only reads: Occam never flashes firmware, it links to
 //! Razer's own updater.
 //!
-//! Only runs when asked (`secbird firmware`, the editor's button, or the tray's weekly check
+//! Only runs when asked (`occam-rzr firmware`, the editor's button, or the tray's weekly check
 //! once turned on).
 
 use crate::commands as cmd;

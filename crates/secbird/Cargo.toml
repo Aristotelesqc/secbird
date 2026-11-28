@@ -5,6 +5,11 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+# The crate keeps upstream's name (easy merges); the executable is ours.
+[[bin]]
+name = "occam-rzr"
+path = "src/main.rs"
+
 [dependencies]
 secbird-core = { path = "../secbird-core" }
 serde_json = "1"

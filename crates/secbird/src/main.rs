@@ -2,9 +2,9 @@ use secbird_core::{actions, config_dir, discover, hidapi::HidApi, Db, Device, Er
 use std::process::ExitCode;
 
 const USAGE: &str = "\
-Secretarybird - minimal control for Razer peripherals
+Occam - minimal control for Razer peripherals
 
-USAGE: secbird [-d PID] <command> [args]
+USAGE: occam-rzr [-d PID] <command> [args]
 
 DEVICE:
   list                      Connected devices
@@ -82,7 +82,7 @@ BUTTONS (mice with on-board button memory; add --hypershift for the HyperShift l
   button restore-all        Every remapped button back to its saved setting at once
                             (also puts back a save-to-mouse)
   button save-to-mouse      Write this profile's remaps into the mouse's on-board slot, so
-                            they work without Secretarybird; the slot's old settings are kept
+                            they work without Occam; the slot's old settings are kept
   button put-back           Put the slot back to what it held before save-to-mouse
   Actions: left right middle back forward scroll-up scroll-down scroll-left scroll-right
            double-click  key:<combo> (key:a, key:ctrl+shift+f13, key:space)
@@ -132,7 +132,7 @@ CLEANUP (Razer's background services and startup entries; drivers are never touc
   debloat undo [-y]         Put back exactly what `debloat apply` changed
 
 UPDATES:
-  update                    Is a newer Secretarybird out? Asks GitHub (api.github.com);
+  update                    Is a newer Occam out? Asks GitHub (api.github.com);
                             never installs anything
 
 OPTIONS:
@@ -142,10 +142,14 @@ OPTIONS:
 Set SECBIRD_SIM=all (or a list: mouse,wireless,keyboard,old-keyboard,naga,cobra,dock,blackwidow,
 goliathus,firefly,blade,base-station) to add simulated devices (no hardware needed).
 
-Files live in %APPDATA%\\Secretarybird (profiles.json, devices.json).
+Files live in %APPDATA%\\occam-rzr (profiles.json, devices.json).
 ";
 
 fn main() -> ExitCode {
+    // First run after the rename: the old Secretarybird settings come along (left in place).
+    if let Ok(true) = secbird_core::migrate_config() {
+        eprintln!("Copied your settings from the Secretarybird folder to {}.", config_dir().display());
+    }
     match run(std::env::args().skip(1).collect()) {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
@@ -172,7 +176,7 @@ fn run(mut args: Vec<String>) -> Result<(), Error> {
         return Ok(());
     };
     if matches!(command.as_str(), "-V" | "--version" | "version") {
-        println!("secbird {}", env!("CARGO_PKG_VERSION"));
+        println!("occam-rzr {}", env!("CARGO_PKG_VERSION"));
         return Ok(());
     }
     if matches!(command.as_str(), "-h" | "--help" | "help") {
@@ -182,9 +186,9 @@ fn run(mut args: Vec<String>) -> Result<(), Error> {
 
     if command == "update" {
         match secbird_core::update::check()? {
-            Some(r) => println!("Secretarybird {} is out (you have {}).
+            Some(r) => println!("Occam {} is out (you have {}).
 Download: {}", r.version, secbird_core::update::CURRENT, r.url),
-            None => println!("Secretarybird {} is the latest version.", secbird_core::update::CURRENT),
+            None => println!("Occam {} is the latest version.", secbird_core::update::CURRENT),
         }
         return Ok(());
     }
@@ -226,7 +230,7 @@ Download: {}", r.version, secbird_core::update::CURRENT, r.url),
     #[cfg(target_os = "linux")]
     if hidraw_blocked(&api) {
         eprintln!("Note: Linux won't let this user open some Razer devices. Install the udev rule that comes");
-        eprintln!("with Secretarybird (see the README, Linux), then unplug and replug them.");
+        eprintln!("with Occam (see the README, Linux), then unplug and replug them.");
     }
 
     if command == "report" {
@@ -263,8 +267,8 @@ Download: {}", r.version, secbird_core::update::CURRENT, r.url),
                 }
                 Some(spec) => println!("{pid:04X}  {}  (connected but not answering{})", spec.name, NOT_ANSWERING_HINT),
                 None => match db.bluetooth_name(pid) {
-                    Some(name) => println!("{pid:04X}  {name}  (connected over Bluetooth, not answering; use the cable or the USB receiver, and please share `secbird report`)"),
-                    None => println!("{pid:04X}  Unknown Razer device  (connected, not answering; please share `secbird report`)"),
+                    Some(name) => println!("{pid:04X}  {name}  (connected over Bluetooth, not answering; use the cable or the USB receiver, and please share `occam-rzr report`)"),
+                    None => println!("{pid:04X}  Unknown Razer device  (connected, not answering; please share `occam-rzr report`)"),
                 },
             }
         }
@@ -274,7 +278,7 @@ Download: {}", r.version, secbird_core::update::CURRENT, r.url),
             if !synapse.is_empty() {
                 println!("
 Note: Razer Synapse is running ({}). It can overwrite these settings;", synapse.join(", "));
-                println!("close it, or run `secbird debloat` to stop it starting with Windows.");
+                println!("close it, or run `occam-rzr debloat` to stop it starting with Windows.");
             }
         }
         return Ok(());
@@ -339,7 +343,7 @@ Note: Razer Synapse is running ({}). It can overwrite these settings;", synapse.
         _ if command == "key" && keyboards.len() == 1 => keyboards[0],
         _ => {
             return Err(Error::InvalidArg(
-                "several devices connected; pick one with -d PID or -d SERIAL (see `secbird list`)".into(),
+                "several devices connected; pick one with -d PID or -d SERIAL (see `occam-rzr list`)".into(),
             ))
         }
     };
@@ -750,7 +754,7 @@ fn profile_cmd(dev: &Device, store: &mut Store, rest: &[String]) -> Result<(), E
             let name = name.ok_or_else(need_name)?;
             profiles.create(name)?;
             store.save()?;
-            println!("Created profile '{name}' (copy of the active one). Switch with: secbird profile use {name}");
+            println!("Created profile '{name}' (copy of the active one). Switch with: occam-rzr profile use {name}");
             Ok(())
         }
         "use" => {
@@ -788,7 +792,7 @@ fn profile_cmd(dev: &Device, store: &mut Store, rest: &[String]) -> Result<(), E
 fn macro_cmd(dev: &Device, store: &mut Store, rest: &[String]) -> Result<(), Error> {
     use secbird_core::macros::Script;
     let id = |v: Option<&String>| -> Result<u16, Error> {
-        let v = v.ok_or_else(|| Error::InvalidArg("which macro? (see `secbird macro`)".into()))?;
+        let v = v.ok_or_else(|| Error::InvalidArg("which macro? (see `occam-rzr macro`)".into()))?;
         v.parse().map_err(|_| Error::InvalidArg(format!("bad macro id '{v}'")))
     };
     match rest.first().map(String::as_str) {
@@ -870,7 +874,7 @@ fn button_cmd(dev: &Device, store: &mut Store, rest: &[String]) -> Result<(), Er
         ["save-to-mouse"] => {
             let slot = actions::save_buttons_to_mouse(dev, store)?;
             let n = store.for_device(dev).active().buttons.len();
-            println!("Saved {n} remapped button(s) in on-board slot {slot}; `secbird button put-back` undoes it.");
+            println!("Saved {n} remapped button(s) in on-board slot {slot}; `occam-rzr button put-back` undoes it.");
             Ok(())
         }
         ["put-back"] => {
@@ -879,13 +883,13 @@ fn button_cmd(dev: &Device, store: &mut Store, rest: &[String]) -> Result<(), Er
             Ok(())
         }
         [button, "reset"] => {
-            button_id(button).ok_or_else(|| Error::InvalidArg(format!("unknown button '{button}' (see `secbird button`)")))?;
+            button_id(button).ok_or_else(|| Error::InvalidArg(format!("unknown button '{button}' (see `occam-rzr button`)")))?;
             actions::set_button(dev, store, button, layer, None)?;
             println!("{button}: back to {}", dev.button(button_id(button).unwrap_or(0), layer)?);
             Ok(())
         }
         [button, action] => {
-            button_id(button).ok_or_else(|| Error::InvalidArg(format!("unknown button '{button}' (see `secbird button`)")))?;
+            button_id(button).ok_or_else(|| Error::InvalidArg(format!("unknown button '{button}' (see `occam-rzr button`)")))?;
             actions::set_button(dev, store, button, layer, Some(action.parse()?))?;
             let on = if layer == Layer::HyperShift { " (Hypershift)" } else { "" };
             println!("{button}{on} now does {action}");
@@ -902,7 +906,7 @@ fn key_cmd(dev: &Device, store: &mut Store, rest: &[String]) -> Result<(), Error
     // `capslock` or `key-capslock`; stored in the profile as `key-capslock`.
     let input = |key: &str| -> Result<Input, Error> {
         let name = if key.starts_with("key-") { key.to_string() } else { format!("key-{key}") };
-        Input::parse(&name).ok_or_else(|| Error::InvalidArg(format!("unknown key '{key}' (see `secbird --help`)")))
+        Input::parse(&name).ok_or_else(|| Error::InvalidArg(format!("unknown key '{key}' (see `occam-rzr --help`)")))
     };
     let unsupported = || {
         use secbird_core::Kind;
@@ -912,10 +916,10 @@ fn key_cmd(dev: &Device, store: &mut Store, rest: &[String]) -> Result<(), Error
                 dev.name()
             )),
             None => Error::Unsupported(format!(
-                "{} doesn't answer key remapping commands; please send `secbird report` in a GitHub issue",
+                "{} doesn't answer key remapping commands; please send `occam-rzr report` in a GitHub issue",
                 dev.name()
             )),
-            Some(_) => Error::Unsupported(format!("{} has no keyboard keys (see `secbird button`)", dev.name())),
+            Some(_) => Error::Unsupported(format!("{} has no keyboard keys (see `occam-rzr button`)", dev.name())),
         }
     };
     match args.as_slice() {
@@ -1073,7 +1077,7 @@ fn scroll_cmd(dev: &Device, store: &mut Store, rest: &[String]) -> Result<(), Er
             actions::set_scroll_disabled(dev, store, modes.clone())?;
             sent.disabled = Some(modes);
         }
-        _ => return Err(Error::InvalidArg("see `secbird --help` for scroll".into())),
+        _ => return Err(Error::InvalidArg("see `occam-rzr --help` for scroll".into())),
     }
     match dev.scroll_wheel()? {
         None => println!("{} has no scroll wheel settings.", dev.name()),
@@ -1224,11 +1228,11 @@ Nothing to turn off.");
                 return Ok(());
             }
             println!("
-`secbird debloat apply` would run these Windows commands:");
+`occam-rzr debloat apply` would run these Windows commands:");
             print_plan(&plan);
             println!("
 This needs administrator rights: open PowerShell with \"Run as administrator\".");
-            println!("Original settings are saved first; `secbird debloat undo` puts them back.");
+            println!("Original settings are saved first; `occam-rzr debloat undo` puts them back.");
             Ok(())
         }
         "apply" => {
@@ -1253,12 +1257,12 @@ Commands to run:");
             backup.save(&backup_path)?;
             println!("Original settings saved to {}", backup_path.display());
             run_plan(&plan)?;
-            println!("Done. Undo any time with `secbird debloat undo`.");
+            println!("Done. Undo any time with `occam-rzr debloat undo`.");
             Ok(())
         }
         "undo" => {
             let Some(backup) = Backup::load(&backup_path)? else {
-                println!("Nothing to undo: `secbird debloat apply` has not been run on this PC (no backup at {}).", backup_path.display());
+                println!("Nothing to undo: `occam-rzr debloat apply` has not been run on this PC (no backup at {}).", backup_path.display());
                 println!("Services you stopped by hand can be started again in services.msc.");
                 return Ok(());
             };
