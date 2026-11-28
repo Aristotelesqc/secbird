@@ -153,6 +153,9 @@ pub struct SimState {
     pub auto_sleep: Option<bool>,
     /// The auto-sleep switch saved in the on-board slot, which the live one starts from.
     pub auto_sleep_saved: Option<bool>,
+    /// Device mode (`00:84`): normal, or driver mode as Synapse leaves it. `None`: the
+    /// device doesn't answer it.
+    pub device_mode: Option<u8>,
     /// Active on-board slot (`05:84`), when set. Lighting written to another slot is kept
     /// but not shown, like the DeathStalker V2 Pro in #37.
     pub active_slot: Option<u8>,
@@ -216,6 +219,7 @@ impl SimState {
             game_mode: None,
             auto_sleep: None,
             auto_sleep_saved: None,
+            device_mode: Some(cmd::NORMAL_MODE),
             active_slot: None,
             paired: Vec::new(),
             dock_light: None,
@@ -357,6 +361,17 @@ impl SimState {
         let known = |s: &Self, led: u8| s.leds.contains(&led);
         match c {
             c if c == cmd::FIRMWARE.get() => ok(vec![self.firmware.0, self.firmware.1]),
+            c if c == cmd::DEVICE_MODE.get() => match self.device_mode {
+                Some(mode) => ok(vec![mode, 0]),
+                None => (NotSupported, vec![]),
+            },
+            c if c == cmd::DEVICE_MODE => match self.device_mode {
+                Some(_) => {
+                    self.device_mode = Some(a[0]);
+                    ok(vec![a[0], a[1]])
+                }
+                None => (NotSupported, vec![]),
+            },
             c if c == cmd::SERIAL.get() => {
                 let mut v = self.serial.as_bytes().to_vec();
                 v.resize(cmd::SERIAL_SIZE as usize, 0);
@@ -867,6 +882,13 @@ impl Transport for Sim {
     }
 }
 
+/// `SECBIRD_SIM_ONLY=1` (development): discovery leaves real hardware alone, so only the
+/// `SECBIRD_SIM` devices are seen. Lets a test tray run beside the real one, with real
+/// devices plugged in, without sending them anything.
+pub fn only() -> bool {
+    std::env::var_os("SECBIRD_SIM_ONLY").is_some_and(|v| v == "1")
+}
+
 /// Simulated devices listed in `SECBIRD_SIM`: `all`, or comma-separated [`PRESETS`] names.
 pub fn from_env() -> Vec<Device> {
     let Ok(list) = std::env::var("SECBIRD_SIM") else { return Vec::new() };
@@ -1264,6 +1286,23 @@ mod tests {
         let sim = Sim::mouse();
         sim.state().txid = 0x42;
         assert!(sim.open(MOUSE_PID, None).is_none());
+    }
+
+    #[test]
+    fn driver_mode_left_by_synapse_is_left() {
+        let sim = Sim::mouse();
+        let dev = open(&sim, MOUSE_PID);
+        // Normal already: nothing is written.
+        assert!(!dev.leave_driver_mode().unwrap());
+        assert!(!sim.state().log.contains(&cmd::DEVICE_MODE));
+        // As Synapse leaves it: back to normal, once.
+        sim.state().device_mode = Some(cmd::DRIVER_MODE);
+        assert!(dev.leave_driver_mode().unwrap());
+        assert_eq!(dev.device_mode().unwrap(), cmd::NORMAL_MODE);
+        assert!(!dev.leave_driver_mode().unwrap());
+        // A device that doesn't answer the mode is left alone.
+        sim.state().device_mode = None;
+        assert!(dev.leave_driver_mode().is_err());
     }
 
     #[test]
@@ -1897,6 +1936,30 @@ mod tests {
         assert_eq!(ids, [1, 2, 15, 0x34, 120]);
         assert_eq!(crate::buttons::button_name(120), "button-120");
         assert_eq!(crate::buttons::button_id("button-120"), Some(120));
+    }
+
+    #[test]
+    fn profile_button_can_send_next_secretarybird_profile() {
+        use crate::buttons::{Input, Layer, PROFILE_BUTTON_ID, PROFILE_NEXT};
+        // Basilisk V3 factory: the profile button cycles on-board slots.
+        let sim = Sim::mouse();
+        let dev = open(&sim, MOUSE_PID);
+        assert!(dev.has_profile_button(), "found by its on-board profile action");
+        assert!(!dev.profile_button_is_next());
+        dev.set_input(Input::Button(PROFILE_BUTTON_ID), Layer::Normal, PROFILE_NEXT).unwrap();
+        assert!(dev.profile_button_is_next());
+        assert_eq!(dev.slot_button(1, PROFILE_BUTTON_ID, Layer::Normal).unwrap(), crate::buttons::Action::ProfileCycleUp, "saved slot untouched");
+        dev.reset_input(Input::Button(PROFILE_BUTTON_ID), Layer::Normal).unwrap();
+        assert!(!dev.profile_button_is_next(), "back to the factory setting");
+
+        // A mouse that lists its buttons: the list decides.
+        sim.state().button_list = Some(vec![1, 2, 3]);
+        assert!(!dev.has_profile_button());
+        sim.state().button_list = Some(vec![1, 2, 3, PROFILE_BUTTON_ID]);
+        assert!(dev.has_profile_button());
+        // Not a mouse: no profile button.
+        let kb = open(&Sim::keyboard(), KEYBOARD_PID);
+        assert!(!kb.has_profile_button());
     }
 
     #[test]

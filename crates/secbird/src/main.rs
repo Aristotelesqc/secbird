@@ -90,6 +90,8 @@ BUTTONS (mice with on-board button memory; add --hypershift for the HyperShift l
            dpi-up dpi-down dpi-cycle-up dpi-cycle-down dpi-clutch:<dpi>
            hypershift  media:volume-up|volume-down|mute|play-pause|next-track|previous-track
            profile-cycle-up  disabled
+           secbird-profile-next  (the tray moves the mouse to its next profile; while the
+             tray runs, the profile button does this unless the profile sets it)
            macro:<id>[@times|@hold|@toggle]  (macro:3, macro:3@5, macro:3@hold)
 
 KEYS (keyboards and keypads; BETA, no keyboard has confirmed it works yet; --hypershift too):

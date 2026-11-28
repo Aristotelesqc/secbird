@@ -1,8 +1,13 @@
 //! Device and profile handling for the tray, kept free of Win32 code.
 
+use secbird_core::buttons::{self, Input, Layer};
+use secbird_core::profile::DeviceProfiles;
 use secbird_core::{config_dir, discover, hidapi::HidApi, Db, Device, Dimming, Result, Store};
+
+/// The profile button's setting key in profiles.json.
+const PROFILE_BUTTON: &str = "profile";
 use crate::studio::Studio;
-use std::cell::{RefCell, RefMut};
+use std::cell::{Cell, RefCell, RefMut};
 use std::collections::{HashMap, HashSet};
 use std::time::{Duration, Instant, SystemTime};
 
@@ -12,8 +17,16 @@ pub struct Engine {
     unsupported: Vec<Unsupported>,
     /// Synapse processes seen at the last rescan.
     synapse: Vec<String>,
+    /// Devices a rescan took out of the driver mode Synapse left them in, not yet applied.
+    released: Vec<String>,
     /// The program in front, when some profile is tied to it.
     foreground: Option<String>,
+    /// Profiles picked with the mouse's profile button while a program with its own profile
+    /// was in front, by device key: they win over that program's profile until another
+    /// program comes to the front. Never saved.
+    manual: RefCell<HashMap<String, String>>,
+    /// The tray holds the profile button's hotkey, so it may take profile buttons.
+    profile_hotkey: Cell<bool>,
     /// Programs tied to any profile, and the profiles.json timestamp they were read at.
     apps: HashSet<String>,
     apps_read: Option<SystemTime>,
@@ -33,6 +46,21 @@ pub struct Engine {
     studio: RefCell<Studio>,
     /// Grows each time a rescan finds other devices than the one before it.
     list_seq: u64,
+    /// Settings were just sent from here (a profile, the editor): a DPI report the device
+    /// sends back until then is that, not its button, and gets no popup.
+    dpi_quiet_until: Cell<Option<Instant>>,
+}
+
+/// How long after settings were sent a DPI report from the device is taken as its answer.
+const DPI_ECHO: Duration = Duration::from_millis(1500);
+
+/// What the DPI popup says about the device ([`Engine::dpi_popup`]).
+pub struct DpiPopup {
+    pub device: String,
+    /// The device's highest DPI, when known.
+    pub max: Option<u16>,
+    /// The stage this DPI is, of how many, when it is one of the device's stages.
+    pub stage: Option<(usize, usize)>,
 }
 
 const FINDER_PAUSE: Duration = Duration::from_secs(10 * 60);
@@ -92,7 +120,10 @@ impl Engine {
             devices: Vec::new(),
             unsupported: Vec::new(),
             synapse: Vec::new(),
+            released: Vec::new(),
             foreground: None,
+            manual: RefCell::new(HashMap::new()),
+            profile_hotkey: Cell::new(false),
             apps: HashSet::new(),
             apps_read: None,
             live_dpi: HashMap::new(),
@@ -103,6 +134,7 @@ impl Engine {
             dim: HashMap::new(),
             studio: RefCell::new(Studio::default()),
             list_seq: 0,
+            dpi_quiet_until: Cell::new(None),
         })
     }
 
@@ -110,11 +142,99 @@ impl Engine {
         self.foreground.as_deref()
     }
 
+    /// The profile a device uses right now: one picked with its profile button while this
+    /// program is in front, else the one tied to the program in front, else the active one.
+    fn current(&self, p: &DeviceProfiles, dev: &Device) -> String {
+        match self.manual.borrow().get(&dev.key()).filter(|n| p.profiles.contains_key(*n)) {
+            Some(name) => name.clone(),
+            None => p.effective(self.foreground()).to_string(),
+        }
+    }
+
+    /// The tray holds the profile button's hotkey ([`Engine::set_profile_hotkey`]). Until it
+    /// does (the editor alone with `--serve`, or another program holds the combo), profile
+    /// buttons keep their own setting.
+    pub fn set_profile_hotkey(&self, held: bool) {
+        self.profile_hotkey.set(held);
+    }
+
+    /// The tray handles the profile button of a mouse whose profile `name` leaves that button
+    /// alone: it sends "next Secretarybird profile" instead of cycling on-board slots.
+    fn takes_profile_button(&self, p: &DeviceProfiles, name: &str, dev: &Device) -> bool {
+        let set_here = p.profiles.get(name).is_some_and(|pr| pr.buttons.contains_key(PROFILE_BUTTON));
+        self.profile_hotkey.get() && !set_here && dev.has_profile_button()
+    }
+
+    /// The mouse's profile button to "next Secretarybird profile", when profile `name`
+    /// leaves it alone. `None` when the tray doesn't take that button.
+    fn send_profile_button(&self, p: &DeviceProfiles, name: &str, dev: &Device) -> Option<Result<bool>> {
+        self.takes_profile_button(p, name, dev).then(|| {
+            dev.set_input(Input::Button(buttons::PROFILE_BUTTON_ID), Layer::Normal, buttons::PROFILE_NEXT)
+        })
+    }
+
+    /// The editor put buttons back to what the mouse stores (a reset, "Restore"): the
+    /// profile button goes back to "next Secretarybird profile" when the tray takes it.
+    pub fn retake_profile_button(&self, dev: &Device) -> Option<Result<bool>> {
+        let mut store = Self::store().ok()?;
+        let p = store.for_device(dev);
+        let name = self.current(p, dev);
+        self.send_profile_button(p, &name, dev)
+    }
+
+    /// The profile button was pressed (the tray got its hotkey): every mouse whose profile
+    /// button sends it moves to its next profile, in the order of the tray menu. With a
+    /// program in front that has its own profile, the pick holds until another program
+    /// comes to the front, and the active profile stays; otherwise it becomes the active
+    /// profile, as a pick in the tray menu does. Returns what was applied.
+    pub fn next_profile(&self) -> Vec<ApplyReport> {
+        let Ok(mut store) = Self::store() else { return Vec::new() };
+        let mut mice: Vec<&Device> = self.devices.iter().filter(|d| d.profile_button_is_next()).collect();
+        if mice.is_empty() {
+            // Another button sends it: every mouse.
+            mice = self.devices.iter().filter(|d| d.spec.as_ref().is_some_and(|s| s.kind == secbird_core::Kind::Mouse)).collect();
+        }
+        let mut keys = Vec::new();
+        let mut saved = false;
+        for dev in mice {
+            let p = store.for_device(dev);
+            let now = self.current(p, dev);
+            let names: Vec<&String> = p.profiles.keys().collect();
+            let at = names.iter().position(|n| **n == now).unwrap_or(0);
+            let next = names[(at + 1) % names.len().max(1)].clone();
+            let app_profile = self.foreground().and_then(|exe| p.for_app(exe)).is_some();
+            if app_profile {
+                self.manual.borrow_mut().insert(dev.key(), next);
+            } else {
+                self.manual.borrow_mut().remove(&dev.key());
+                if p.switch(&next).is_ok() {
+                    saved = true;
+                }
+            }
+            keys.push(dev.key());
+        }
+        if saved {
+            let _ = store.save();
+        }
+        self.apply(&keys)
+    }
+
+    /// Exit: profile buttons the tray took go back to what the mouse stores, so they don't
+    /// send a combo nobody listens to.
+    pub fn release_profile_buttons(&self) {
+        for dev in self.devices.iter().filter(|d| d.profile_button_is_next()) {
+            let _ = dev.reset_input(Input::Button(buttons::PROFILE_BUTTON_ID), Layer::Normal);
+        }
+    }
+
     /// Collections that carry a device's own event reports (DPI and profile changes made
     /// with its buttons), as (device key, path). On the Basilisk V3 that is interface 1,
     /// collection 5 (usage 0001:0000, 16-byte reports); its sibling with the same usage
     /// stays silent, so listening to both costs nothing.
     pub fn event_paths(&self) -> Vec<(String, std::ffi::CString)> {
+        if secbird_core::sim::only() {
+            return Vec::new();
+        }
         self.devices
             .iter()
             .flat_map(|dev| {
@@ -143,11 +263,47 @@ impl Engine {
         let Some(dev) = self.devices.iter().find(|d| d.key() == key) else { return };
         if let Ok(mut store) = Self::store() {
             let p = store.for_device(dev);
-            let name = p.effective(self.foreground.as_deref()).to_string();
+            let name = self.current(p, dev);
             if let Some(profile) = p.profiles.get_mut(&name) {
                 profile.dpi = Some((x, y));
                 let _ = store.save();
             }
+        }
+    }
+
+    /// Settings were just sent to devices from here: see [`Engine::dpi_quiet`].
+    pub fn hush_dpi(&self) {
+        self.dpi_quiet_until.set(Some(Instant::now() + DPI_ECHO));
+    }
+
+    /// Settings were sent from here a moment ago (a profile applied, a change in the editor):
+    /// a DPI report now is the device answering them, not its DPI button, so no popup.
+    pub fn dpi_quiet(&self) -> bool {
+        self.dpi_quiet_until.get().is_some_and(|t| Instant::now() < t)
+    }
+
+    /// For the DPI popup: the device's name, its highest DPI, and which of its stages `(x, y)`
+    /// is (one short read of the stages, on devices with a DPI range).
+    pub fn dpi_popup(&self, key: &str, x: u16, y: u16) -> DpiPopup {
+        let Some(dev) = self.devices.iter().find(|d| d.key() == key) else {
+            return DpiPopup { device: "Mouse".into(), max: None, stage: None };
+        };
+        let max = dev.spec.as_ref().and_then(|s| s.dpi.as_ref()).map(|r| r.max);
+        let stage = max.and_then(|_| dev.dpi_stages().ok()).and_then(|s| {
+            // The active stage when it is this DPI, else the first stage that is.
+            let active = (s.active as usize).checked_sub(1).filter(|&i| s.stages.get(i) == Some(&(x, y)));
+            let at = active.or_else(|| s.stages.iter().position(|&st| st == (x, y)))?;
+            Some((at + 1, s.stages.len()))
+        });
+        DpiPopup { device: self.label(dev), max, stage }
+    }
+
+    /// For the on-board profile popup: the device's name and how many on-board profiles it
+    /// has (0 when unknown).
+    pub fn onboard_popup(&self, key: &str) -> (String, u8) {
+        match self.devices.iter().find(|d| d.key() == key) {
+            Some(dev) => (self.label(dev), dev.spec.as_ref().map_or(0, |s| s.onboard_profiles)),
+            None => ("Mouse".into(), 0),
         }
     }
 
@@ -166,16 +322,21 @@ impl Engine {
         if exe == self.foreground {
             return Vec::new();
         }
-        let before = std::mem::replace(&mut self.foreground, exe);
-        let Ok(mut store) = Self::store() else { return Vec::new() };
+        let Ok(mut store) = Self::store() else {
+            self.foreground = exe;
+            self.manual.borrow_mut().clear();
+            return Vec::new();
+        };
+        // What each device used before (a profile-button pick included), then the new program.
+        let before: Vec<String> = self.devices.iter().map(|d| self.current(store.for_device(d), d)).collect();
+        self.foreground = exe;
+        self.manual.borrow_mut().clear();
         let changed: Vec<String> = self
             .devices
             .iter()
-            .filter(|d| {
-                let p = store.for_device(d);
-                p.effective(before.as_deref()) != p.effective(self.foreground.as_deref())
-            })
-            .map(|d| d.key())
+            .zip(before)
+            .filter(|(d, before)| *before != self.current(store.for_device(d), d))
+            .map(|(d, _)| d.key())
             .collect();
         self.apply(&changed)
     }
@@ -202,6 +363,11 @@ impl Engine {
         &self.synapse
     }
 
+    /// Devices taken out of driver mode since the last call: their remaps need sending again.
+    pub fn take_released(&mut self) -> Vec<String> {
+        std::mem::take(&mut self.released)
+    }
+
     /// Battery of every wireless device that answers.
     pub fn batteries(&self) -> Vec<Battery> {
         self.devices
@@ -220,7 +386,7 @@ impl Engine {
         let Ok(mut store) = Self::store() else { return };
         for dev in self.devices.iter().filter(|d| d.spec.as_ref().is_some_and(|s| s.wireless)) {
             let p = store.for_device(dev);
-            let name = p.effective(self.foreground()).to_string();
+            let name = self.current(p, dev);
             p.refresh_battery_lights(&name, dev);
         }
     }
@@ -244,7 +410,7 @@ impl Engine {
         let studio = self.studio.borrow();
         for dev in wired_boards.filter(|d| !studio.is_streaming(&d.key())) {
             let p = store.for_device(dev);
-            let name = p.effective(self.foreground()).to_string();
+            let name = self.current(p, dev);
             p.refresh_frame(&name, dev);
         }
     }
@@ -259,7 +425,7 @@ impl Engine {
         let laptops = self.devices.iter().filter(|d| d.spec.as_ref().is_some_and(|s| s.kind == secbird_core::Kind::Laptop));
         for dev in laptops {
             let p = store.for_device(dev);
-            let name = p.effective(self.foreground()).to_string();
+            let name = self.current(p, dev);
             let stays_lit = Dimming::StaysLit.to_string();
             if p.profiles.get(&name).is_some_and(|p| p.dimming.as_deref() == Some(stays_lit.as_str())) {
                 let _ = dev.dimming();
@@ -415,6 +581,16 @@ impl Engine {
             })
             .collect();
         self.synapse = secbird_core::debloat::synapse_running();
+        // Synapse puts devices in driver mode and leaves them there when it stops; a mouse
+        // in driver mode ignores its own remaps. Only when Synapse isn't running, so the two
+        // never fight over the mode. A device that doesn't answer the mode is left alone.
+        if self.synapse.is_empty() {
+            for dev in &self.devices {
+                if dev.leave_driver_mode().unwrap_or(false) && !self.released.contains(&dev.key()) {
+                    self.released.push(dev.key());
+                }
+            }
+        }
         if self.listed() != listed_before {
             self.list_seq += 1;
         }
@@ -462,13 +638,16 @@ impl Engine {
 
     /// The profile a device shows right now (see [`Engine::set_foreground`]).
     pub fn effective_profile(&self, dev: &Device) -> String {
-        Self::store().map(|mut s| s.for_device(dev).effective(self.foreground()).to_string()).unwrap_or_default()
+        Self::store().map(|mut s| self.current(s.for_device(dev), dev)).unwrap_or_default()
     }
 
     /// Apply the current profile of each listed device (by [`Device::key`]): the one tied
     /// to the program in front, else the active one.
     pub fn apply(&self, keys: &[String]) -> Vec<ApplyReport> {
         self.studio.borrow_mut().restart(keys);
+        if !keys.is_empty() {
+            self.hush_dpi();
+        }
         let mut store = Self::store();
         self.devices
             .iter()
@@ -479,12 +658,15 @@ impl Engine {
                     // Lights stay down while away (a lock screen in front switches profiles);
                     // this copy of the store is never saved.
                     p.lighting_off |= self.away.is_some();
-                    let name = p.effective(self.foreground()).to_string();
-                    let failures = p
+                    let name = self.current(p, dev);
+                    let mut failures: Vec<String> = p
                         .apply(&name, dev)
                         .into_iter()
                         .filter_map(|a| a.result.err().map(|e| format!("{}: {e}", a.setting)))
                         .collect();
+                    if let Some(Err(e)) = self.send_profile_button(p, &name, dev) {
+                        failures.push(format!("profile button: {e}"));
+                    }
                     ApplyReport { device: dev.name(), profile: name, failures }
                 }
                 Err(e) => ApplyReport {
@@ -507,15 +689,19 @@ impl Engine {
             .filter(|d| !skip.contains(&d.key()))
             .filter_map(|dev| {
                 let p = store.for_device(dev);
-                let name = p.effective(self.foreground()).to_string();
-                if !p.buttons_lost(&name, dev) {
+                let name = self.current(p, dev);
+                let button_lost = self.takes_profile_button(p, &name, dev) && !dev.profile_button_is_next();
+                if !p.buttons_lost(&name, dev) && !button_lost {
                     return None;
                 }
-                let failures = p
+                let mut failures: Vec<String> = p
                     .apply_buttons(&name, dev)
                     .into_iter()
                     .filter_map(|a| a.result.err().map(|e| format!("{}: {e}", a.setting)))
                     .collect();
+                if let Some(Err(e)) = self.send_profile_button(p, &name, dev) {
+                    failures.push(format!("profile button: {e}"));
+                }
                 Some((dev.key(), ApplyReport { device: self.label(dev), profile: name, failures }))
             })
             .collect()
@@ -548,6 +734,8 @@ impl Engine {
         let mut store = Self::store()?;
         store.for_device(dev).switch(name)?;
         store.save()?;
+        // A pick in the menu or the editor ends a profile-button pick.
+        self.manual.borrow_mut().remove(key);
         Ok(self.apply(&[key.to_string()]))
     }
 
@@ -563,7 +751,7 @@ impl Engine {
         let path = config_dir().join("profiles.json");
         let ended = {
             let mut studio = self.studio.borrow_mut();
-            studio.tick(&self.devices, self.foreground(), &path, self.away.is_some(), paused);
+            studio.tick(&self.devices, self.foreground(), &self.manual.borrow(), &path, self.away.is_some(), paused);
             for key in std::mem::take(&mut studio.gave_up) {
                 secbird_core::log::append(&format!("lighting: {} stopped taking frames, trying again every 5 s", self.names(&[key])));
             }

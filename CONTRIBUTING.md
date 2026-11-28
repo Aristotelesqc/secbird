@@ -168,6 +168,7 @@ crates/
 | `editor.html` | The whole editor: markup, CSS and script in one file |
 | `apps.rs` | Which program is in front, for per-game profiles |
 | `osd.rs` | The small DPI and profile popups |
+| `theme.rs`, `app.manifest` | Tray icon for the taskbar's theme and scale, dark menu, per-screen DPI (icons: `tools/make-tray-icons.ps1`) |
 | `studio.rs`, `sensors.rs`, `input.rs` | RGB Studio's frame timer, audio/screen sensors, key presses |
 | `settings.rs` | The tray's own settings |
 
@@ -206,6 +207,12 @@ $env:SECBIRD_SIM = "all"                 # or a list: "mouse,keyboard,headset"
 
 It prints a local URL; open it in a browser. `secbird list` and `secbird report` see the
 same simulated devices. The presets are listed in `sim.rs` (`PRESETS`).
+
+To try the tray itself (icon, menu, popups) while your own tray runs with your real devices,
+add `$env:SECBIRD_SIM_ONLY = "1"` and start it without `--serve`. It then leaves real hardware
+alone, sees only the simulated devices, and uses its own single-instance lock, so it runs
+beside the real tray. Don't tick "Start with Windows" in that one: it would point autostart at
+your build.
 
 If you edit `editor.html`, check its script still parses, because a single duplicate name
 blanks the whole page:

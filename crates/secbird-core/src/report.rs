@@ -154,7 +154,7 @@ pub fn build(api: &HidApi, db: &Db) -> Report {
     let mut interfaces = Vec::new();
     let mut devices = Vec::new();
 
-    let mut infos: Vec<_> = api.device_list().filter(|d| d.vendor_id() == RAZER_VID).collect();
+    let mut infos: Vec<_> = api.device_list().filter(|d| d.vendor_id() == RAZER_VID && !crate::sim::only()).collect();
     infos.sort_by_key(|d| (d.product_id(), d.interface_number(), d.usage_page(), d.usage()));
     infos.dedup_by(|a, b| a.path() == b.path());
 

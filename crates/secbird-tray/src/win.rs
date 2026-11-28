@@ -2,7 +2,7 @@ use crate::engine::{ApplyReport, Battery, Engine, LightsRetry, DIM_FOR, RELIGHT_
 use secbird_core::{log, Kind};
 use std::collections::{HashMap, HashSet};
 use crate::settings::{autostart_enabled, open_config_folder, set_autostart, TraySettings};
-use crate::{apps, osd, server};
+use crate::{apps, osd, server, theme};
 use std::ffi::CString;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use secbird_core::update::Release;
@@ -21,6 +21,9 @@ use windows_sys::Win32::System::RemoteDesktop::{WTSRegisterSessionNotification, 
 use windows_sys::Win32::System::SystemServices::GUID_CONSOLE_DISPLAY_STATE;
 use windows_sys::Win32::System::Threading::CreateMutexW;
 use windows_sys::Win32::UI::Accessibility::{SetWinEventHook, HWINEVENTHOOK};
+use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
+    RegisterHotKey, UnregisterHotKey, MOD_ALT, MOD_CONTROL, MOD_NOREPEAT, MOD_SHIFT, VK_F24,
+};
 use windows_sys::Win32::UI::Shell::*;
 use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
@@ -42,7 +45,33 @@ const WM_UPDATE_INSTALL: u32 = WM_APP + 7;
 const WM_START_UPDATE: u32 = WM_APP + 8;
 /// Sent by the editor's server after it rescanned by itself: who is asleep may have changed.
 const WM_RESCANNED: u32 = WM_APP + 9;
+/// Development: sent by `secbird-tray --sim-event` to a tray with `SECBIRD_SIM_ONLY=1`, to
+/// make a simulated device do what a real one does by itself ([`send_sim_events`]).
+const WM_SIM_EVENT: u32 = WM_APP + 10;
+const SIM_DPI_BUTTON: usize = 1;
+const SIM_DPI: usize = 2;
+const SIM_ONBOARD: usize = 3;
+const SIM_MENU: usize = 4;
+const SIM_PROFILE_BUTTON: usize = 5;
+/// The hotkey the mouse's profile button sends ([`secbird_core::buttons::PROFILE_NEXT`]).
+const HOTKEY_PROFILE_NEXT: i32 = 1;
 const CLASS_NAME: &str = "SecretarybirdTray";
+const MUTEX_NAME: &str = "Local\\Secretarybird.Tray";
+/// Development, with `SECBIRD_SIM_ONLY=1` (see [`secbird_core::sim::only`]): a tray that only
+/// sees simulated devices gets its own lock and window class, so it runs beside the real
+/// one and neither hands the other its editor.
+const SIM_ONLY_CLASS_NAME: &str = "SecretarybirdTraySimOnly";
+const SIM_ONLY_MUTEX_NAME: &str = "Local\\Secretarybird.Tray.SimOnly";
+
+/// The tray window class this process talks to: a SECBIRD_SIM_ONLY editor never reaches
+/// the real tray beside it.
+fn own_class() -> &'static str {
+    if secbird_core::sim::only() {
+        SIM_ONLY_CLASS_NAME
+    } else {
+        CLASS_NAME
+    }
+}
 const TIMER_RESCAN: usize = 1;
 /// Extra rescans after start and wake: devices often answer late at boot.
 const TIMER_RETRY: usize = 2;
@@ -108,6 +137,10 @@ const GUID_DEVINTERFACE_HID: GUID = GUID::from_u128(0x4d1e55b2_f16f_11cf_88cb_00
 
 /// "TaskbarCreated" is broadcast when Explorer restarts; the icon must be re-added.
 static TASKBAR_CREATED: AtomicU32 = AtomicU32::new(0);
+/// The icon in the notification area, owned here: swapped when the theme or the scale changes.
+/// Not in `App`: theme and scale changes are sent messages, which can come in while `App` is
+/// borrowed.
+static TRAY_ICON: AtomicPtr<c_void> = AtomicPtr::new(null_mut());
 /// The tray window, for the foreground hook (which gets no user data).
 static TRAY_HWND: AtomicPtr<c_void> = AtomicPtr::new(null_mut());
 /// Index into RETRY_DELAYS_MS of the next retry, and how many times the retries were started
@@ -129,7 +162,6 @@ static RETRY_IF_ASLEEP: AtomicBool = AtomicBool::new(false);
 
 struct App {
     hwnd: HWND,
-    icon: HICON,
     /// Shared with the editor's server thread.
     engine: Arc<Mutex<Engine>>,
     /// Started on first use; holds the tokenized URL.
@@ -178,7 +210,13 @@ struct App {
     input_woke: bool,
     /// How many more times input may start one (see [`INPUT_WAKES`]).
     input_wakes_left: u8,
+    /// The last on-board profile popup: (device key, slot, when). The DPI report that
+    /// follows it goes into it instead of replacing it.
+    onboard_shown: Option<(String, u8, std::time::Instant)>,
 }
+
+/// How long after an on-board profile switch a DPI report is taken as part of it.
+const ONBOARD_DPI_FOR: Duration = Duration::from_millis(600);
 
 /// A device in [`App::asleep`].
 struct Sleeper {
@@ -200,7 +238,7 @@ static REQUESTED_UPDATE: Mutex<Option<Release>> = Mutex::new(None);
 /// and shows its progress. `false` when no tray is running (the editor alone, `--serve`).
 pub fn request_update(r: Release) -> bool {
     unsafe {
-        let tray = FindWindowW(wide(CLASS_NAME).as_ptr(), null());
+        let tray = FindWindowW(wide(own_class()).as_ptr(), null());
         if tray.is_null() {
             return false;
         }
@@ -213,7 +251,7 @@ pub fn request_update(r: Release) -> bool {
 /// the tray follow who is asleep now. Nothing to do when no tray is running (`--serve`).
 pub fn rescanned() {
     unsafe {
-        let tray = FindWindowW(wide(CLASS_NAME).as_ptr(), null());
+        let tray = FindWindowW(wide(own_class()).as_ptr(), null());
         if !tray.is_null() {
             PostMessageW(tray, WM_RESCANNED, 0, 0);
         }
@@ -242,7 +280,7 @@ fn now_secs() -> u64 {
 /// Something a device did by itself, reported on its event collection.
 enum DeviceEvent {
     Dpi { key: String, x: u16, y: u16 },
-    OnboardProfile(u8),
+    OnboardProfile { key: String, slot: u8 },
 }
 
 /// Listener threads only block on a read, so a small stack is plenty.
@@ -274,10 +312,12 @@ fn copy_wide(dst: &mut [u16], s: &str) {
 
 pub fn run() {
     unsafe {
-        let _mutex = CreateMutexW(null(), 0, wide("Local\\Secretarybird.Tray").as_ptr());
+        let sim_only = secbird_core::sim::only();
+        let (class_name, mutex_name) = if sim_only { (SIM_ONLY_CLASS_NAME, SIM_ONLY_MUTEX_NAME) } else { (CLASS_NAME, MUTEX_NAME) };
+        let _mutex = CreateMutexW(null(), 0, wide(mutex_name).as_ptr());
         if GetLastError() == ERROR_ALREADY_EXISTS {
-            let running = FindWindowW(wide(CLASS_NAME).as_ptr(), null());
-            if std::env::var_os("SECBIRD_SIM").is_some() {
+            let running = FindWindowW(wide(class_name).as_ptr(), null());
+            if std::env::var_os("SECBIRD_SIM").is_some() && !sim_only {
                 let text = wide(
                     "Secretarybird is already running, so SECBIRD_SIM has no effect.
 
@@ -303,7 +343,7 @@ pub fn run() {
         };
 
         let hinstance = GetModuleHandleW(null());
-        let class = wide(CLASS_NAME);
+        let class = wide(class_name);
         let wc = WNDCLASSW {
             lpfnWndProc: Some(wndproc),
             hInstance: hinstance,
@@ -345,8 +385,9 @@ pub fn run() {
             WINEVENT_OUTOFCONTEXT,
         );
 
-        let icon = load_icon();
-        add_icon(hwnd, icon);
+        // Dark menu when apps are dark, then the icon for the taskbar's theme and scale.
+        theme::dark_menus(hwnd);
+        show_icon(hwnd, true);
         let (events_tx, events) = channel();
         let (firmware_tx, firmware) = channel();
         let (updates_tx, updates) = channel();
@@ -354,7 +395,6 @@ pub fn run() {
         APP.with(|cell| {
             *cell.borrow_mut() = Some(App {
                 hwnd,
-                icon,
                 engine: Arc::new(Mutex::new(engine)),
                 editor_url: None,
                 profile_items: Vec::new(),
@@ -383,9 +423,20 @@ pub fn run() {
                 asleep: Vec::new(),
                 input_woke: false,
                 input_wakes_left: INPUT_WAKES,
+                onboard_shown: None,
             })
         });
         log::append("tray started");
+        // The mouse's profile button sends this combo (see `buttons::PROFILE_NEXT`); the tray
+        // takes profile buttons only while it holds the hotkey. A SECBIRD_SIM_ONLY tray leaves
+        // the real hotkey to the real tray beside it, and drives its simulated mice with
+        // `--sim-event profile-button`.
+        let held = secbird_core::sim::only()
+            || RegisterHotKey(hwnd, HOTKEY_PROFILE_NEXT, MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, VK_F24 as u32) != 0;
+        if !held {
+            log::append("profile button: Ctrl+Alt+Shift+F24 is taken by another program, so the button keeps its own setting");
+        }
+        with_app(|app| app.engine().set_profile_hotkey(held));
         with_app(|app| app.announce_updated());
         with_app(|app| app.rescan());
         start_retries(hwnd, false);
@@ -431,6 +482,10 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             with_app(|app| app.device_events());
             0
         }
+        WM_HOTKEY if wparam as i32 == HOTKEY_PROFILE_NEXT => {
+            with_app(|app| app.profile_button());
+            0
+        }
         WM_FIRMWARE => {
             with_app(|app| app.firmware_news());
             0
@@ -447,6 +502,10 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             if let Some(r) = REQUESTED_UPDATE.lock().unwrap_or_else(|p| p.into_inner()).take() {
                 with_app(|app| app.start_update(r));
             }
+            0
+        }
+        WM_SIM_EVENT if secbird_core::sim::only() => {
+            with_app(|app| app.sim_event(wparam, lparam as usize));
             0
         }
         WM_RESCANNED => {
@@ -636,15 +695,30 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             0
         }
         WM_DESTROY => {
-            with_app(|app| remove_icon(app.hwnd));
+            with_app(|app| {
+                remove_icon(app.hwnd);
+                // No tray to catch the profile button's combo: it cycles on-board slots again.
+                UnregisterHotKey(app.hwnd, HOTKEY_PROFILE_NEXT);
+                app.engine().release_profile_buttons();
+            });
             PostQuitMessage(0);
             0
         }
         m if m != 0 && m == TASKBAR_CREATED.load(Ordering::Relaxed) => {
-            with_app(|app| {
-                add_icon(app.hwnd, app.icon);
-                app.update_tooltip();
-            });
+            // Explorer restarted, maybe at another scale: load the icon again.
+            show_icon(hwnd, true);
+            with_app(|app| app.update_tooltip());
+            0
+        }
+        // Light or dark theme changed: the menu and the icon follow.
+        WM_SETTINGCHANGE if theme::is_theme_change(lparam) => {
+            theme::dark_menus(hwnd);
+            show_icon(hwnd, false);
+            0
+        }
+        // Scale or screens changed: the icon at the new size.
+        WM_DPICHANGED | WM_DISPLAYCHANGE => {
+            show_icon(hwnd, false);
             0
         }
         _ => DefWindowProcW(hwnd, msg, wparam, lparam),
@@ -704,22 +778,30 @@ impl App {
 
     fn rescan(&mut self) {
         let apply_all = std::mem::take(&mut self.apply_all_pending);
-        let (reports, new_names, gone, synapse) = {
+        let (reports, new_names, released_names, gone, synapse) = {
             let mut engine = self.engine();
             let before: Vec<(String, String)> = engine.devices().iter().map(|d| (d.key(), engine.label(d))).collect();
             let new = engine.rescan();
             let names: Vec<String> =
                 engine.devices().iter().filter(|d| new.contains(&d.key())).map(|d| engine.label(d)).collect();
+            // Out of driver mode: send the profile again, as for a device just plugged in.
+            let released = engine.take_released();
+            let released_names: Vec<String> =
+                engine.devices().iter().filter(|d| released.contains(&d.key())).map(|d| engine.label(d)).collect();
             let now = engine.all_keys();
             let gone: Vec<String> = before.into_iter().filter(|(key, _)| !now.contains(key)).map(|(_, name)| name).collect();
-            let targets = if apply_all { now } else { new };
-            (engine.apply(&targets), names, gone, engine.synapse().to_vec())
+            let mut targets = if apply_all { now } else { new };
+            targets.extend(released.into_iter().filter(|k| !targets.contains(k)).collect::<Vec<_>>());
+            (engine.apply(&targets), names, released_names, gone, engine.synapse().to_vec())
         };
         if !gone.is_empty() {
             log::append(&format!("gone: {}", gone.join(", ")));
         }
         if !new_names.is_empty() {
             log::append(&format!("found: {}", new_names.join(", ")));
+        }
+        if !released_names.is_empty() {
+            log::append(&format!("out of Synapse's driver mode, so its own button remaps work: {}", released_names.join(", ")));
         }
         self.follow_sleepers();
         self.notify_failures(&reports);
@@ -834,7 +916,7 @@ impl App {
                             x: u16::from_be_bytes([buf[2], buf[3]]),
                             y: u16::from_be_bytes([buf[4], buf[5]]),
                         },
-                        (3.., 0x05, 0x01) => DeviceEvent::OnboardProfile(buf[2]),
+                        (3.., 0x05, 0x01) => DeviceEvent::OnboardProfile { key: key.clone(), slot: buf[2] },
                         _ => continue,
                     };
                     if tx.send(event).is_err() {
@@ -850,22 +932,100 @@ impl App {
         }
     }
 
+    /// What devices did by themselves (their DPI or profile button): recorded, and shown in
+    /// the popup above the clock unless popups are off.
     fn device_events(&mut self) {
+        let popups = !TraySettings::load().popups_off;
         while let Ok(event) = self.events.try_recv() {
             match event {
                 DeviceEvent::Dpi { key, x, y } => {
-                    self.engine().dpi_changed(&key, x, y);
-                    if !TraySettings::load().popups_off {
-                        osd::show(&if x == y { format!("{x} DPI") } else { format!("{x} × {y} DPI") });
+                    let quiet = {
+                        let mut engine = self.engine();
+                        engine.dpi_changed(&key, x, y);
+                        engine.dpi_quiet()
+                    };
+                    // `quiet`: the device answering settings sent from here (a profile, the editor).
+                    if !popups || quiet {
+                        continue;
                     }
+                    // The on-board profile just changed, and this is its DPI: one popup.
+                    let onboard = self.onboard_shown.as_ref().filter(|(k, _, at)| *k == key && at.elapsed() < ONBOARD_DPI_FOR);
+                    if let Some(&(_, slot, _)) = onboard {
+                        let (device, count) = self.engine().onboard_popup(&key);
+                        osd::show(osd::Popup::onboard(slot, count, &device, Some((x, y))));
+                        continue;
+                    }
+                    let info = self.engine().dpi_popup(&key, x, y);
+                    osd::show(osd::Popup::dpi(x, y, info.max, info.stage, &info.device));
                 }
-                DeviceEvent::OnboardProfile(n) => {
-                    if !TraySettings::load().popups_off {
-                        osd::show(&format!("On-board profile {n}"));
+                DeviceEvent::OnboardProfile { key, slot } => {
+                    if popups {
+                        let (device, count) = self.engine().onboard_popup(&key);
+                        osd::show(osd::Popup::onboard(slot, count, &device, None));
+                        self.onboard_shown = Some((key, slot, std::time::Instant::now()));
                     }
                 }
             }
         }
+    }
+
+    /// Development, in a tray with `SECBIRD_SIM_ONLY=1` only: the simulated mouse does what a
+    /// real one does by itself, and it goes the way a real device's report goes.
+    fn sim_event(&mut self, what: usize, value: usize) {
+        let mouse = {
+            let engine = self.engine();
+            let mouse = engine.devices().iter().find(|d| d.spec.as_ref().is_some_and(|s| s.kind == Kind::Mouse));
+            mouse.map(|d| d.key())
+        };
+        let Some(key) = mouse else { return log::append("sim event: no simulated mouse") };
+        let event = match what {
+            // The DPI button: the next stage, which the mouse moves to by itself.
+            SIM_DPI_BUTTON => {
+                let engine = self.engine();
+                let Some(dev) = engine.devices().iter().find(|d| d.key() == key) else { return };
+                let Ok(mut stages) = dev.dpi_stages() else { return };
+                stages.active = stages.active % stages.stages.len().max(1) as u8 + 1;
+                let Ok(sent) = dev.set_dpi_stages(&stages) else { return };
+                let (x, y) = sent.stages[sent.active as usize - 1];
+                DeviceEvent::Dpi { key, x, y }
+            }
+            // A DPI that is no stage (the sniper button).
+            SIM_DPI => {
+                let engine = self.engine();
+                let Some(dev) = engine.devices().iter().find(|d| d.key() == key) else { return };
+                let Ok((x, y)) = dev.set_dpi(value as u16, (value >> 16) as u16) else { return };
+                DeviceEvent::Dpi { key, x, y }
+            }
+            SIM_ONBOARD => DeviceEvent::OnboardProfile { key, slot: value as u8 },
+            // The tray menu's profile item at this place, as if clicked.
+            SIM_MENU => {
+                unsafe { DestroyMenu(self.build_menu()) };
+                return self.handle_command(ID_PROFILE_BASE + value as u32);
+            }
+            // The profile button: what its hotkey does.
+            SIM_PROFILE_BUTTON => return self.profile_button(),
+            _ => return,
+        };
+        let _ = self.events_tx.send(event);
+        self.device_events();
+    }
+
+    /// The mouse's profile button (its hotkey): the next profile, shown in the popup over
+    /// whatever is in front, a game included.
+    fn profile_button(&mut self) {
+        let reports = self.engine().next_profile();
+        if reports.is_empty() {
+            return;
+        }
+        let what: Vec<String> = reports.iter().map(|r| format!("{} -> {}", r.device, r.profile)).collect();
+        log::append(&format!("profile button: {}", what.join(", ")));
+        if !TraySettings::load().popups_off {
+            let names: Vec<String> = reports.iter().map(|r| r.profile.clone()).collect();
+            let devices: Vec<String> = reports.iter().map(|r| r.device.clone()).collect();
+            osd::show(osd::Popup::profile(&names, &devices, osd::Why::Button));
+        }
+        self.notify_failures(&reports);
+        self.update_tooltip();
     }
 
     /// Switch devices to the profile tied to the program now in front, or back.
@@ -875,16 +1035,27 @@ impl App {
             return;
         }
         let exe = apps::foreground();
-        let reports = self.engine().set_foreground(exe.clone());
+        let (before, reports, now) = {
+            let mut engine = self.engine();
+            let before = engine.foreground().map(str::to_string);
+            let reports = engine.set_foreground(exe.clone());
+            (before, reports, engine.foreground().map(str::to_string))
+        };
         if reports.is_empty() {
             return;
         }
         let what: Vec<String> = reports.iter().map(|r| format!("{} -> {}", r.device, r.profile)).collect();
         log::append(&format!("{} in front: {}", exe.as_deref().unwrap_or("?"), what.join(", ")));
-        let mut names: Vec<&str> = reports.iter().map(|r| r.profile.as_str()).collect();
-        names.dedup();
         if !settings.popups_off {
-            osd::show(&format!("{} profile", names.join(", ")));
+            // Why: the program tied to the profile came to the front, or the one before left.
+            let why = match (&now, &before) {
+                (Some(exe), _) => osd::Why::Auto(exe),
+                (None, Some(exe)) => osd::Why::Back(exe),
+                (None, None) => osd::Why::Menu,
+            };
+            let names: Vec<String> = reports.iter().map(|r| r.profile.clone()).collect();
+            let devices: Vec<String> = reports.iter().map(|r| r.device.clone()).collect();
+            osd::show(osd::Popup::profile(&names, &devices, why));
         }
         self.notify_failures(&reports);
         self.update_tooltip();
@@ -981,7 +1152,7 @@ impl App {
             text.push_str("\nSynapse is running");
         }
         unsafe {
-            let mut nid = icon_data(self.hwnd, self.icon);
+            let mut nid = icon_data(self.hwnd);
             nid.uFlags = NIF_TIP;
             copy_wide(&mut nid.szTip, &text);
             Shell_NotifyIconW(NIM_MODIFY, &nid);
@@ -1014,7 +1185,7 @@ impl App {
     fn notify_click(&self, title: &str, body: &str, icon: NOTIFY_ICON_INFOTIP_FLAGS, click: Option<Click>) {
         self.balloon_click.replace(click);
         unsafe {
-            let mut nid = icon_data(self.hwnd, self.icon);
+            let mut nid = icon_data(self.hwnd);
             nid.uFlags = NIF_INFO;
             nid.dwInfoFlags = icon;
             copy_wide(&mut nid.szInfoTitle, title);
@@ -1329,7 +1500,18 @@ impl App {
                 if let Some((key, name)) = self.profile_items.get(idx).cloned() {
                     let result = self.engine().switch_profile(&key, &name);
                     match result {
-                        Ok(reports) => self.notify_failures(&reports),
+                        Ok(reports) => {
+                            // What was applied: a program in front with its own profile keeps it.
+                            if !TraySettings::load().popups_off {
+                                let mut names: Vec<String> = reports.iter().map(|r| r.profile.clone()).collect();
+                                if names.is_empty() {
+                                    names.push(name);
+                                }
+                                let devices: Vec<String> = reports.iter().map(|r| r.device.clone()).collect();
+                                osd::show(osd::Popup::profile(&names, &devices, osd::Why::Menu));
+                            }
+                            self.notify_failures(&reports);
+                        }
                         Err(e) => self.balloon("Could not switch profile", &e.to_string()),
                     }
                     self.update_tooltip();
@@ -1338,6 +1520,39 @@ impl App {
             _ => {}
         }
     }
+}
+
+/// Development: `secbird-tray --sim-event <event>...` makes the simulated mouse of a tray
+/// started with `SECBIRD_SIM_ONLY=1` do what a real mouse does by itself, to see the popups
+/// without one. Events, sent in turn: `dpi-button` (the next DPI stage), `dpi <x> [<y>]`
+/// (a DPI that is no stage), `onboard <slot>`, `menu <n>` (the tray menu's profile item n,
+/// from 0), `profile-button` (the mouse's profile button). A tray that sees real devices
+/// has another window class and never gets them.
+pub fn send_sim_events(args: &[String]) -> Result<(), String> {
+    let tray = unsafe { FindWindowW(wide(SIM_ONLY_CLASS_NAME).as_ptr(), null()) };
+    if tray.is_null() {
+        return Err("no tray with SECBIRD_SIM_ONLY=1 is running".into());
+    }
+    let number = |s: Option<&String>| s.and_then(|s| s.parse::<u16>().ok()).ok_or("a number is missing");
+    let mut args = args.iter().peekable();
+    while let Some(what) = args.next() {
+        let (kind, value) = match what.as_str() {
+            "dpi-button" => (SIM_DPI_BUTTON, 0),
+            "dpi" => {
+                let x = number(args.next())?;
+                let y = args.next_if(|s| s.parse::<u16>().is_ok()).map_or(Ok(x), |s| number(Some(s)))?;
+                (SIM_DPI, x as usize | (y as usize) << 16)
+            }
+            "onboard" => (SIM_ONBOARD, number(args.next())? as usize),
+            "menu" => (SIM_MENU, number(args.next())? as usize),
+            "profile-button" => (SIM_PROFILE_BUTTON, 0),
+            other => {
+                return Err(format!("unknown event {other}: dpi-button, dpi <x> [<y>], onboard <slot>, menu <n> or profile-button"))
+            }
+        };
+        unsafe { PostMessageW(tray, WM_SIM_EVENT, kind, value as LPARAM) };
+    }
+    Ok(())
 }
 
 /// Open a web page in the default browser.
@@ -1364,25 +1579,36 @@ unsafe fn show_menu(hwnd: HWND) {
     }
 }
 
-unsafe fn icon_data(hwnd: HWND, icon: HICON) -> NOTIFYICONDATAW {
+unsafe fn icon_data(hwnd: HWND) -> NOTIFYICONDATAW {
     let mut nid: NOTIFYICONDATAW = zeroed();
     nid.cbSize = size_of::<NOTIFYICONDATAW>() as u32;
     nid.hWnd = hwnd;
     nid.uID = 1;
     nid.uCallbackMessage = WM_TRAY;
-    nid.hIcon = icon;
+    nid.hIcon = TRAY_ICON.load(Ordering::Relaxed);
     nid
 }
 
-unsafe fn add_icon(hwnd: HWND, icon: HICON) {
-    let mut nid = icon_data(hwnd, icon);
-    nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-    copy_wide(&mut nid.szTip, APP_NAME);
-    Shell_NotifyIconW(NIM_ADD, &nid);
+/// Load the icon for the taskbar's theme and the screen's scale, and show it: added when
+/// `add` (at start, and after Explorer restarts), else swapped in place.
+unsafe fn show_icon(hwnd: HWND, add: bool) {
+    let old = TRAY_ICON.swap(theme::tray_icon(hwnd), Ordering::Relaxed);
+    let mut nid = icon_data(hwnd);
+    if add {
+        nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+        copy_wide(&mut nid.szTip, APP_NAME);
+        Shell_NotifyIconW(NIM_ADD, &nid);
+    } else {
+        nid.uFlags = NIF_ICON;
+        Shell_NotifyIconW(NIM_MODIFY, &nid);
+    }
+    if !old.is_null() {
+        DestroyIcon(old);
+    }
 }
 
 unsafe fn remove_icon(hwnd: HWND) {
-    let nid = icon_data(hwnd, null_mut());
+    let nid = icon_data(hwnd);
     Shell_NotifyIconW(NIM_DELETE, &nid);
 }
 
@@ -1444,24 +1670,5 @@ fn set_clipboard(text: &str) -> bool {
         }
         GlobalFree(mem);
         false
-    }
-}
-
-
-/// The tray variant of the logo (white background, resource id 2 from build.rs), at the
-/// small-icon size Windows uses for the notification area. Resource 1 is the app icon.
-unsafe fn load_icon() -> HICON {
-    let icon = LoadImageW(
-        GetModuleHandleW(null()),
-        2 as _,
-        IMAGE_ICON,
-        GetSystemMetrics(SM_CXSMICON),
-        GetSystemMetrics(SM_CYSMICON),
-        LR_DEFAULTCOLOR,
-    );
-    if icon.is_null() {
-        LoadIconW(null_mut(), IDI_APPLICATION)
-    } else {
-        icon as HICON
     }
 }

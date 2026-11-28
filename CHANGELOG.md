@@ -1,5 +1,106 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **Mouse editor.** Mice open on a new screen in the editor:
+  - the profile list on the left;
+  - a drawing of the mouse whose buttons you click;
+  - the actions for the picked button on the right, by category (mouse, keyboard shortcut,
+    Windows shortcut, sensitivity, media, macro, turbo, HyperShift);
+  - a Standard / HyperShift switch, and a List view that shows both layers side by side;
+  - tabs for Performance (DPI stages, polling, scroll, sleep), Lighting (click a zone on the
+    drawing) and Macros.
+
+  A button marks it as changed with a dot, not only with a colour. Profiles are deleted from
+  their own card, after a confirmation in the page. The classic tiles are one click away
+  ("Classic view"). Every change goes through the same calls as before and is saved to the live
+  profile at once. Tested on a Basilisk V3 (0099) with three profiles, and on the simulator
+  (`SECBIRD_SIM=all`). The drawing is original, with no Razer artwork.
+- **French editor.** Settings → Editor → Language: Français, or "system language" on a French
+  Windows. Covers every message the editor has.
+- **The mouse's profile button switches Secretarybird profiles.** Out of Synapse's driver
+  mode, the button under the mouse only cycled its on-board slots, so on a mouse with one slot
+  it did nothing. While the tray runs, it now moves that mouse to its next profile (in the
+  tray menu's order), and the popup shows which one is in use. With a game in front that has
+  its own profile, the pick holds until another program comes to the front. A profile that
+  sets the button to something else keeps it; "Next Secretarybird profile" is also in the
+  editor's actions (Profiles), for any button. Behind it, the button sends Ctrl+Alt+Shift+F24,
+  a combo no keyboard has, which the tray takes as a hotkey; on exit the button goes back to
+  its own setting. Tested with the simulated mouse (three profiles, the popup, the editor);
+  not yet on a real mouse, and the pick over a game's profile only by reading the code.
+- **Clearer DPI and profile popups.** The small popup above the clock is now a card in
+  Windows' light or dark theme: a DPI change shows the DPI in large type, a bar in Windows'
+  accent colour filled up to the mouse's highest DPI, the stage ("Stage 2 of 5") and the
+  mouse's name; a profile change shows the profile, the device and why ("Auto · game.exe",
+  "Auto · back from game.exe"); an on-board profile change shows its number and the DPI that
+  came with it. It now also shows when you pick a profile in the tray menu, but not for changes
+  made in the editor, on plug-in or wake. It shows over full-screen windows and borderless
+  games, but not over a game in exclusive full screen (it would knock it out of that mode)
+  nor in presentation mode. It fades in and out (at once when Windows' animation effects are off), and a second
+  press updates it in place. Tested on Windows 11 (build 26300) at 150 % with the simulated
+  mouse, in dark and light; not yet with a real mouse's buttons, on several screens or over a
+  full-screen game.
+
+### Fixed
+- **The editor no longer flattens a mouse's separate X and Y DPI.** Changing the DPI or a DPI
+  stage used to set both axes to the same value, so a mouse at 1150 × 1050 silently became
+  1150 × 1150. X and Y stay linked by default, with one control as before; untick **Link X and
+  Y** (remembered per mouse), or open a mouse that already has different values, to get separate
+  X (horizontal) and Y (vertical) fields. Ticking the link writes nothing; the next change sets
+  both axes. DPI shows as `1150 × 1050` wherever it differs. A DPI or stage change also goes to
+  the mouse it was made on, even if you switch devices before it completes. Idea from
+  Xnmk029's fork (upstream PR #55) and the upstream maintainer's review of it. Tested with the
+  simulated mice (with and without stages), mouse editor and classic view, dark and light, at
+  1366, 900 and 375 px; not yet on a real mouse.
+- **Sharp, dark tray menu and a tray icon that follows the theme.** The right-click menu was
+  drawn at 100 % and stretched, so it looked blurry on a screen at 125 % or more; it is now sharp
+  at any scale, and dark when Windows apps are dark. The icon is the bird alone, white on a dark
+  taskbar and dark on a light one, switching when the theme changes, at the screen's own size
+  instead of a stretched 16 px. The DPI and profile popups are sharp too. Tested on Windows 11
+  (build 26300) at 150 % in dark mode, with simulated devices; the light theme and other scales
+  are untested.
+- Turbo on the middle button, back, forward and the four scroll directions shows its rate and
+  can be changed in the editor; only left and right click turbo were recognised.
+- **Button remaps that did nothing after Synapse.** Synapse puts a mouse in "driver mode",
+  where it leaves its buttons to Synapse and ignores its own remaps, and leaves it there when
+  it stops. The tray now puts such a device back in normal mode whenever it looks for devices
+  (start, plug-in, wake, "Apply again") while Synapse isn't running, sends its profile again,
+  and says so in the log. While Synapse runs, the mode is left to it. Found on a Basilisk V3
+  (0099) whose remaps read back correctly but did nothing, after Synapse was turned off; a
+  replug fixed it by hand. The new code is tested on the simulated mouse; on the real one, only
+  that a mouse already in normal mode is left as it is.
+- **"Restore all" asks first and can be undone.** One click on it used to put every remapped
+  button of the profile back at once, so a stray click wiped a profile's remaps. It now asks in
+  place ("Put 8 remapped buttons of PC back to what the mouse stores?"), and the message after
+  it has an Undo button for 10 seconds that sends every remap again. Tested in the editor with
+  the simulated mouse (`SECBIRD_SIM=all`).
+
+### Changed
+- **Mouse editor, second round** (#6). Tested in the editor with the simulated mouse
+  (`SECBIRD_SIM=all`), in French, dark and light, at 1366x768, 900 px and 375 px wide; not yet
+  with a real mouse.
+  - **Lighter labels on the drawing** (#7): each button's name and action as plain text, with
+    the box only on hover, focus and selection. Long actions wrap onto a second line instead of
+    being cut at 29 characters, and the leader lines are easier to see.
+  - **Less empty space** above the mouse drawing (#8).
+  - **Narrow windows** (#9): from 820 to 980 px the panel on the right slides in over the
+    drawing when a button is picked, with a close button and Escape; under 820 px the buttons
+    show as a list and the panel opens from the bottom.
+  - **HyperShift help** (#10): a "?" beside Standard / HyperShift explains it, the hint names
+    the button that holds HyperShift, and the HyperShift layer warns, with a shortcut, when no
+    button holds it. The scroll wheel settings also show under the drawing, and the toolbar no
+    longer changes height between tabs.
+  - **"Restore all" set apart**: at the far end of the toolbar, in red, after a separator, away
+    from "On-board memory…" (the button that was "Saved on the mouse…").
+  - **Keyboard** (#12): the tabs follow the arrow keys, Home and End; each DPI stage has a real
+    "use this stage" choice, a larger remove button and Undo after a removal; List view rows
+    move with the arrow keys and open with Space. The macro buttons say what they do ("Record
+    steps", "Write to device").
+  - **No more browser dialogs** (#13): deleting a profile in the classic view and in Compare,
+    the first "Save to mouse" and Settings → "Restore all" ask inside the page, with Cancel
+    focused and Escape to cancel. The classic view shows delete once, on the profile bar.
+
 ## [0.6.1] - 2026-11-21
 
 ### Added

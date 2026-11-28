@@ -9,7 +9,9 @@ test('automatic language follows the first browser preference, with English fall
   assert.equal(i18n.resolveLanguage('auto', ['zh-CN', 'en']), 'zh-CN');
   assert.equal(i18n.resolveLanguage('auto', ['zh-TW']), 'zh-CN');
   assert.equal(i18n.resolveLanguage('auto', ['en', 'zh-CN']), 'en');
-  assert.equal(i18n.resolveLanguage('auto', ['fr']), 'en');
+  assert.equal(i18n.resolveLanguage('auto', ['fr-CA', 'en']), 'fr');
+  assert.equal(i18n.resolveLanguage('auto', ['de']), 'en');
+  assert.equal(i18n.resolveLanguage('fr', ['en']), 'fr');
   assert.equal(i18n.resolveLanguage('auto', []), 'en');
   assert.equal(i18n.resolveLanguage('en', ['zh-CN']), 'en');
   assert.equal(i18n.resolveLanguage('zh-CN', ['en']), 'zh-CN');
@@ -60,9 +62,14 @@ test('localization preserves button action encoding and round trips', () => {
   const helpers = html.slice(html.indexOf('function splitAction('), html.indexOf('// Plain words for any action text.'));
   const { splitAction, joinAction } = vm.runInNewContext(helpers + '\n({splitAction, joinAction})');
   for (const action of ['key:ctrl+shift+f13', 'turbo:key:alt+tab@9', 'turbo:left@15',
-    'dpi-clutch:400', 'macro:7@hold', 'macro:9@toggle', 'hypershift', 'scroll-mode:1']) {
+    'dpi-clutch:400', 'macro:7@hold', 'macro:9@toggle', 'hypershift', 'scroll-mode:1',
+    'turbo:right@7', 'turbo:middle@20', 'turbo:back@5', 'turbo:forward@5', 'turbo:scroll-up@12',
+    'turbo:scroll-down@1', 'turbo:scroll-left@50', 'turbo:scroll-right@30']) {
     assert.equal(joinAction(...splitAction(action)), action);
   }
+  // Turbo scrolls are recognised (a choice and a rate), not passed through as raw text.
+  assert.deepEqual([...splitAction('turbo:scroll-left@50')], ['turbo-scroll-left', '', '50']);
+  assert.equal(joinAction('turbo-scroll-left', '', '12'), 'turbo:scroll-left@12');
 });
 
 test('localization does not change CSS class tokens or keyboard event identifiers', () => {
@@ -72,3 +79,70 @@ test('localization does not change CSS class tokens or keyboard event identifier
   assert.match(html, /className: 'tile' \+ \(changed \? ' changed' : ''\)/);
   assert.match(html, /className: 'cell' \+ \(changed \? ' changed' : ''\)/);
 });
+
+test('French covers every editor message and keeps placeholders', () => {
+  const fr = i18n.create({ preference: 'fr' });
+  assert.equal(fr.text('Underglow'), 'Dessous');
+  assert.equal(fr.text`Sniper · ${400} DPI`, 'Sniper · 400 DPI');
+  assert.equal(fr.text`Put ${fr.plural(8, 'remapped button')} of ${'PC'} back to what the ${'la souris'} stores?`,
+    'Remettre 8 boutons réassignés de « PC » à ce que garde la souris ?');
+  assert.equal(fr.plural(1, 'button'), '1 bouton');
+  assert.equal(fr.plural(3, 'DPI stage'), '3 paliers DPI');
+  for (const [source, translated] of Object.entries(i18n.frMessages)) {
+    const available = new Set(source.match(/\{\d+\}/g) || []);
+    for (const placeholder of translated.match(/\{\d+\}/g) || []) assert.ok(available.has(placeholder), `${source}: invented ${placeholder}`);
+  }
+  const html = fs.readFileSync(path.join(__dirname, '../src/editor.html'), 'utf8');
+  const keys = [...html.matchAll(/uiText\(\s*'((?:[^'\\]|\\.)*)'\s*\)/g)].map(m => m[1].replace(/\\'/g, "'"));
+  // Tagged templates (uiText`Stage ${n} in use`) are looked up as 'Stage {0} in use'.
+  const templates = templateKeys(html);
+  assert.ok(templates.length > 10, 'found the tagged templates');
+  const missing = [...keys, ...templates].filter(k => !(k in i18n.frMessages));
+  assert.deepEqual(missing, [], 'untranslated: ' + missing.join(' | '));
+});
+
+// The table keys of every uiText`...` in `src`: each ${...} becomes {0}, {1}, ... Follows
+// nested braces, strings and templates inside the ${...}.
+function templateKeys(src) {
+  const keys = [];
+  let i = 0;
+  while ((i = src.indexOf('uiText`', i)) !== -1) {
+    i += 'uiText`'.length;
+    let key = '', n = 0;
+    while (i < src.length && src[i] !== '`') {
+      if (src[i] === '\\') { key += src[i + 1]; i += 2; continue; }
+      if (src[i] === '$' && src[i + 1] === '{') { i = skipExpression(src, i + 2); key += `{${n++}}`; continue; }
+      key += src[i++];
+    }
+    i++;
+    keys.push(key);
+  }
+  return keys;
+}
+// Past the `}` that closes a ${ whose body starts at `i`.
+function skipExpression(src, i) {
+  let depth = 1;
+  while (i < src.length) {
+    const c = src[i];
+    if (c === '`') { i = skipTemplate(src, i + 1); continue; }
+    if (c === '\'' || c === '"') {
+      i++;
+      while (i < src.length && src[i] !== c) i += src[i] === '\\' ? 2 : 1;
+      i++;
+      continue;
+    }
+    if (c === '{') depth++;
+    else if (c === '}' && --depth === 0) return i + 1;
+    i++;
+  }
+  return i;
+}
+// Past the closing backtick of a template whose body starts at `i`.
+function skipTemplate(src, i) {
+  while (i < src.length && src[i] !== '`') {
+    if (src[i] === '\\') { i += 2; continue; }
+    if (src[i] === '$' && src[i + 1] === '{') { i = skipExpression(src, i + 2); continue; }
+    i++;
+  }
+  return i + 1;
+}

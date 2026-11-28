@@ -20,6 +20,8 @@ mod settings;
 #[cfg(windows)]
 mod studio;
 #[cfg(windows)]
+mod theme;
+#[cfg(windows)]
 mod win;
 
 #[cfg(windows)]
@@ -29,6 +31,16 @@ fn main() {
     // tray, e.g. with SECBIRD_SIM devices. Debug builds have a console for the URL.
     if std::env::args().any(|a| a == "--serve") {
         return serve();
+    }
+    // Development: the simulated mouse of a `SECBIRD_SIM_ONLY=1` tray presses its DPI
+    // button and the like, to see the popups (see `win::send_sim_events`).
+    let args: Vec<String> = std::env::args().collect();
+    if let Some(at) = args.iter().position(|a| a == "--sim-event") {
+        if let Err(e) = win::send_sim_events(&args[at + 1..]) {
+            eprintln!("{e}");
+            std::process::exit(1);
+        }
+        return;
     }
     win::run();
 }

@@ -330,6 +330,26 @@ const FN_SCROLL_MODE: u8 = 18;
 /// Synapse's default turbo rate.
 pub const DEFAULT_TURBO_RATE: u8 = 7;
 
+/// "Next Secretarybird profile": the mouse sends Ctrl+Alt+Shift+F24, a combo no keyboard
+/// has, and the tray (which registers it as a hotkey) moves that mouse to its next
+/// profile. Named `secbird-profile-next` in profiles.json and the CLI. Synapse did the
+/// same job in driver mode; out of it, the mouse's own profile button only cycles its
+/// on-board slots, which a mouse with one slot can't.
+pub const PROFILE_NEXT: Action = Action::Key { modifiers: 0x07, usage: 0x73 };
+pub const PROFILE_NEXT_NAME: &str = "secbird-profile-next";
+/// The profile button's id ([`BUTTONS`]).
+pub const PROFILE_BUTTON_ID: u8 = 14;
+
+impl Action {
+    /// A firmware profile action: what a mouse's profile button holds from the factory.
+    pub fn is_onboard_profile(&self) -> bool {
+        matches!(
+            self,
+            Action::ProfileUp | Action::ProfileDown | Action::ProfileCycleUp | Action::ProfileCycleDown | Action::ProfileSlot(_)
+        )
+    }
+}
+
 fn interval_ms(rate: u8) -> [u8; 2] {
     (1000 / u16::from(rate.max(1))).to_be_bytes()
 }
@@ -600,6 +620,7 @@ impl fmt::Display for Action {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Action::Disabled => write!(f, "disabled"),
+            a if a == PROFILE_NEXT => write!(f, "{PROFILE_NEXT_NAME}"),
             Action::Mouse(b) => write!(f, "{}", mouse_name(b)),
             Action::DoubleClick => write!(f, "double-click"),
             Action::Key { modifiers, usage } => write!(f, "key:{}", combo_name(modifiers, usage)),
@@ -656,6 +677,7 @@ impl FromStr for Action {
             "profile-cycle-up" => Action::ProfileCycleUp,
             "profile-cycle-down" => Action::ProfileCycleDown,
             "hypershift" => Action::HyperShift,
+            PROFILE_NEXT_NAME => PROFILE_NEXT,
             _ => {
                 let (kind, arg) = s.split_once(':').ok_or_else(bad)?;
                 match kind {
@@ -850,6 +872,26 @@ impl Device {
         Some(ids)
     }
 
+    /// Whether this mouse has a profile button: in its own button list, or (when it has no
+    /// list) its profile button answers with a profile action. Verified on a Basilisk V3
+    /// (id 14, factory "profile-cycle-up").
+    pub fn has_profile_button(&self) -> bool {
+        if !matches!(self.spec.as_ref().map(|s| s.kind), Some(crate::Kind::Mouse)) {
+            return false;
+        }
+        match self.button_ids() {
+            Some(ids) => ids.contains(&PROFILE_BUTTON_ID),
+            None => self
+                .button(PROFILE_BUTTON_ID, Layer::Normal)
+                .is_ok_and(|a| a.is_onboard_profile() || a == PROFILE_NEXT),
+        }
+    }
+
+    /// Whether the profile button sends "next Secretarybird profile" right now.
+    pub fn profile_button_is_next(&self) -> bool {
+        self.button(PROFILE_BUTTON_ID, Layer::Normal).is_ok_and(|a| a == PROFILE_NEXT)
+    }
+
     /// Buttons this device has, with their current (live, normal-layer) action. Empty for
     /// devices without on-board button assignments. Uses the mouse's own button list, or
     /// asks about each known button id when it has none (a mouse behind a receiver may
@@ -904,12 +946,23 @@ mod tests {
             "macro:12@3",
             "macro:300@hold",
             "macro:5@toggle",
+            "secbird-profile-next",
         ] {
             let a: Action = text.parse().unwrap();
             assert_eq!(a.to_string(), text, "text round trip");
             let (function, _, data) = a.encode();
             assert_eq!(Action::decode(function, data), a, "byte round trip for {text}");
         }
+    }
+
+    #[test]
+    fn profile_next_is_a_combo_no_keyboard_sends() {
+        // Ctrl (0x01) + Shift (0x02) + Alt (0x04), F24 (HID usage 0x73).
+        assert_eq!(PROFILE_NEXT.encode(), (2, 2, [0x07, 0x73, 0, 0, 0]));
+        assert_eq!("key:ctrl+shift+alt+f24".parse::<Action>().unwrap(), PROFILE_NEXT);
+        assert_eq!(Action::decode(2, [0x07, 0x73, 0, 0, 0]).to_string(), PROFILE_NEXT_NAME);
+        assert!(Action::ProfileCycleUp.is_onboard_profile());
+        assert!(!PROFILE_NEXT.is_onboard_profile());
     }
 
     #[test]
