@@ -1,27 +1,30 @@
-; Secretarybird installer (Inno Setup 6).
+; Occam installer (Inno Setup 6).
 ; Build:  cargo build --release
 ;         ISCC.exe /DAppVersion=0.1.0 installer\secbird.iss
-; Output: target\installer\Secretarybird-Setup-<version>.exe
+; Output: target\installer\Occam-Setup-<version>.exe
 ;
 ; Installs for the current user only (no administrator prompt) into
-; %LOCALAPPDATA%\Programs\Secretarybird. Settings stay in %APPDATA%\Secretarybird.
+; %LOCALAPPDATA%\Programs\Occam. Settings stay in %APPDATA%\occam-rzr.
 
 #ifndef AppVersion
   #define AppVersion "0.0.0-dev"
 #endif
-#define AppName "Secretarybird"
-#define TrayExe "secbird-tray.exe"
+#define AppName "Occam"
+; Settings folder and file names.
+#define FileName "occam-rzr"
+#define TrayExe "occam-rzr-tray.exe"
 
 [Setup]
-; Never change AppId: Windows uses it to find the existing install on upgrade.
-AppId={{6E3A1F52-8C4D-4B7E-9A21-5D0C3B8F7E14}
+; Never change AppId: Windows uses it to find the existing install on upgrade. Occam has
+; its own (Secretarybird's was {6E3A1F52-8C4D-4B7E-9A21-5D0C3B8F7E14}), so it never installs over it.
+AppId={{244AE420-EED3-409A-ADBB-FACA8AABA98B}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
-AppPublisher=Secretarybird contributors
-AppPublisherURL=https://github.com/infinityInfinite/secbird
-AppSupportURL=https://github.com/infinityInfinite/secbird/issues
-AppUpdatesURL=https://github.com/infinityInfinite/secbird/releases
+AppPublisher=Occam contributors
+AppPublisherURL=https://github.com/Aristotelesqc/occam-rzr
+AppSupportURL=https://github.com/Aristotelesqc/occam-rzr/issues
+AppUpdatesURL=https://github.com/Aristotelesqc/occam-rzr/releases
 PrivilegesRequired=lowest
 DefaultDirName={autopf}\{#AppName}
 DisableProgramGroupPage=yes
@@ -31,7 +34,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 SourceDir=..
 OutputDir=target\installer
-OutputBaseFilename=Secretarybird-Setup-{#AppVersion}
+OutputBaseFilename=Occam-Setup-{#AppVersion}
 SetupIconFile=assets\secretarybird.ico
 UninstallDisplayIcon={app}\{#TrayExe}
 UninstallDisplayName={#AppName}
@@ -46,11 +49,11 @@ ChangesEnvironment=yes
 [Tasks]
 Name: "autostart"; Description: "Start {#AppName} with Windows (applies your profiles at sign-in)"
 Name: "desktopicon"; Description: "Desktop shortcut"; Flags: unchecked
-Name: "addtopath"; Description: "Add the secbird command line to PATH"; Flags: unchecked
+Name: "addtopath"; Description: "Add the occam-rzr command line to PATH"; Flags: unchecked
 
 [Files]
-Source: "target\release\secbird-tray.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "target\release\secbird.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "target\release\occam-rzr-tray.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "target\release\occam-rzr.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE-MIT"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE-APACHE"; DestDir: "{app}"; Flags: ignoreversion
@@ -72,7 +75,7 @@ Filename: "{sys}\taskkill.exe"; Parameters: "/IM {#TrayExe} /F"; Flags: runhidde
 
 [Code]
 const
-  TrayClass = 'SecretarybirdTray';
+  TrayClass = 'OccamTray';
   RunKey = 'Software\Microsoft\Windows\CurrentVersion\Run';
   EnvKey = 'Environment';
 
@@ -152,12 +155,12 @@ begin
   RegDeleteValue(HKCU, RunKey, '{#AppName}');
   RemoveFromPath(ExpandConstant('{app}'));
 
-  Settings := ExpandConstant('{userappdata}\{#AppName}');
+  Settings := ExpandConstant('{userappdata}\{#FileName}');
   if UninstallSilent or not DirExists(Settings) then Exit;
   Msg := 'Also delete your profiles and settings?' + #13#10 + Settings + #13#10#13#10 +
          'Choose No to keep them for a later reinstall.';
   if FileExists(Settings + '\debloat-backup.json') then
-    Msg := Msg + #13#10#13#10 + 'It also holds the backup made by "secbird debloat apply". ' +
+    Msg := Msg + #13#10#13#10 + 'It also holds the backup made by "occam-rzr debloat apply". ' +
            'If you may want Razer''s services back later, choose No.';
   if MsgBox(Msg, mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
     DelTree(Settings, True, True, True);

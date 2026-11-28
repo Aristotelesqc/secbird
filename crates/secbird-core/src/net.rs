@@ -33,7 +33,7 @@ fn fetch(host: &str, path: &str, max: usize, receive_ms: i32) -> Result<Option<V
     }
     let fail = |what: &str| Error::Unsupported(format!("couldn't reach {host} ({what}); check the internet connection"));
     unsafe {
-        let agent = wide(concat!("Secretarybird/", env!("CARGO_PKG_VERSION")));
+        let agent = wide(concat!("occam-rzr/", env!("CARGO_PKG_VERSION")));
         let session = Handle(WinHttpOpen(agent.as_ptr(), WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, null(), null(), 0));
         if session.0.is_null() {
             return Err(fail("open"));
@@ -100,7 +100,7 @@ fn fetch(host: &str, path: &str, max: usize, receive_ms: i32) -> Result<Option<V
     let out = std::process::Command::new("curl")
         .args(["--silent", "--location", "--proto", "=https", "--connect-timeout", "5"])
         .args(["--max-time", &(receive_ms / 1000 + 5).to_string(), "--max-filesize", &max.to_string()])
-        .args(["--user-agent", concat!("Secretarybird/", env!("CARGO_PKG_VERSION"))])
+        .args(["--user-agent", concat!("occam-rzr/", env!("CARGO_PKG_VERSION"))])
         .args(["--write-out", "\n%{http_code}", &format!("https://{host}{path}")])
         .output()
         .map_err(|e| fail(&format!("curl: {e}")))?;

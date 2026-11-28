@@ -31,7 +31,7 @@ pub fn running() -> Vec<String> {
     let mut list = BTreeSet::new();
     unsafe { EnumWindows(Some(each), &mut list as *mut _ as LPARAM) };
     // Windows' own shell windows are never a game.
-    for exe in ["explorer.exe", "applicationframehost.exe", "textinputhost.exe", "secbird-tray.exe"] {
+    for exe in ["explorer.exe", "applicationframehost.exe", "textinputhost.exe", "occam-rzr-tray.exe"] {
         list.remove(exe);
     }
     list.into_iter().collect()

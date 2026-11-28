@@ -108,7 +108,7 @@ pub struct DeviceProfiles {
 }
 
 /// A profile's button remaps saved in one of the mouse's on-board slots, so they work
-/// without Secretarybird (on another PC, on Linux, before the tray starts, after sleep).
+/// without Occam (on another PC, on Linux, before the tray starts, after sleep).
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct OnboardSave {
     /// The on-board slot written: the one active when saving (1-5).
@@ -117,7 +117,7 @@ pub struct OnboardSave {
     pub profile: String,
     #[serde(default)]
     pub buttons: BTreeMap<String, String>,
-    /// What each written button held before Secretarybird first wrote it (Synapse's or the
+    /// What each written button held before Occam first wrote it (Synapse's or the
     /// factory setting), to put back.
     #[serde(default)]
     pub before: BTreeMap<String, String>,

@@ -446,7 +446,7 @@ impl Device {
     }
 
     fn no_lighting(&self) -> Error {
-        Error::Unsupported(format!("lighting on {} uses a protocol Secretarybird doesn't speak yet", self.name()))
+        Error::Unsupported(format!("lighting on {} uses a protocol Occam doesn't speak yet", self.name()))
     }
 
     /// Brightness 0-100 %.

@@ -330,7 +330,7 @@ const FN_SCROLL_MODE: u8 = 18;
 /// Synapse's default turbo rate.
 pub const DEFAULT_TURBO_RATE: u8 = 7;
 
-/// "Next Secretarybird profile": the mouse sends Ctrl+Alt+Shift+F24, a combo no keyboard
+/// "Next Occam profile": the mouse sends Ctrl+Alt+Shift+F24, a combo no keyboard
 /// has, and the tray (which registers it as a hotkey) moves that mouse to its next
 /// profile. Named `secbird-profile-next` in profiles.json and the CLI. Synapse did the
 /// same job in driver mode; out of it, the mouse's own profile button only cycles its
@@ -660,7 +660,7 @@ impl FromStr for Action {
 
     fn from_str(s: &str) -> Result<Self> {
         let s = s.trim().to_ascii_lowercase();
-        let bad = || Error::InvalidArg(format!("unknown action '{s}' (see `secbird button --help`)"));
+        let bad = || Error::InvalidArg(format!("unknown action '{s}' (see `occam-rzr button --help`)"));
         let num = |v: &str| v.parse::<u16>().map_err(|_| bad());
         if let Some(m) = MOUSE_NAMES.iter().find(|m| m.1 == s) {
             return Ok(Action::Mouse(m.0));
@@ -887,7 +887,7 @@ impl Device {
         }
     }
 
-    /// Whether the profile button sends "next Secretarybird profile" right now.
+    /// Whether the profile button sends "next Occam profile" right now.
     pub fn profile_button_is_next(&self) -> bool {
         self.button(PROFILE_BUTTON_ID, Layer::Normal).is_ok_and(|a| a == PROFILE_NEXT)
     }

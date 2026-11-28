@@ -1,4 +1,4 @@
-"""Restate OpenRazer's device facts as Secretarybird's devices.json.
+"""Restate OpenRazer's device facts as Occam's devices.json.
 
 OpenRazer (GPL-2.0) is the public reference for Razer hardware. This script reads
 facts from a local checkout -- product ids, names, device type, DPI maximum, key

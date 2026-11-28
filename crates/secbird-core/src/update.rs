@@ -1,4 +1,4 @@
-//! Is there a newer Secretarybird? Reads the latest published release of the repository
+//! Is there a newer Occam? Reads the latest published release of the repository
 //! this build came from (GitHub's public API; drafts and pre-releases are never "latest").
 //! Updating, when the user asks: download that release's installer, check it was signed with
 //! the maintainer's key, and run it silently. The installer keeps settings and profiles,
@@ -73,7 +73,7 @@ pub fn installed() -> bool {
 }
 
 fn installer_name(version: &str) -> String {
-    format!("Secretarybird-Setup-{version}.exe")
+    format!("Occam-Setup-{version}.exe")
 }
 
 /// Download `version`'s installer and its signature from the release, check the signature,
@@ -85,13 +85,13 @@ pub fn download_installer(version: &str) -> Result<std::path::PathBuf> {
     let name = installer_name(version);
     let base = format!("/{}/releases/download/v{version}/{name}", repo());
     let missing = |what: &str| {
-        Error::Unsupported(format!("Secretarybird {version} has no {what} to update from; download it from the release page instead"))
+        Error::Unsupported(format!("Occam {version} has no {what} to update from; download it from the release page instead"))
     };
     let sig = crate::net::download("github.com", &format!("{base}.sig"))?.ok_or_else(|| missing("signature"))?;
     let exe = crate::net::download("github.com", &base)?.ok_or_else(|| missing("installer"))?;
     verify(&name, &exe, &String::from_utf8_lossy(&sig))?;
     let save = |e: std::io::Error| Error::System(format!("couldn't save the update: {e}"));
-    let dir = std::env::temp_dir().join("Secretarybird-update");
+    let dir = std::env::temp_dir().join("Occam-update");
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).map_err(save)?;
     let path = dir.join(&name);
@@ -114,7 +114,7 @@ pub fn run_installer(path: &std::path::Path) -> Result<()> {
 fn verify(name: &str, exe: &[u8], sig_hex: &str) -> Result<()> {
     let bad = || {
         Error::Unsupported(
-            "the downloaded installer isn't signed with Secretarybird's key, so it was not run. Download it from the release page if you want it anyway".into(),
+            "the downloaded installer isn't signed with Occam's key, so it was not run. Download it from the release page if you want it anyway".into(),
         )
     };
     let sig = from_hex(sig_hex.trim()).filter(|s| s.len() == 64).ok_or_else(bad)?;
@@ -204,19 +204,21 @@ mod tests {
         assert!(newer_than("0.4.0", moved).unwrap().is_some(), "the organization the repository moves to");
     }
 
-    /// Signed with the release key, the way tools/sign-release.ps1 signs.
+    /// Signed with the release key, the way tools/sign-release.ps1 signs. That key is still
+    /// upstream's (our own comes with #27), so the fixture is upstream's installer name.
     #[test]
     #[cfg(windows)]
     fn only_a_signed_installer_passes() {
         let sig = "6b37f8d9acc178cbe15a39292f10c64e2c481a4f253acb79e05a617f538f43112e59f590e38026e5d09cf40f3cc8a2eb4e156b0e9e892574847f93f987fe8437";
-        let name = installer_name("0.0.1");
-        assert!(verify(&name, b"test installer", sig).is_ok());
-        assert!(verify(&name, b"test installer", &format!("{sig}\n")).is_ok(), "the .sig file ends in a newline");
-        assert!(verify(&name, b"test installeR", sig).is_err(), "changed installer");
-        assert!(verify(&installer_name("0.0.2"), b"test installer", sig).is_err(), "signed for another version");
-        assert!(verify(&name, b"test installer", &sig.replace('6', "7")).is_err(), "changed signature");
-        assert!(verify(&name, b"test installer", "").is_err());
-        assert!(verify(&name, b"test installer", "zz").is_err());
+        let name = "Secretarybird-Setup-0.0.1.exe";
+        assert_eq!(installer_name("0.0.1"), "Occam-Setup-0.0.1.exe");
+        assert!(verify(name, b"test installer", sig).is_ok());
+        assert!(verify(name, b"test installer", &format!("{sig}\n")).is_ok(), "the .sig file ends in a newline");
+        assert!(verify(name, b"test installeR", sig).is_err(), "changed installer");
+        assert!(verify("Secretarybird-Setup-0.0.2.exe", b"test installer", sig).is_err(), "signed for another version");
+        assert!(verify(name, b"test installer", &sig.replace('6', "7")).is_err(), "changed signature");
+        assert!(verify(name, b"test installer", "").is_err());
+        assert!(verify(name, b"test installer", "zz").is_err());
     }
 
     #[test]

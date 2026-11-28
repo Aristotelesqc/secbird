@@ -1,10 +1,15 @@
 [package]
 name = "secbird-tray"
-description = "Secretarybird tray app: applies profiles on plug-in and wake"
+description = "Occam tray app: applies profiles on plug-in and wake"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+
+# The crate keeps upstream's name (easy merges); the executable is ours.
+[[bin]]
+name = "occam-rzr-tray"
+path = "src/main.rs"
 
 [dependencies]
 secbird-core = { path = "../secbird-core" }

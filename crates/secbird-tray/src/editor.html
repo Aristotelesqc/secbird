@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Secretarybird</title>
+<title>Occam</title>
 <link rel="icon" type="image/png" href="{{LOGO}}">
 <style>
   /* Themes. Each sets every token; the accent means live, selected, changed or focused, and
@@ -870,7 +870,7 @@
 </head>
 <body>
 <header class="top">
-  <button class="brand" id="home" title="All devices"><img src="{{LOGO}}" alt="">Secretarybird</button>
+  <button class="brand" id="home" title="All devices"><img src="{{LOGO}}" alt="">Occam</button>
   <div class="scrollrow" id="tabsRow"><nav class="tabs" id="tabs" aria-label="Devices"></nav></div>
   <div class="actions">
     <div class="sync" id="sync" hidden>
@@ -886,7 +886,7 @@
     <button class="ghost gear" id="gear" title="Settings" aria-label="Settings" aria-pressed="false"></button>
   </div>
 </header>
-<p class="banner" id="synBanner" hidden>Razer Synapse is running and can overwrite these settings. Close it, or run <code>secbird debloat</code> to stop it starting with Windows.</p>
+<p class="banner" id="synBanner" hidden>Razer Synapse is running and can overwrite these settings. Close it, or run <code>occam-rzr debloat</code> to stop it starting with Windows.</p>
 
 <main id="main">
   <p class="empty" id="empty" hidden>No Razer devices found. Plug one in, then press Rescan.</p>
@@ -941,7 +941,7 @@
 </script>
 <script>
 const languagePreference = document.documentElement.dataset.editorLanguage || 'auto';
-const uiI18n = SecretarybirdI18n.create({ preference: languagePreference, languages: navigator.languages || [navigator.language] });
+const uiI18n = OccamI18n.create({ preference: languagePreference, languages: navigator.languages || [navigator.language] });
 const uiText = uiI18n.text;
 uiI18n.applyStatic(document);
 
@@ -1015,7 +1015,7 @@ function knownLayout(m, kind) {
   const placed = PLACED[m.rows + 'x' + (m.cols - shift) + ':' + kind];
   return placed ? nameKeys(placed.map(([label, row, col, x, y, w, h]) => ({ label, row, col: col + shift, x, y, w, h }))) : null;
 }
-// Each drawn key's remap name (`secbird key`), from its label and where it sits: the second
+// Each drawn key's remap name (`occam-rzr key`), from its label and where it sits: the second
 // Shift, Ctrl or Alt in a row is the right one, and keys from x 18.4 on are the numpad.
 const KEY_NAMES = { Esc: 'esc', '`': 'grave', '-': 'minus', '=': 'equal', Backspace: 'backspace', Tab: 'tab', '[': 'lbracket',
   ']': 'rbracket', '\\': 'backslash', Caps: 'capslock', ';': 'semicolon', "'": 'quote', Enter: 'enter', ',': 'comma', '.': 'period',
@@ -1588,7 +1588,7 @@ function keyTiles(t, cur) {
   if (!cur.rows.length) {
     t.append(el('p', { className: 'hint', textContent: btnFailed[dev.id] ? uiText('Couldn’t read the keys. Unplug and replug it, then open this again.')
       : btnLayer === 'hypershift' ? uiText`This ${holder()} has no HyperShift layer to change.`
-      : uiText`Key remapping isn’t supported on this ${holder()} yet. It doesn’t take Razer’s remap commands, so it needs a remap done by Secretarybird itself, which isn’t built yet.` }));
+      : uiText`Key remapping isn’t supported on this ${holder()} yet. It doesn’t take Razer’s remap commands, so it needs a remap done by Occam itself, which isn’t built yet.` }));
     return;
   }
   const rows = new Map(cur.rows.map(r => [r.key, r])), drawn = new Set(), keys = remapLayout();
@@ -1823,7 +1823,7 @@ const differs = (key, name) => name !== dev.active && cellValue(key, name) !== c
 // mouse saved. Other columns get their mark from differs().
 function cellView(key, name) {
   const p = prof(name), active = name === dev.active;
-  if (key === 'lighting-control') return [dev.lighting_control ? 'Secretarybird' : `<span class="unset">${esc(uiText('Not controlled'))}</span>`];
+  if (key === 'lighting-control') return [dev.lighting_control ? 'Occam' : `<span class="unset">${esc(uiText('Not controlled'))}</span>`];
   if (key === 'onboard') {
     const o = onboardData[dev.id];
     if (!o) return [`<span class="unset">${esc(uiText('Not saved'))}</span>`];
@@ -2199,7 +2199,7 @@ function appsEditor(box, noDelete) {
 function lightingControlEditor(box) {
   const target = dev;
   const input = el('input', { type: 'checkbox', className: 'switch', id: 'lightingControl', checked: dev.lighting_control,
-    ariaLabel: uiText('Secretarybird controls lighting') });
+    ariaLabel: uiText('Occam controls lighting') });
   input.setAttribute('aria-describedby', 'lightingControlHelp');
   input.onchange = async () => {
     const enabled = input.checked;
@@ -2213,7 +2213,7 @@ function lightingControlEditor(box) {
     input.disabled = false;
   };
   box.append(el('div', { className: 'edgroup' },
-    el('div', { className: 'row' }, input, el('label', { htmlFor: 'lightingControl', textContent: uiText('Secretarybird controls lighting') })),
+    el('div', { className: 'row' }, input, el('label', { htmlFor: 'lightingControl', textContent: uiText('Occam controls lighting') })),
     el('p', { className: 'note', id: 'lightingControlHelp', textContent: uiText('Off leaves this device’s RGB untouched so another app can control it. Sync, profile changes, startup and wake skip its lighting. DPI, buttons and other settings still work.') })),
     el('p', { className: 'note', textContent: uiText('Applies to this device, across all profiles. Saved colors are kept. Turning this on sends nothing immediately; edit lighting or apply a profile to use them again.') }));
 }
@@ -2258,7 +2258,7 @@ function zoneEditor(box, name) {
       else { record(name, { off: true }); await api('/api/off', { zone: name }); toast(label(name) + uiText(' off · saved to ') + dev.active); }
     } catch (err) { toast(err.message, true); }
   };
-  if (studioOn(dev.profile)) box.append(el('p', { className: 'note', textContent: uiText('Studio is on, so the device shows its layers. This is what it shows by itself, with Secretarybird closed.') }));
+  if (studioOn(dev.profile)) box.append(el('p', { className: 'note', textContent: uiText('Studio is on, so the device shows its layers. This is what it shows by itself, with Occam closed.') }));
   box.append(effectGroup(name),
     el('div', { className: 'edgroup' }, el('h3', { textContent: label(name) + uiText(' color') }), presets, custom),
     el('div', { className: 'edgroup' }, el('h3', { textContent: uiText('Brightness') }), el('div', { className: 'row' }, bright, val),
@@ -2320,7 +2320,7 @@ function effectGroup(name) {
     note.textContent = savedKind && unsupported.includes(savedKind)
       ? uiText`The saved ${savedKind} effect is not supported on this device. Choose an available effect to replace it.`
       : k === 'battery'
-      ? uiText('Green when the mouse is charged, through yellow and orange to red when it’s nearly empty. Secretarybird updates it every 5 minutes.')
+      ? uiText('Green when the mouse is charged, through yellow and orange to red when it’s nearly empty. Occam updates it every 5 minutes.')
       : uiText('Runs on the device itself. Not every device has every effect; it says so if not.');
     dir.hidden = speed.hidden = k !== 'wave';
     dur.hidden = !(k === 'reactive' || k === 'starlight');
@@ -2518,7 +2518,7 @@ async function pollStudio() {
     const r = await api('/api/studio-frame', {});
     paintStudio(r.colors);
     setStudioStatus(!studio.scene.layers.length ? ['idle', uiText('No layers: the device shows its zone colors')]
-      : r.failing ? ['err', uiText('Not taking frames. Asleep? Secretarybird keeps trying')]
+      : r.failing ? ['err', uiText('Not taking frames. Asleep? Occam keeps trying')]
       : r.streaming ? ['live', uiText('Live on the device')]
       : dev.lighting_control ? ['wait', uiText('Starting…')] : ['idle', uiText('Lighting control is off for this device')]);
   } catch { }
@@ -2682,7 +2682,7 @@ function sceneGroup() {
         const before = structuredClone(studio.scene); studio.scene = { layers: [] }; studioChanged(true);
         toast(uiText('Studio off · zone colors are back'), false, () => { studio.scene = before; studioChanged(true); });
       } }) : ''),
-    el('p', { className: 'note', textContent: uiText('Runs while Secretarybird is running. Closed, the device shows its zone colors. Wireless devices get 10 frames a second to save battery.') }));
+    el('p', { className: 'note', textContent: uiText('Runs while Occam is running. Closed, the device shows its zone colors. Wireless devices get 10 frames a second to save battery.') }));
 }
 
 function layersGroup(ls) {
@@ -2943,7 +2943,7 @@ const STUDIO_TIPS = [
   [uiText('Start from a scene'), uiText('Pick one on the right, or press Add layer for a single effect.')],
   [uiText('Stack layers'), uiText('The top layer covers the ones below. Blend “Lit parts only” puts sparks or ripples over a background.')],
   [uiText('Pick the lights'), uiText('Click or drag across the drawing to put a layer on some keys or zones only.')],
-  [uiText('It runs from your PC'), uiText('Live while Secretarybird runs. Closed, each device shows its own zone colors.')],
+  [uiText('It runs from your PC'), uiText('Live while Occam runs. Closed, each device shows its own zone colors.')],
 ];
 function renderStudioPage() {
   const page = $('studioPage'), list = studioDevices();
@@ -3544,18 +3544,18 @@ function sensorsEditor(box) {
   const host = el('div', { className: 'readouts', id: 'pwrReadouts', role: 'status', ariaLive: 'off' });
   drawReadouts(host);
   box.append(el('div', { className: 'edgroup' }, el('h3', { textContent: uiText('Right now') }), host),
-    el('p', { className: 'note', textContent: uiText('Read from the laptop every 3 seconds while this section is open. The fans follow the performance mode; Secretarybird never sets their speed.') }),
+    el('p', { className: 'note', textContent: uiText('Read from the laptop every 3 seconds while this section is open. The fans follow the performance mode; Occam never sets their speed.') }),
     el('p', { className: 'note', textContent: uiText('The temperatures come from the laptop’s controller, which sits near the chips, so they read lower than the CPU’s own sensor.') }));
 }
 
 // Save to mouse: the profile's button remaps written into the mouse's on-board slot, so they
-// work without Secretarybird. Remaps are live only until then. Put back undoes it.
+// work without Occam. Remaps are live only until then. Put back undoes it.
 function onboardEditor(box) {
   const o = onboardData[dev.id], n = Object.keys(dev.profile.buttons || {}).length;
-  const status = !o ? uiText('Your button remaps work while Secretarybird is running. Saved on the mouse, they also work on another PC, on Linux or macOS, and before Secretarybird starts.')
+  const status = !o ? uiText('Your button remaps work while Occam is running. Saved on the mouse, they also work on another PC, on Linux or macOS, and before Occam starts.')
     : o.profile !== dev.active ? uiText`${o.profile} is saved in on-board slot ${o.slot}. Saving ${dev.active} replaces it.`
     : o.changed ? uiText`${o.profile} was saved in on-board slot ${o.slot} and has changed since. Save again to update the mouse.`
-    : uiText`${o.profile} is saved in on-board slot ${o.slot} (${plural(o.count, 'remapped button')}). It works without Secretarybird.`;
+    : uiText`${o.profile} is saved in on-board slot ${o.slot} (${plural(o.count, 'remapped button')}). It works without Occam.`;
   const done = (r, msg) => { btnData[dev.id] = r.buttons; onboardData[dev.id] = r.onboard; sel = 'onboard'; renderWork(); toast(msg); };
   const save = el('button', { className: 'ghost', textContent: o && o.profile === dev.active ? uiText('Save again') : uiText('Save ') + dev.active + uiText(' to the mouse'),
     onclick: async e => {
@@ -3577,7 +3577,7 @@ function onboardEditor(box) {
     } });
   const putBack = o && el('button', { className: 'ghost', textContent: uiText('Put back what the mouse had'), onclick: async e => {
     e.target.disabled = true;
-    try { done(await api('/api/put-back', {}), uiText('The mouse has its own settings back. Your remaps still work while Secretarybird runs.')); }
+    try { done(await api('/api/put-back', {}), uiText('The mouse has its own settings back. Your remaps still work while Occam runs.')); }
     catch (err) { toast(err.message, true); e.target.disabled = false; }
   } });
   box.append(el('div', { className: 'edgroup' }, el('p', { textContent: status }),
@@ -3719,7 +3719,7 @@ function firmwareCheck() {
 }
 
 // ---------- Buttons ----------
-// Values are action texts, as in `secbird button`.
+// Values are action texts, as in `occam-rzr button`.
 const BTN_CHOICES = [
   [uiText('Mouse'), [['left', uiText('Left click')], ['right', uiText('Right click')], ['middle', uiText('Middle click')], ['back', uiText('Back')],
     ['forward', uiText('Forward')], ['double-click', uiText('Double click')], ['scroll-up', uiText('Scroll up')], ['scroll-down', uiText('Scroll down')],
@@ -3733,7 +3733,7 @@ const BTN_CHOICES = [
   [uiText('Media'), [['media:volume-up', uiText('Volume up')], ['media:volume-down', uiText('Volume down')], ['media:mute', uiText('Mute')],
     ['media:play-pause', uiText('Play / pause')], ['media:next-track', uiText('Next track')], ['media:previous-track', uiText('Previous track')]]],
   [uiText('Macro'), [['macro', uiText('Play a macro…')]]],
-  [uiText('Other'), [['hypershift', uiText('HyperShift (hold)')], ['secbird-profile-next', uiText('Next Secretarybird profile')], ['profile-cycle-up', uiText('Next on-board profile')],
+  [uiText('Other'), [['hypershift', uiText('HyperShift (hold)')], ['secbird-profile-next', uiText('Next Occam profile')], ['profile-cycle-up', uiText('Next on-board profile')],
     ['scroll-mode:1', uiText('Switch wheel free-spin')], ['disabled', uiText('Disabled')]]],
 ];
 const CHOICE_LABEL = Object.fromEntries(BTN_CHOICES.flatMap(g => g[1]));
@@ -4253,7 +4253,7 @@ const peCats = () => [
   ['turbo', uiText('Turbo')],
   ['hs', 'HyperShift', [['hypershift', uiText('HyperShift (hold)')]]],
   ['wheel', uiText('Scroll wheel'), [['scroll-mode:1', uiText('Switch wheel free-spin')]]],
-  ['profiles', uiText('Profiles'), [['secbird-profile-next', uiText('Next Secretarybird profile')], ['profile-cycle-up', uiText('Next on-board profile')]]],
+  ['profiles', uiText('Profiles'), [['secbird-profile-next', uiText('Next Occam profile')], ['profile-cycle-up', uiText('Next on-board profile')]]],
   ['off', uiText('Disabled'), [['disabled', uiText('Disabled')]]],
 ].filter(Boolean);
 function peCatOf(a) {
@@ -4451,7 +4451,7 @@ function peBar() {
     const how = el('span', { className: 'seg', role: 'group', ariaLabel: uiText('Show as') });
     [[false, uiText('Drawing')], [true, uiText('List')]].forEach(([v, text]) => how.append(el('button', { textContent: text, ariaPressed: peList === v, onclick: () => { peList = v; renderPE(true); } })));
     const onboardBtn = el('button', { className: 'ghost', textContent: uiText('On-board memory…'), ariaPressed: peAside === 'onboard',
-      title: uiText('Save the remaps into the mouse so they work without Secretarybird'),
+      title: uiText('Save the remaps into the mouse so they work without Occam'),
       onclick: () => { peAside = peAside === 'onboard' ? null : 'onboard'; renderPE(); } });
     const restoreCtl = restoreAllControl(() => peBar());
     bar.append(hsWrap, how, onboardBtn, el('span', { className: 'grow' }));
@@ -4479,7 +4479,7 @@ function peBar() {
   } else {
     peHsHelp = false;
     if (peTab === 'perf') bar.append(el('p', { className: 'hint', textContent: uiText('DPI stages, polling rate and scroll wheel of ') + dev.active + '.' }));
-    else if (peTab === 'light') bar.append(el('p', { className: 'hint', textContent: dev.lighting_control ? uiText('Pick a zone on the mouse to set its color.') : uiText('Secretarybird leaves this mouse’s lighting alone.') }));
+    else if (peTab === 'light') bar.append(el('p', { className: 'hint', textContent: dev.lighting_control ? uiText('Pick a zone on the mouse to set its color.') : uiText('Occam leaves this mouse’s lighting alone.') }));
     else bar.append(el('p', { className: 'hint', textContent: uiText('Macros live on the mouse and can be played by any button, in every profile.') }));
   }
 }
@@ -5051,7 +5051,7 @@ function renderSettings() {
 
   // Startup and games
   const startup = group(uiText('Startup and games'),
-    row(uiText('Start with Windows'), uiText('Your settings go back on as soon as you sign in. Off means they only apply while Secretarybird is running.'), ...traySwitch('autostart', uiText('Start with Windows'))),
+    row(uiText('Start with Windows'), uiText('Your settings go back on as soon as you sign in. Off means they only apply while Occam is running.'), ...traySwitch('autostart', uiText('Start with Windows'))),
     row(uiText('Switch profiles with games'), uiText('A profile tied to a program comes up while that program is in front, and goes back after.'), ...traySwitch('auto_switch', uiText('Switch profiles with games'))),
     row(uiText('Lights when away'), uiText('While the PC is locked or its screen is off, the lights dim to a quarter or turn off, and come back when you return. Nothing is saved on the devices.'),
       seg(uiText('Lights when away'), [['', uiText('Leave on')], ['dim', uiText('Dim')], ['off', uiText('Off')]], a.away_lights || '', async v => {
@@ -5098,12 +5098,12 @@ function renderSettings() {
       const r = await api('/api/update-check', {});
       if (!r.latest) checkOut.replaceChildren(uiText('You’re up to date'));
       else {
-        const link = el('a', { href: r.url, target: '_blank', rel: 'noopener noreferrer', textContent: 'Secretarybird ' + r.latest + uiText(' is out') });
+        const link = el('a', { href: r.url, target: '_blank', rel: 'noopener noreferrer', textContent: 'Occam ' + r.latest + uiText(' is out') });
         const go = el('button', { className: 'ghost', textContent: uiText('Update now'), onclick: async () => {
           go.disabled = true;
           try {
             await api('/api/update-install', {});
-            checkOut.replaceChildren(uiText('Updating to ') + r.latest + uiText('. Secretarybird restarts in a few seconds; open the editor again from the tray.'));
+            checkOut.replaceChildren(uiText('Updating to ') + r.latest + uiText('. Occam restarts in a few seconds; open the editor again from the tray.'));
           } catch (e) { go.disabled = false; toast(e.message, true); }
         } });
         checkOut.replaceChildren(link, ...(r.installed ? [' ', go] : []));
@@ -5116,7 +5116,7 @@ function renderSettings() {
     row(uiText('Low battery warning'), uiText('A notification when a wireless device drops to ') + a.battery_warning_at + '%.',
       batteryLevel(),
       ...traySwitch('battery_warning', uiText('Low battery warning'))),
-    row(uiText('New version notices'), uiText('Once a day, asks GitHub whether a newer Secretarybird is out. Nothing else is sent.'), checkOut, checkBtn, ...traySwitch('updates', uiText('New version notices'))),
+    row(uiText('New version notices'), uiText('Once a day, asks GitHub whether a newer Occam is out. Nothing else is sent.'), checkOut, checkBtn, ...traySwitch('updates', uiText('New version notices'))),
     row(uiText('Weekly firmware check'), uiText('Once a week, asks Razer’s website whether newer firmware is out for your devices. It never installs anything.'), ...traySwitch('firmware_weekly', uiText('Weekly firmware check'))));
 
   // Profiles and backup
@@ -5128,7 +5128,7 @@ function renderSettings() {
       listSeq = null; // only the devices of that answer were taken: the next tick fetches the whole list
       dev = devices.find(d => dev && d.id === dev.id) || devices[0] || null;
       toast(r.added ? uiText('Added ') + plural(r.added, 'profile') + uiText('; yours were kept. Pick one in the profile list.') : uiText('Nothing new in that file'));
-    } catch (err) { toast(err instanceof SyntaxError ? uiText('That file isn’t a Secretarybird backup') : err.message, true); }
+    } catch (err) { toast(err instanceof SyntaxError ? uiText('That file isn’t an Occam backup') : err.message, true); }
     e.target.value = '';
   } });
   const backup = group(uiText('Profiles and backup'),
@@ -5136,7 +5136,7 @@ function renderSettings() {
       try {
         const data = await api('/api/export');
         const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
-        el('a', { href: url, download: 'secretarybird-profiles.json' }).click();
+        el('a', { href: url, download: 'occam-rzr-profiles.json' }).click();
         setTimeout(() => URL.revokeObjectURL(url), 5000);
       } catch (e) { toast(e.message, true); }
     } })),
@@ -5151,7 +5151,7 @@ function renderSettings() {
       const r = await api('/api/report', {});
       await navigator.clipboard.writeText(r.text);
       window.open(a.repository + '/issues/new?template=device-report.yml', '_blank', 'noopener');
-      toast(uiText('Report copied: paste it into “Output of secbird report”'));
+      toast(uiText('Report copied: paste it into “Output of occam-rzr report”'));
     } catch (e) { toast(e.message, true); }
     reportBtn.disabled = false; reportBtn.textContent = uiText('Copy report and open GitHub');
   } });
@@ -5176,8 +5176,8 @@ function renderSettings() {
     row(uiText('Device report'), uiText('A read-only description of your devices for a GitHub issue, when one is missing or misbehaves. Serial numbers are shortened.'), reportBtn),
     mice.length ? row(uiText('Restore all mouse buttons'), uiText('Every remapped button on every mouse back to what the mouse stores (factory or Synapse), and the remaps forgotten.'),
       restoreAllBtn) : null,
-    row(uiText('Razer Synapse'), a.synapse.length ? uiText('Running (') + a.synapse.join(', ') + uiText('). It can overwrite these settings. `secbird debloat` stops it starting with Windows.') : uiText('Not running. Good: nothing will overwrite your settings.')),
-    row(uiText('About'), 'Secretarybird ' + a.version + uiText('. Not affiliated with Razer. It goes online only for the daily version check and, if on, the weekly firmware check.'),
+    row(uiText('Razer Synapse'), a.synapse.length ? uiText('Running (') + a.synapse.join(', ') + uiText('). It can overwrite these settings. `occam-rzr debloat` stops it starting with Windows.') : uiText('Not running. Good: nothing will overwrite your settings.')),
+    row(uiText('About'), 'Occam ' + a.version + uiText('. Not affiliated with Razer. It goes online only for the daily version check and, if on, the weekly firmware check.'),
       el('a', { href: a.repository, target: '_blank', rel: 'noopener noreferrer', textContent: 'GitHub' })));
 
   box.replaceChildren(el('div', { className: 'set-wrap' },
@@ -5275,7 +5275,7 @@ function showState(s) {
   devices = s.devices; unsupported = s.unsupported || []; synapse = s.synapse || [];
   if (s.list !== undefined) listSeq = s.list;
   devices.forEach(d => { d.profile = d.profile || {}; d.profilesData = d.profilesData || {}; d.profilesData[d.active] = d.profile; });
-  if (s.version) $('home').title = 'Secretarybird ' + s.version + uiText(': all devices');
+  if (s.version) $('home').title = 'Occam ' + s.version + uiText(': all devices');
   const want = new URLSearchParams(location.search).get('d');
   const wanted = d => d.pid === want || d.id === want;
   dev = devices.find(d => dev && d.id === dev.id) || devices.find(wanted) || devices[0] || null;

@@ -1,5 +1,8 @@
 # Code signing policy
 
+> **Occam:** this is Secretarybird's signing policy, kept for reference. Occam doesn't publish
+> signed releases yet; its own signing key and policy come with issue #27.
+
 Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
 
 ## What is signed

@@ -25,10 +25,10 @@ jobs:
       - name: Tarball
         run: |
           version="${GITHUB_REF_NAME#v}"
-          name="secbird-$version-linux-x86_64"
+          name="occam-rzr-$version-linux-x86_64"
           mkdir -p "dist/$name"
-          cp target/x86_64-unknown-linux-musl/release/secbird packaging/linux/install.sh packaging/linux/70-secretarybird.rules README.md LICENSE-MIT LICENSE-APACHE NOTICE "dist/$name/"
-          chmod 755 "dist/$name/secbird" "dist/$name/install.sh"
+          cp target/x86_64-unknown-linux-musl/release/occam-rzr packaging/linux/install.sh packaging/linux/70-occam-rzr.rules README.md LICENSE-MIT LICENSE-APACHE NOTICE "dist/$name/"
+          chmod 755 "dist/$name/occam-rzr" "dist/$name/install.sh"
           tar -C dist -czf "dist/$name.tar.gz" "$name"
       - uses: actions/upload-artifact@v4
         with:
@@ -65,8 +65,8 @@ jobs:
         with:
           name: unsigned-exes
           path: |
-            target/release/secbird-tray.exe
-            target/release/secbird.exe
+            target/release/occam-rzr-tray.exe
+            target/release/occam-rzr.exe
           if-no-files-found: error
 
       # GitHub lists a new artifact on the run a moment after the upload finishes, and SignPath
@@ -100,7 +100,7 @@ jobs:
 
       - name: Use the signed exes
         if: vars.SIGNPATH_ORGANIZATION_ID != ''
-        run: cp signed/exes/secbird-tray.exe signed/exes/secbird.exe target/release/
+        run: cp signed/exes/occam-rzr-tray.exe signed/exes/occam-rzr.exe target/release/
 
       - name: Installer
         run: |
@@ -113,7 +113,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: unsigned-installer
-          path: target/installer/Secretarybird-Setup-${{ env.VERSION }}.exe
+          path: target/installer/Occam-Setup-${{ env.VERSION }}.exe
           if-no-files-found: error
 
       # GitHub lists a new artifact on the run a moment after the upload finishes, and SignPath
@@ -147,7 +147,7 @@ jobs:
 
       - name: Use the signed installer
         if: vars.SIGNPATH_ORGANIZATION_ID != ''
-        run: cp "signed/installer/Secretarybird-Setup-$VERSION.exe" target/installer/
+        run: cp "signed/installer/Occam-Setup-$VERSION.exe" target/installer/
 
       - uses: actions/download-artifact@v4
         with:
@@ -156,11 +156,11 @@ jobs:
 
       - name: Portable zip and checksums
         run: |
-          mkdir -p dist/Secretarybird
-          cp target/release/secbird-tray.exe target/release/secbird.exe README.md LICENSE-MIT LICENSE-APACHE dist/Secretarybird/
-          cp NOTICE dist/Secretarybird/NOTICE.txt
-          cp "target/installer/Secretarybird-Setup-$VERSION.exe" dist/
-          (cd dist && 7z a -tzip "Secretarybird-$VERSION-portable.zip" Secretarybird >/dev/null && rm -r Secretarybird)
+          mkdir -p dist/occam-rzr
+          cp target/release/occam-rzr-tray.exe target/release/occam-rzr.exe README.md LICENSE-MIT LICENSE-APACHE dist/occam-rzr/
+          cp NOTICE dist/occam-rzr/NOTICE.txt
+          cp "target/installer/Occam-Setup-$VERSION.exe" dist/
+          (cd dist && 7z a -tzip "occam-rzr-$VERSION-portable.zip" occam-rzr >/dev/null && rm -r occam-rzr)
           (cd dist && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt)
 
       - name: Release notes from CHANGELOG.md
@@ -176,4 +176,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" dist/* --draft --prerelease \
-            --title "Secretarybird $VERSION" --notes-file notes.md
+            --title "Occam $VERSION" --notes-file notes.md

@@ -1,15 +1,15 @@
-//! A small append-only log in the config folder (`secbird.log`), so failures that
+//! A small append-only log in the config folder (`occam-rzr.log`), so failures that
 //! happen in the background can be looked up later instead of vanishing.
 
 use std::io::Write;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-/// Rotated to `secbird.log.old` beyond this size, so it never grows without bound.
+/// Rotated to `occam-rzr.log.old` beyond this size, so it never grows without bound.
 const MAX_BYTES: u64 = 256 * 1024;
 
 pub fn path() -> PathBuf {
-    crate::config_dir().join("secbird.log")
+    crate::config_dir().join(format!("{}.log", crate::FILE_NAME))
 }
 
 pub fn append(msg: &str) {

@@ -18,8 +18,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: Secretarybird version
-      description: "`secbird --version`, or hover the tray icon"
+      label: Occam version
+      description: "`occam-rzr --version`, or hover the tray icon"
     validations:
       required: true
   - type: input
@@ -36,5 +36,5 @@ body:
     id: log
     attributes:
       label: Last lines of secbird.log
-      description: 'In %APPDATA%\Secretarybird\secbird.log (tray menu: Open settings folder)'
+      description: 'In %APPDATA%\occam-rzr\occam-rzr.log (tray menu: Open settings folder)'
       render: text
